@@ -1,0 +1,10 @@
+sudo nano /etc/security/limits.conf
+
+
+root hard nofile 20480
+root soft nofile 20480
+jl hard nofile 20480
+jl soft nofile 20480
+jl hard stack 2048
+jl soft stack 2048
+
