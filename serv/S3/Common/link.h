@@ -23,7 +23,6 @@
 #endif
 
 #include "kfifo.h"
-#include "msgClient.pb.h"
 
 //#define ENABLE_ENCRYPT 1
 
