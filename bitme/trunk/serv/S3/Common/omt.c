@@ -10,6 +10,11 @@
 #include <string.h>
 #include <assert.h>
 #include <inttypes.h>
+#ifdef WIN32
+	#include <malloc.h>
+#else
+	#include <alloca.h>
+#endif
 
 #include "omt.h"
 
@@ -373,7 +378,7 @@ int omt_get(struct omt_tree *tree,char *key,struct slice **v)
 	struct slice sl;
 	slice_init(&sl);
 	sl.size = strlen(key);
-	sl.data = calloc(sl.size, sizeof(char));
+	sl.data = alloca(sl.size * sizeof(char));
 	memcpy(sl.data,key,sl.size);
 	
 	uint32_t order = 0;
