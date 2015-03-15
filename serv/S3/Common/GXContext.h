@@ -5,6 +5,7 @@
 #include "GameTime.h"
 #include "packet_header.h"
 #include "link.h"
+#include "omt.h"
 
 
 
@@ -56,10 +57,12 @@ struct GXContext{
 	int	link_pool_size_;
 	Link *link_pool_;
 	
+	struct omt_tree *map_portal_;
+	
 	
 	GXContext():type_(0),layer_(0),header_type_(0),stat_(0),enable_encrypt_(false),link_pool_size_conf_(0),
 	link_pool_size_(0),read_buf_len_(0),write_fifo_len_(0),listening_socket_(-1),
-	callback_(0),link_cut_callback_(0),link_pool_(NULL),
+	callback_(0),link_cut_callback_(0),link_pool_(NULL),map_portal_(NULL),
 	#ifdef __USING_WINDOWS_IOCP
 		iocp_handle_(0)
 	#else

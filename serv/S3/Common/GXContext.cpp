@@ -244,6 +244,13 @@ int __kfifo_2_net(struct kfifo *fifo,intptr_t fd,u32 len)
 
 // =================================================================
 
+
+struct PortalPrint{
+	int stat_;
+	int pool_index_;
+};
+	
+
 bool GXContext::init(int type,int pool_size,int read_buf_len,int write_buf_len)
 {
 	type_ = type;
@@ -282,7 +289,14 @@ bool GXContext::init(int type,int pool_size,int read_buf_len,int write_buf_len)
 	
 	stat_ = 1;
 	
+	map_portal_ = omt_new();
+	
 	return true;
+}
+
+void GXContext::free()
+{
+	// @TODO
 }
 
 
@@ -357,11 +371,102 @@ Link* GXContext::getLink(int pool_index)
 
 void GXContext::bindLinkWithGlobalID(char *gid,Link *l)
 {
+	if(NULL==gid || NULL==l) return;
+	
 	strncpy(l->link_id_,gid,LINK_ID_LEN-1);
+	
+	struct PortalPrint aa;
+	aa.stat_ = 1;
+	aa.pool_index_ = l->pool_index_;
+	
+	omt_put(map_portal_,gid,sizeof(aa),(char*)&aa);
 }
 
 void GXContext::unbind(char *gid)
 {
+	struct slice *v = NULL;
+	omt_get(map_portal_,gid,&v);
+	if(v){
+		PortalPrint *aa = (PortalPrint*)v->val;
+		aa->stat_ = 0;
+	}
+}
+
+int GXContext::findPortal(int typee,const char* ID)
+{
+	struct slice *v = NULL;
+	omt_get(map_portal_,ID,&v);
+	if(v){
+		PortalPrint *aa = (PortalPrint*)v->val;
+		if(aa && 1 == aa->stat_){
+			return aa->pool_index_;
+		}
+	}
+	
+	return -1;
+}
+
+int GXContext::createPortal(int typee,const char* ID)
+{
+	Link *l = newLink();
+	if(l){
+		int index = l->pool_index_;
+		bindLinkWithGlobalID(ID,l);
+		return index;
+	}
+	
+	return -1;
+}
+
+int GXContext::freePortal(int localPoolIndex)
+{
+	Link *l = getLink(localPoolIndex);
+	if(l){
+		releaseLink(l);
+		return localPoolIndex;
+	}
+	
+	return -1;
+}
+
+int GXContext::freePortal(int typee,const char* ID)
+{
+	int pool_index = findPortal(typee,ID);
+	if(pool_index >= 0){
+		int r = freePortal(pool_index);
+		unbind(ID);
+		return r;
+	}
+	
+	return -1;
+}
+
+int GXContext::sendToPortal(int localPoolIndex,const char* destID,int datalen,void *data)
+{
+	Link *l = getLink(localPoolIndex);
+	if(l && (NULL==destID || 0 == strncmp(destID,l->link_id_,LINK_ID_LEN))){
+		kfifo *ff = &l->write_fifo_;
+		return __kfifo_put(ff,(unsigned char*)data,datalen);
+	}
+	
+	return -1;
+}
+
+int GXContext::sendToPortal(const char* destID,int datalen,void *data)
+{
+	if(NULL == destID) return -1;
+	int index = findPortal(0,destID);
+	if(index >= 0){
+		return sendToPortal(index,destID,datalen,data);
+	}
+	
+	return -1;
+}
+
+bool GX_isComePacket(InternalHeader *h)
+{
+	if(!h) return true;
+	return true;
 }
 
 void GXContext::forceCutLink(Link* ll)
