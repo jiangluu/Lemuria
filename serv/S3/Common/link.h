@@ -42,7 +42,7 @@
 #define LINK_ID_LEN 16
 
 
-struct FrontEnd;
+struct GXContext;
 
 extern char *g_e_key;
 
@@ -130,7 +130,7 @@ struct Link{
 		usersn_ = 0;
 	}
 	
-	void releaseSystemHandle(FrontEnd *nc);
+	void releaseSystemHandle(GXContext *nc);
 	
 	#ifdef __USING_WINDOWS_IOCP
 	int post_recv(){
