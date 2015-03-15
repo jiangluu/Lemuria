@@ -12,7 +12,7 @@ int Link::register_read_event(FrontEnd *nc){
 #endif
 
 
-void Link::releaseSystemHandle(FrontEnd *nc){
+void Link::releaseSystemHandle(GXContext *nc){
 #ifdef __USING_WINDOWS_IOCP
 	CancelIo((HANDLE)sock_);
 	//shutdown((HANDLE)sock_, SD_BOTH );
