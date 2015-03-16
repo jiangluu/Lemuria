@@ -289,6 +289,8 @@ bool GXContext::init(int type,int pool_size,int read_buf_len,int write_buf_len)
 	
 	stat_ = 1;
 	
+	memset(&input_context_,0,sizeof(input_context_));
+	
 	map_portal_ = omt_new();
 	
 	return true;
@@ -458,6 +460,41 @@ int GXContext::sendToPortal(const char* destID,int datalen,void *data)
 	int index = findPortal(0,destID);
 	if(index >= 0){
 		return sendToPortal(index,destID,datalen,data);
+	}
+	
+	return -1;
+}
+
+int GXContext::syncWriteBack(int msgid,int datalen,void *data)
+{
+	datalen = datalen>0?datalen:0;
+	
+	int index = input_context_.src_link_pool_index_;
+	Link *l = getLink(index);
+	if(l){
+		kfifo *ff = &l->write_fifo_;
+		if(0 == input_context_.header_type_){
+			InternalHeader &h = input_context_.header_;
+			h.message_id_ = msgid;
+			h.len_ = INTERNAL_HEADER_LEN + datalen;
+			
+			__kfifo_put(ff,(unsigned char*)&h,INTERNAL_HEADER_LEN);
+		}
+		else{
+			ClientHeader &h = input_context_.header2_;
+			h.message_id_ = msgid;
+			h.len_ = CLIENT_HEADER_LEN + datalen;
+			
+			__kfifo_put(ff,(unsigned char*)&h,CLIENT_HEADER_LEN);
+		}
+		
+		if(data && datalen>0){
+			return __kfifo_put(ff,(unsigned char*)data,datalen);
+		}
+		else{
+			return 0;
+		}
+		
 	}
 	
 	return -1;
@@ -734,7 +771,15 @@ int GXContext::try_deal_one_msg_s(Link *ioable,int &begin)
 			int full_len = hh->len_+(INTERNAL_HEADER_LEN-CLIENT_HEADER_LEN);
 			if(full_len<=(end-begin)){
 				if(callback_){
-					int r = ((GXContextMessageDispatch)callback_)(ioable,hh,full_len-INTERNAL_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
+					// 准备好上下文
+					memset(&input_context_,0,sizeof(input_context_));
+					
+					input_context_.gxc_ = this;
+					input_context_.src_link_pool_index_ = ioable->pool_index_;
+					input_context_.header_type_ = header_type_;
+					memcpy(&input_context_.header_,hh,INTERNAL_HEADER_LEN);
+					
+					int r = ((GXContextMessageDispatch)callback_)(this,ioable,hh,full_len-INTERNAL_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
 				}
 				
 				begin += full_len;
@@ -805,7 +850,16 @@ int GXContext::try_deal_one_msg_s(Link *ioable,int &begin)
 			#endif
 				int r = 0;
 				if(callback_){
-					r = ((GXContextMessageDispatch2)callback_)(ioable,hh,full_len-CLIENT_HEADER_LEN,ioable->read_buf_+begin+CLIENT_HEADER_LEN);
+					// 准备好上下文
+					memset(&input_context_,0,sizeof(input_context_));
+					
+					input_context_.gxc_ = this;
+					input_context_.src_link_pool_index_ = ioable->pool_index_;
+					input_context_.header_type_ = header_type_;
+					input_context_.header2_ = *hh;
+					//memcpy(&input_context_.header2_,hh,CLIENT_HEADER_LEN);
+					
+					r = ((GXContextMessageDispatch2)callback_)(this,ioable,hh,full_len-CLIENT_HEADER_LEN,ioable->read_buf_+begin+CLIENT_HEADER_LEN);
 				}
 				
 				if(-999 == r){
@@ -962,7 +1016,7 @@ void GXContext::frame_poll(timetype now,int block_time)
 				Link *ioable = (Link*)completionKey;
 				printf("做断开处理   [%d]\n",ioable->pool_index_);
 				if(link_cut_callback_){
-					link_cut_callback_(ioable,1,type_);
+					link_cut_callback_(this,ioable,1,type_);
 				}
 				ioable->link_stat_ = 0;
 				ioable->releaseSystemHandle(this);
@@ -1102,7 +1156,7 @@ void GXContext::frame_poll(timetype now,int block_time)
 						printf("做断开处理   [%d]\n",ioable->pool_index_);
 						
 						if(link_cut_callback_){
-							link_cut_callback_(ioable,1,type_);
+							link_cut_callback_(this,ioable,1,type_);
 						}
 						ioable->link_stat_ = 0;
 						ioable->releaseSystemHandle(this);

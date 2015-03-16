@@ -15,10 +15,11 @@
 // 故把这个值定为163840
 #define MY_SO_RCVBUF_MAX_LEN 163840
 
+struct GXContext;
 
-typedef int (*GXContextMessageDispatch)(Link*,struct InternalHeader*,int,char*);
-typedef int (*GXContextMessageDispatch2)(Link*,struct ClientHeader*,int,char*);
-typedef void (*LinkCut)(Link*,int reason,int gxcontext_type);
+typedef int (*GXContextMessageDispatch)(GXContext*,Link*,struct InternalHeader*,int,char*);
+typedef int (*GXContextMessageDispatch2)(GXContext*,Link*,struct ClientHeader*,int,char*);
+typedef void (*LinkCut)(GXContext*,Link*,int reason,int gxcontext_type);
 
 
 struct GXContext{
@@ -58,6 +59,16 @@ struct GXContext{
 	Link *link_pool_;
 	
 	struct omt_tree *map_portal_;
+	
+	struct InputContext{
+		struct GXContext *gxc_;
+		int src_link_pool_index_;
+		int header_type_;
+		InternalHeader header_;
+		ClientHeader header2_;
+	};
+	
+	InputContext input_context_;
 	
 	
 	GXContext():type_(0),layer_(0),header_type_(0),stat_(0),enable_encrypt_(false),link_pool_size_conf_(0),
