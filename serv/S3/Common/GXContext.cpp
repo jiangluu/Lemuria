@@ -477,6 +477,7 @@ int GXContext::syncWriteBack(int msgid,int datalen,void *data)
 			InternalHeader &h = input_context_.header_;
 			h.message_id_ = msgid;
 			h.len_ = INTERNAL_HEADER_LEN + datalen;
+			H_Set_PacketBack(h);
 			
 			__kfifo_put(ff,(unsigned char*)&h,INTERNAL_HEADER_LEN);
 		}
@@ -500,11 +501,6 @@ int GXContext::syncWriteBack(int msgid,int datalen,void *data)
 	return -1;
 }
 
-bool GX_isComePacket(InternalHeader *h)
-{
-	if(!h) return true;
-	return true;
-}
 
 void GXContext::forceCutLink(Link* ll)
 {
