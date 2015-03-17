@@ -151,9 +151,6 @@ int nc_read(intptr_t fd,char *buf,int buf_len,int &real_read);
 int nc_write(intptr_t fd,char *buf,int buf_len,int &real_write);
 
 
-bool GX_isComePacket(InternalHeader*);
-
-
 
 #endif
 
