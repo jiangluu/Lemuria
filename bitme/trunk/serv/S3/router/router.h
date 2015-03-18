@@ -12,7 +12,7 @@
 #include "GameTime.h"
 #include "ARand.h"
 #include "alog.h"
-
+#include "GXContext.h"
 
 
 
@@ -21,6 +21,8 @@ extern GameTime *g_time;
 extern ARand *g_rand;
 
 extern ALog *g_log;
+
+extern GXContext *g_gx1;
 
 
 #define ARAND32 (g_rand->rand32())
