@@ -8,17 +8,30 @@
 	#include <signal.h>
 #endif
 #include "router.h"
-//#include "LuaInterface.h"
+#include "LuaInterface.h"
+#include "GXContext.h"
 
 
 
 #ifdef ENABLE_ENCRYPT
 char *g_e_key = NULL;
 #endif
+LuaInterface *g_luavm = 0;
+GameTime *g_time = 0;
+ARand *g_rand = 0;
+GXContext *g_gx1 = 0;
+
+int g_stop_loop = 0;
 
 
 // 前置声明 
 void __installHandler();
+
+int message_dispatch(GXContext*,Link* src_link,InternalHeader *hh,int body_len,char *body);
+void on_client_cut(GXContext*,Link *ll,int reason,int gxcontext_type);
+
+void frame_time_driven(timetype now);
+
 
 
 int main(int argc, char** argv) {
@@ -33,6 +46,57 @@ int main(int argc, char** argv) {
 #endif	
 	
 	__installHandler();
+	
+	
+	// 初始化时间 
+	g_time = new GameTime();
+	g_time->init();
+	
+	g_rand = new ARand((u32)g_time->getANSITime());
+	
+	
+	// 读取配置文件
+	g_luavm = new LuaInterface();
+	g_luavm->Init();
+	
+	
+	// 初始化GX上下文
+	g_gx1 = new GXContext();
+	g_gx1->init(GXContext::typeFullFunction,1024,1024*1024*8,1024*1024*8);
+	
+	g_gx1->registerCallback((void*)message_dispatch,0);
+	
+	g_gx1->registerLinkCutCallback(on_client_cut);
+	
+#ifdef ENABLE_ENCRYPT
+	g_gx1->enable_encrypt_ = true;
+#endif
+	 
+	
+	
+	// 进入主循环 
+	static int frame_time_max = 10;		// 每帧最多让CPU等待10个千分之一秒 
+	
+	printf("server inited. start running...\n");
+	
+	while(0 == g_stop_loop){
+		g_time->setTime();
+		timetype now = g_time->currentTime();
+		g_time->incLocalFrame();
+		
+		
+		g_gx1->frame_poll(now,frame_time_max);
+		
+		// 内部时间驱动
+		frame_time_driven(now);
+		
+		
+		g_gx1->frame_flush(now);
+	}
+	
+	
+	printf("exit main_loop\n");
+	fprintf(stderr,"exit main_loop\n");
 	
 	
 	return 0;
