@@ -19,6 +19,6 @@ end
 g_lua_dir = "lua/"
 
 
-jlpcall(dofile,g_lua_dir.."serverframe/init_ffi.lua")
+jlpcall(dofile,g_lua_dir.."predefine/init.lua")
 
 
