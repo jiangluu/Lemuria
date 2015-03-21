@@ -15,9 +15,10 @@ function OnInternalMessage()
 			alog.debug(ret)
 			return -1
 		end
+	else
+		print(string.format('msg %d has NO handle',msg_id))
+		return -1
 	end
-	
-	return -1
 end
 
 
