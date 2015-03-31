@@ -22,6 +22,8 @@ struct Slice{
 	uint16_t len_;
 	const char *mem_;
 };
+
+CF_EXPORT void gx_set_context(struct GXContext*);
 	
 CF_EXPORT void* gx_env_get_shared_ptr(int index);
 
@@ -55,40 +57,18 @@ CF_EXPORT bool gx_cur_stream_push_float32(f32 v);
 
 CF_EXPORT bool gx_cur_stream_push_slice(struct Slice s);
 
+CF_EXPORT bool gx_cur_stream_push_slice2(const char* v,int len);
 
-CF_EXPORT void gx_cur_write_stream_cleanup();
+
+CF_EXPORT void gx_cur_writestream_cleanup();
 
 // 同步原路返回。messageid 是req的+1，内容是push到 stream里的内容。 
-CF_EXPORT void cur_stream_write_back();
+CF_EXPORT int gx_cur_writestream_syncback();
 
-CF_EXPORT void cur_stream_write_back2(int message_id);
+CF_EXPORT int gx_cur_writestream_syncback2(int message_id);
 
-CF_EXPORT void cur_stream_broadcast(int message_id);
+CF_EXPORT s32 gx_get_portal_pool_index();
 
-CF_EXPORT s32 cur_actor_id();
-
-CF_EXPORT u64 cur_user_sn();
-
-CF_EXPORT u32 cur_game_time();
-
-CF_EXPORT u64 cur_game_usec();
-
-
-
-// 因为传入了长度len，这个接口支持二进制数据 
-CF_EXPORT bool log_write(int level,const char*,int len);
-
-CF_EXPORT bool log_write2(int index,const char *ss,int len);
-
-CF_EXPORT void log_force_flush();
-
-
-CF_EXPORT int string_hash(const char *str);
-
-CF_EXPORT int cur_message_loopback();
-
-
-CF_EXPORT void MD5( const unsigned char *input, size_t ilen, unsigned char output[16] );
 
 }
 
