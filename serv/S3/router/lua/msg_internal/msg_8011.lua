@@ -26,7 +26,7 @@ function onMsg()
 			l_gx_cur_writestream_put_slice(v[2])
 			lcf.gx_cur_writestream_put_int16(1)		-- 节点状态
 			
-			lcf.gx_cur_writestream_syncback(8013)
+			lcf.gx_cur_writestream_syncback2(8013)
 		end
 	end
 	
