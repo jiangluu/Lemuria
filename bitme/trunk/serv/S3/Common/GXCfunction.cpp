@@ -207,6 +207,19 @@ int gx_cur_writestream_syncback2(int message_id)
 	return -1;
 }
 
+int gx_cur_writestream_send_to(int portal_index,int message_id)
+{
+	if(s_gx){
+		AStream *aa = s_gx->input_context_.ws_;
+		Link* ll = s_gx->getLink(portal_index);
+		if(ll){
+			return s_gx->sendToPortal(portal_index,ll->link_id_,aa->getwritebuflen(),aa->getbuf());
+		}
+	}
+	
+	return -1;
+}
+
 s32 gx_get_portal_pool_index()
 {
 	if(s_gx){
