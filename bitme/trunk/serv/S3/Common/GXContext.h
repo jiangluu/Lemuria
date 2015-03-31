@@ -2,8 +2,10 @@
 #define __GXCONTEXT_H
 
 
+#include <string>
 #include "GameTime.h"
 #include "packet_header.h"
+#include "AStream.h"
 #include "link.h"
 #include "omt.h"
 
@@ -66,6 +68,17 @@ struct GXContext{
 		int header_type_;
 		InternalHeader header_;
 		ClientHeader header2_;
+		
+		AStream *rs_;
+		AStream *ws_;
+		
+		void reset(){	// 不释放内存，只是为了复用 
+			gxc_ = 0;
+			src_link_pool_index_ = -1;
+			header_type_ = 0;
+			memset(&header_,0,sizeof(header_));
+			memset(&header2_,0,sizeof(header2_));
+		}
 	};
 	
 	InputContext input_context_;

@@ -289,7 +289,10 @@ bool GXContext::init(int type,int pool_size,int read_buf_len,int write_buf_len)
 	
 	stat_ = 1;
 	
-	memset(&input_context_,0,sizeof(input_context_));
+	input_context_.reset();
+	input_context_.rs_ = new AStream(0,0);
+	void* mem = calloc(1,write_buf_len);
+	input_context_.ws_ = new AStream(write_buf_len,(char*)mem);
 	
 	map_portal_ = omt_new();
 	
@@ -768,12 +771,15 @@ int GXContext::try_deal_one_msg_s(Link *ioable,int &begin)
 			if(full_len<=(end-begin)){
 				if(callback_){
 					// 准备好上下文
-					memset(&input_context_,0,sizeof(input_context_));
+					input_context_.reset();
 					
 					input_context_.gxc_ = this;
 					input_context_.src_link_pool_index_ = ioable->pool_index_;
 					input_context_.header_type_ = header_type_;
 					memcpy(&input_context_.header_,hh,INTERNAL_HEADER_LEN);
+					
+					input_context_.ws_->cleanup();
+					input_context_.rs_->reset(full_len-INTERNAL_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
 					
 					int r = ((GXContextMessageDispatch)callback_)(this,ioable,hh,full_len-INTERNAL_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
 				}
@@ -847,13 +853,15 @@ int GXContext::try_deal_one_msg_s(Link *ioable,int &begin)
 				int r = 0;
 				if(callback_){
 					// 准备好上下文
-					memset(&input_context_,0,sizeof(input_context_));
+					input_context_.reset();
 					
 					input_context_.gxc_ = this;
 					input_context_.src_link_pool_index_ = ioable->pool_index_;
 					input_context_.header_type_ = header_type_;
 					input_context_.header2_ = *hh;
 					//memcpy(&input_context_.header2_,hh,CLIENT_HEADER_LEN);
+					input_context_.ws_->cleanup();
+					input_context_.rs_->reset(full_len-CLIENT_HEADER_LEN,ioable->read_buf_+begin+CLIENT_HEADER_LEN);
 					
 					r = ((GXContextMessageDispatch2)callback_)(this,ioable,hh,full_len-CLIENT_HEADER_LEN,ioable->read_buf_+begin+CLIENT_HEADER_LEN);
 				}
