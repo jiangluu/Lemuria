@@ -127,6 +127,8 @@ struct GXContext{
 	
 	void forceCutLink(Link*);
 	
+	int connect2_no_care_id(char *ip_and_port);
+	
 	
 	// GX functions
 	int sendToPortal(const char* destID,int datalen,void *data);
@@ -144,8 +146,6 @@ struct GXContext{
 	// level-3
 	
 private:
-	int connect2_no_care_id(char *ip_and_port);
-	
 	int try_deal_one_msg_s(Link *ioable,int &begin);
 };
 

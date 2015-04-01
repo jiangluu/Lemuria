@@ -229,5 +229,19 @@ s32 gx_get_portal_pool_index()
 	return -1;
 }
 
+int gx_make_portal_sync(const char* ID,const char* port)
+{
+	if(s_gx && ID && port){
+		int r = s_gx->connect2_no_care_id(port);
+		if(r>=0){
+			Link* ll = s_gx->getLink(r);
+			s_gx->bindLinkWithGlobalID((char*)ID,ll);
+			
+			return r;
+		}
+	}
+	
+	return -1;
+}
 
 
