@@ -64,5 +64,7 @@ int gx_cur_writestream_send_to(int portal_index,int message_id);
 
 int gx_get_portal_pool_index();
 
+int gx_make_portal_sync(const char* ID,const char* port);
+
 
 ]]

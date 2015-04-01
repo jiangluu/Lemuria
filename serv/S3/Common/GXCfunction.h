@@ -71,6 +71,7 @@ CF_EXPORT int gx_cur_writestream_send_to(int portal_index,int message_id);
 
 CF_EXPORT s32 gx_get_portal_pool_index();
 
+CF_EXPORT int gx_make_portal_sync(const char* ID,const char* port);
 
 }
 
