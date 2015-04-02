@@ -38,21 +38,8 @@ struct TailJump{
 #define TAIL_JUMP_LEN 12
 
 
-// help functions
-inline bool H_Is_ComePacket(InternalHeader &h){
-	return (0==h.flag_);
-}
-inline bool H_Is_ComePacket(InternalHeader *h){
-	return (0==h->flag_);
-}
-
-
-inline void H_Set_PacketBack(InternalHeader &h){
-	h.flag_ = 1;
-}
-inline void H_Set_PacketBack(InternalHeader *h){
-	h->flag_ = 1;
-}
+#define HEADER_FLAG_BACK 0x1
+#define HEADER_FLAG_ROUTE 0x2
 
 
 
