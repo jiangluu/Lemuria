@@ -504,6 +504,55 @@ int GXContext::syncWriteBack(int msgid,int datalen,void *data)
 	return -1;
 }
 
+int GXContext::packetRouteToNode(const char* destID,int msgid,int datalen,void *data)
+{
+	datalen = datalen>0?datalen:0;
+	if(NULL == destID){
+		return -1;
+	}
+	
+	int r = findPortal(0,destID);
+	if(r >= 0){
+		// 在本上下文中直接定位到了，不必route了（PS，认为这种情况不常见） 
+		Link *l = getLink(r);
+		if(l){
+			kfifo *ff = &l->write_fifo_;
+			
+			if(0 == input_context_.header_type_){
+				InternalHeader &h = input_context_.header_;
+				h.message_id_ = msgid;
+				h.len_ = INTERNAL_HEADER_LEN + datalen;
+				h.flag_ = 0;
+				
+				__kfifo_put(ff,(unsigned char*)&h,INTERNAL_HEADER_LEN);
+			}
+			else{
+				ClientHeader &h = input_context_.header2_;
+				h.message_id_ = msgid;
+				h.len_ = CLIENT_HEADER_LEN + datalen;
+				
+				__kfifo_put(ff,(unsigned char*)&h,CLIENT_HEADER_LEN);
+			}
+			
+			if(data && datalen>0){
+				return __kfifo_put(ff,(unsigned char*)data,datalen);
+			}
+			else{
+				return 0;
+			}
+		}
+		else{
+			return -1;
+		}
+	}
+	else{
+		// 定位不到，要route 
+	}
+	
+	
+	return -1;
+}
+
 
 void GXContext::forceCutLink(Link* ll)
 {
