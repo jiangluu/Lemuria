@@ -144,6 +144,7 @@ struct GXContext{
 	// level-2
 	
 	// level-3
+	int packetRouteToNode(const char* destID,int msgid,int datalen,void *data);
 	
 private:
 	int try_deal_one_msg_s(Link *ioable,int &begin);
