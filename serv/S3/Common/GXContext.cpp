@@ -547,6 +547,39 @@ int GXContext::packetRouteToNode(const char* destID,int msgid,int datalen,void *
 	}
 	else{
 		// 定位不到，要route 
+		if(0 != input_context_.header_type_){	// 不支持自定义格式包的route 
+			return -1;
+		}
+		
+		Link *first_router = NULL;
+		FOR(i,link_pool_size_){
+			Link *ll = link_pool_+i;
+			if(ll->isOnline() && 'R'==ll->link_id_[0]){
+				first_router = ll;
+				break;
+			}
+		}
+		
+		if(NULL == first_router){
+			fprintf(stderr,"find NO router\n");
+			return -1;
+		}
+		
+				InternalHeader &h = input_context_.header_;
+				h.message_id_ = msgid;
+				h.len_ = INTERNAL_HEADER_LEN + datalen;
+				h.flag_ = 0;
+				h.flag_ |= HEADER_FLAG_ROUTE;
+				
+				kfifo *ff = &first_router->write_fifo_;
+				__kfifo_put(ff,(unsigned char*)&h,INTERNAL_HEADER_LEN);
+				
+				if(data && datalen>0){
+					return __kfifo_put(ff,(unsigned char*)data,datalen);
+				}
+				else{
+					return 0;
+				}
 	}
 	
 	
