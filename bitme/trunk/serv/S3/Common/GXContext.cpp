@@ -251,9 +251,11 @@ struct PortalPrint{
 };
 	
 
-bool GXContext::init(int type,int pool_size,int read_buf_len,int write_buf_len)
+bool GXContext::init(int type,const char* ID,int pool_size,int read_buf_len,int write_buf_len)
 {
 	type_ = type;
+	
+	strncpy(gx_id_,ID,LINK_ID_LEN);
 	
 	link_pool_size_conf_ = pool_size;
 	read_buf_len_ = read_buf_len;
@@ -896,7 +898,7 @@ int GXContext::try_deal_one_msg_s(Link *ioable,int &begin)
 				if(full_len<=(end-begin)){
 					TailJump *jj = (TailJump*)(ioable->read_buf_+begin+hh->len_+(INTERNAL_HEADER_LEN-CLIENT_HEADER_LEN));
 					
-					if(0 == strncmp(jj->portal_id_,ioable->link_id_,TAIL_ID_LEN)){
+					if(0 == strncmp(jj->portal_id_,this->gx_id_,TAIL_ID_LEN)){
 						// it's me
 						// ========================================================================================
 						if(callback_){
