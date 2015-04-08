@@ -62,7 +62,7 @@ int main(int argc, char** argv) {
 	
 	// 初始化GX上下文
 	g_gx1 = new GXContext();
-	g_gx1->init(GXContext::typeFullFunction,1024,1024*1024*8,1024*1024*8);
+	g_gx1->init(GXContext::typeFullFunction,"R0",1024,1024*1024*8,1024*1024*8);
 	
 	g_gx1->registerCallback((void*)message_dispatch,0);
 	

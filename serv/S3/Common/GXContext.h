@@ -48,6 +48,7 @@ struct GXContext{
 	bool	enable_encrypt_;
 	// -------- 配置信息 --------
 	char	ip_and_port_[128];		// 本上下文的物理地址
+	char	gx_id_[LINK_ID_LEN];
 	int		link_pool_size_conf_;
 	int		read_buf_len_;
 	int		write_fifo_len_;
@@ -94,9 +95,10 @@ struct GXContext{
 	#endif
 	{
 		ip_and_port_[0] = 0;
+		gx_id_[0] = 0;
 	}
 	
-	bool init(int type,int pool_size,int read_buf_len,int write_buf_len);
+	bool init(int type,const char* ID,int pool_size,int read_buf_len,int write_buf_len);
 	
 	void free();
 	
