@@ -895,23 +895,45 @@ int GXContext::try_deal_one_msg_s(Link *ioable,int &begin)
 				int full_len = hh->len_+(INTERNAL_HEADER_LEN-CLIENT_HEADER_LEN) + TAIL_JUMP_LEN*hh->jumpnum_;
 				if(full_len<=(end-begin)){
 					TailJump *jj = (TailJump*)(ioable->read_buf_+begin+hh->len_+(INTERNAL_HEADER_LEN-CLIENT_HEADER_LEN));
-					// find destiny
-					int r = findPortal(0,jj->portal_id_);
-					if(r >= 0){
-						Link *ll = getLink(r);
-						if(ll){
-							++ hh->jumpnum_;
-							int r2 = __kfifo_put(&ll->write_fifo_,(unsigned char*)hh,full_len);
-							if(r2 == full_len){
-								pushTailJump(ioable->pool_index_,ioable->link_id_,&ll->write_fifo_);
+					
+					if(0 == strncmp(jj->portal_id_,ioable->link_id_,TAIL_ID_LEN)){
+						// it's me
+						// ========================================================================================
+						if(callback_){
+							// 准备好上下文
+							input_context_.reset();
+							
+							input_context_.gxc_ = this;
+							input_context_.src_link_pool_index_ = ioable->pool_index_;
+							input_context_.header_type_ = header_type_;
+							memcpy(&input_context_.header_,hh,INTERNAL_HEADER_LEN);
+							
+							input_context_.ws_->cleanup();
+							input_context_.rs_->reset(hh->len_-CLIENT_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
+							
+							int r = ((GXContextMessageDispatch)callback_)(this,ioable,hh,hh->len_-CLIENT_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
+						}
+						// ========================================================================================
+					}
+					else{
+						// find destiny
+						int r = findPortal(0,jj->portal_id_);
+						if(r >= 0){
+							Link *ll = getLink(r);
+							if(ll){
+								++ hh->jumpnum_;
+								int r2 = __kfifo_put(&ll->write_fifo_,(unsigned char*)hh,full_len);
+								if(r2 == full_len){
+									pushTailJump(ioable->pool_index_,ioable->link_id_,&ll->write_fifo_);
+								}
+							}
+							else{
+								return -1;
 							}
 						}
 						else{
-							return -1;
+							// continue route
 						}
-					}
-					else{
-						// continue route
 					}
 					
 					
