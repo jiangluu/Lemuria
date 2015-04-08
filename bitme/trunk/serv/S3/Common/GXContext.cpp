@@ -504,6 +504,17 @@ int GXContext::syncWriteBack(int msgid,int datalen,void *data)
 	return -1;
 }
 
+int GXContext::pushTailJump(u32 local_link_index,const char *ID,kfifo *f)
+{
+	if(NULL == ID || NULL == f) return -1;
+	
+	TailJump aa;
+	aa.local_index_ = local_link_index;
+	strncpy(aa.portal_id_,ID,TAIL_ID_LEN);
+	
+	return __kfifo_put(f,(unsigned char*)&aa,TAIL_JUMP_LEN);
+}
+
 int GXContext::packetRouteToNode(const char* destID,int msgid,int datalen,void *data)
 {
 	datalen = datalen>0?datalen:0;
@@ -570,15 +581,22 @@ int GXContext::packetRouteToNode(const char* destID,int msgid,int datalen,void *
 				h.len_ = INTERNAL_HEADER_LEN + datalen;
 				h.flag_ = 0;
 				h.flag_ |= HEADER_FLAG_ROUTE;
+				h.jumpnum_ = 1;
 				
 				kfifo *ff = &first_router->write_fifo_;
 				__kfifo_put(ff,(unsigned char*)&h,INTERNAL_HEADER_LEN);
 				
 				if(data && datalen>0){
-					return __kfifo_put(ff,(unsigned char*)data,datalen);
+					__kfifo_put(ff,(unsigned char*)data,datalen);
+				}
+				
+				Link *src_link = getLink(input_context_.src_link_pool_index_);
+				if(src_link){
+					return pushTailJump(input_context_.src_link_pool_index_,src_link->link_id_,ff);
 				}
 				else{
-					return 0;
+					static char *s_ID = "NOID";
+					return pushTailJump(input_context_.src_link_pool_index_,s_ID,ff);
 				}
 	}
 	
@@ -849,25 +867,32 @@ int GXContext::try_deal_one_msg_s(Link *ioable,int &begin)
 				return -1;
 			}
 			
-			int full_len = hh->len_+(INTERNAL_HEADER_LEN-CLIENT_HEADER_LEN);
-			if(full_len<=(end-begin)){
-				if(callback_){
-					// 准备好上下文
-					input_context_.reset();
+			if(0 == (hh->flag_ ^ HEADER_FLAG_ROUTE)){
+				int full_len = hh->len_+(INTERNAL_HEADER_LEN-CLIENT_HEADER_LEN);
+				if(full_len<=(end-begin)){
+					if(callback_){
+						// 准备好上下文
+						input_context_.reset();
+						
+						input_context_.gxc_ = this;
+						input_context_.src_link_pool_index_ = ioable->pool_index_;
+						input_context_.header_type_ = header_type_;
+						memcpy(&input_context_.header_,hh,INTERNAL_HEADER_LEN);
+						
+						input_context_.ws_->cleanup();
+						input_context_.rs_->reset(full_len-INTERNAL_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
+						
+						int r = ((GXContextMessageDispatch)callback_)(this,ioable,hh,full_len-INTERNAL_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
+					}
 					
-					input_context_.gxc_ = this;
-					input_context_.src_link_pool_index_ = ioable->pool_index_;
-					input_context_.header_type_ = header_type_;
-					memcpy(&input_context_.header_,hh,INTERNAL_HEADER_LEN);
-					
-					input_context_.ws_->cleanup();
-					input_context_.rs_->reset(full_len-INTERNAL_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
-					
-					int r = ((GXContextMessageDispatch)callback_)(this,ioable,hh,full_len-INTERNAL_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
+					begin += full_len;
+					return 1;
 				}
-				
-				begin += full_len;
-				return 1;
+			}
+			else{	// 是route包 
+				int full_len = hh->len_+(INTERNAL_HEADER_LEN-CLIENT_HEADER_LEN) + TAIL_JUMP_LEN*hh->jumpnum_;
+				if(full_len<=(end-begin)){
+				}
 			}
 		}
 	}
