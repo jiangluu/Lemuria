@@ -581,7 +581,7 @@ int GXContext::packetRouteToNode(const char* destID,int msgid,int datalen,void *
 				h.len_ = INTERNAL_HEADER_LEN + datalen;
 				h.flag_ = 0;
 				h.flag_ |= HEADER_FLAG_ROUTE;
-				h.jumpnum_ = 1;
+				h.jumpnum_ = 2;
 				
 				kfifo *ff = &first_router->write_fifo_;
 				__kfifo_put(ff,(unsigned char*)&h,INTERNAL_HEADER_LEN);
@@ -589,6 +589,8 @@ int GXContext::packetRouteToNode(const char* destID,int msgid,int datalen,void *
 				if(data && datalen>0){
 					__kfifo_put(ff,(unsigned char*)data,datalen);
 				}
+				
+				pushTailJump(-1,destID,ff);
 				
 				Link *src_link = getLink(input_context_.src_link_pool_index_);
 				if(src_link){
@@ -892,6 +894,29 @@ int GXContext::try_deal_one_msg_s(Link *ioable,int &begin)
 			else{	// ÊÇroute°ü 
 				int full_len = hh->len_+(INTERNAL_HEADER_LEN-CLIENT_HEADER_LEN) + TAIL_JUMP_LEN*hh->jumpnum_;
 				if(full_len<=(end-begin)){
+					TailJump *jj = (TailJump*)(ioable->read_buf_+begin+hh->len_+(INTERNAL_HEADER_LEN-CLIENT_HEADER_LEN));
+					// find destiny
+					int r = findPortal(0,jj->portal_id_);
+					if(r >= 0){
+						Link *ll = getLink(r);
+						if(ll){
+							++ hh->jumpnum_;
+							int r2 = __kfifo_put(&ll->write_fifo_,(unsigned char*)hh,full_len);
+							if(r2 == full_len){
+								pushTailJump(ioable->pool_index_,ioable->link_id_,&ll->write_fifo_);
+							}
+						}
+						else{
+							return -1;
+						}
+					}
+					else{
+						// continue route
+					}
+					
+					
+					begin += full_len;
+					return 1;
 				}
 			}
 		}
