@@ -142,6 +142,7 @@ struct GXContext{
 	int syncWriteBack(int msgid,int datalen,void *data);
 	
 	// level-2
+	int pushTailJump(u32 local_link_index,const char *ID,kfifo *f);
 	
 	// level-3
 	int packetRouteToNode(const char* destID,int msgid,int datalen,void *data);
