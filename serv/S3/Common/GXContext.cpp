@@ -935,6 +935,38 @@ int GXContext::try_deal_one_msg_s(Link *ioable,int &begin)
 						}
 						else{
 							// continue route
+							// 下面的2层循环是 在本上下文里找出一个没有“经过” 过的router 
+							Link *next_router = NULL;
+							FOR(i,link_pool_size_){
+								Link *ll = link_pool_+i;
+								if(ll->isOnline() && 'R'==ll->link_id_[0]){
+									bool found = false;
+									for(int rev=hh->jumpnum_-1;rev>=0;--rev){
+										TailJump *aa = jj+rev;
+										if(0 == strncmp(ll->link_id_,aa->portal_id_,TAIL_ID_LEN)){
+											found = true;
+											break;
+										}
+									}
+									
+									if(!found){
+										next_router = ll;
+										break;
+									}
+								}
+							}
+							
+							if(next_router){
+								++ hh->jumpnum_;
+								int r2 = __kfifo_put(&next_router->write_fifo_,(unsigned char*)hh,full_len);
+								if(r2 == full_len){
+									pushTailJump(ioable->pool_index_,ioable->link_id_,&next_router->write_fifo_);
+								}
+							}
+							else{
+								fprintf(stderr,"NO more router\n");
+								return -1;
+							}
 						}
 					}
 					
