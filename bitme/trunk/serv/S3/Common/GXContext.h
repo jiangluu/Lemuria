@@ -69,6 +69,7 @@ struct GXContext{
 		int header_type_;
 		InternalHeader header_;
 		ClientHeader header2_;
+		char* tail_ptr_;
 		
 		AStream *rs_;
 		AStream *ws_;
@@ -77,6 +78,7 @@ struct GXContext{
 			gxc_ = 0;
 			src_link_pool_index_ = -1;
 			header_type_ = 0;
+			tail_ptr_ = 0;
 			memset(&header_,0,sizeof(header_));
 			memset(&header2_,0,sizeof(header2_));
 		}
