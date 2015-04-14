@@ -484,7 +484,15 @@ int GXContext::syncWriteBack(int msgid,int datalen,void *data)
 			h.len_ = INTERNAL_HEADER_LEN + datalen;
 			h.flag_ |= HEADER_FLAG_BACK;
 			
-			__kfifo_put(ff,(unsigned char*)&h,INTERNAL_HEADER_LEN);
+			if(0 == (h.flag_ ^ HEADER_FLAG_ROUTE)){
+				__kfifo_put(ff,(unsigned char*)&h,INTERNAL_HEADER_LEN);
+			}
+			else{
+				-- h.jumpnum_;
+			#define JUMP_SAFER 256		// 防止减成负数 OR 跳的次数过多 
+				h.jumpnum_ = h.jumpnum_<=JUMP_SAFER?h.jumpnum_:JUMP_SAFER;
+				__kfifo_put(ff,(unsigned char*)&h,INTERNAL_HEADER_LEN);
+			}
 		}
 		else{
 			ClientHeader &h = input_context_.header2_;
@@ -494,13 +502,19 @@ int GXContext::syncWriteBack(int msgid,int datalen,void *data)
 			__kfifo_put(ff,(unsigned char*)&h,CLIENT_HEADER_LEN);
 		}
 		
+		int r = 0;
 		if(data && datalen>0){
-			return __kfifo_put(ff,(unsigned char*)data,datalen);
-		}
-		else{
-			return 0;
+			r = __kfifo_put(ff,(unsigned char*)data,datalen);
 		}
 		
+		if(0 == input_context_.header_type_){
+			InternalHeader &h = input_context_.header_;
+			if(0 == (h.flag_ ^ HEADER_FLAG_ROUTE)){
+				__kfifo_put(ff,(unsigned char*)input_context_.tail_ptr_,TAIL_JUMP_LEN*h.jumpnum_);
+			}
+		}
+		
+		return r;
 	}
 	
 	return -1;
@@ -896,76 +910,97 @@ int GXContext::try_deal_one_msg_s(Link *ioable,int &begin)
 			else{	// 是route包 
 				int full_len = hh->len_+(INTERNAL_HEADER_LEN-CLIENT_HEADER_LEN) + TAIL_JUMP_LEN*hh->jumpnum_;
 				if(full_len<=(end-begin)){
-					TailJump *jj = (TailJump*)(ioable->read_buf_+begin+hh->len_+(INTERNAL_HEADER_LEN-CLIENT_HEADER_LEN));
-					
-					if(0 == strncmp(jj->portal_id_,this->gx_id_,TAIL_ID_LEN)){
-						// it's me
-						// ========================================================================================
-						if(callback_){
-							// 准备好上下文
-							input_context_.reset();
+					if(0 != (hh->flag_ ^ HEADER_FLAG_BACK)){
+						// 是回包 
+						if(hh->jumpnum_ > 1){
+							// 还未到达目的地 
+							-- hh->jumpnum_;
+							TailJump *jj = (TailJump*)(ioable->read_buf_+begin+hh->len_+(INTERNAL_HEADER_LEN-CLIENT_HEADER_LEN));
+							jj += hh->jumpnum_;
 							
-							input_context_.gxc_ = this;
-							input_context_.src_link_pool_index_ = ioable->pool_index_;
-							input_context_.header_type_ = header_type_;
-							memcpy(&input_context_.header_,hh,INTERNAL_HEADER_LEN);
-							
-							input_context_.ws_->cleanup();
-							input_context_.rs_->reset(hh->len_-CLIENT_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
-							
-							int r = ((GXContextMessageDispatch)callback_)(this,ioable,hh,hh->len_-CLIENT_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
-						}
-						// ========================================================================================
-					}
-					else{
-						// find destiny
-						int r = findPortal(0,jj->portal_id_);
-						if(r >= 0){
-							Link *ll = getLink(r);
-							if(ll){
-								++ hh->jumpnum_;
-								int r2 = __kfifo_put(&ll->write_fifo_,(unsigned char*)hh,full_len);
-								if(r2 == full_len){
-									pushTailJump(ioable->pool_index_,ioable->link_id_,&ll->write_fifo_);
-								}
-							}
-							else{
-								return -1;
+							int r = sendToPortal(jj->local_index_,jj->portal_id_,full_len-TAIL_JUMP_LEN,ioable->read_buf_+begin);
+							if(r != full_len-TAIL_JUMP_LEN){
+								fprintf(stderr,"auto back send failed. request [%d] sent [%d]\n",full_len-TAIL_JUMP_LEN,r);
 							}
 						}
 						else{
-							// continue route
-							// 下面的2层循环是 在本上下文里找出一个没有“经过” 过的router 
-							Link *next_router = NULL;
-							FOR(i,link_pool_size_){
-								Link *ll = link_pool_+i;
-								if(ll->isOnline() && 'R'==ll->link_id_[0]){
-									bool found = false;
-									for(int rev=hh->jumpnum_-1;rev>=0;--rev){
-										TailJump *aa = jj+rev;
-										if(0 == strncmp(ll->link_id_,aa->portal_id_,TAIL_ID_LEN)){
-											found = true;
-											break;
-										}
-									}
-									
-									if(!found){
-										next_router = ll;
-										break;
+							// 这里就是目的地 
+						}
+					}
+					else{
+						// 是去包 
+						TailJump *jj = (TailJump*)(ioable->read_buf_+begin+hh->len_+(INTERNAL_HEADER_LEN-CLIENT_HEADER_LEN));
+						
+						if(0 == strncmp(jj->portal_id_,this->gx_id_,TAIL_ID_LEN)){
+							// it's me
+							// ========================================================================================
+							if(callback_){
+								// 准备好上下文
+								input_context_.reset();
+								
+								input_context_.gxc_ = this;
+								input_context_.src_link_pool_index_ = ioable->pool_index_;
+								input_context_.header_type_ = header_type_;
+								memcpy(&input_context_.header_,hh,INTERNAL_HEADER_LEN);
+								
+								input_context_.tail_ptr_ = (char*)jj;
+								input_context_.ws_->cleanup();
+								input_context_.rs_->reset(hh->len_-CLIENT_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
+								
+								int r = ((GXContextMessageDispatch)callback_)(this,ioable,hh,hh->len_-CLIENT_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
+							}
+							// ========================================================================================
+						}
+						else{
+							// find destiny
+							int r = findPortal(0,jj->portal_id_);
+							if(r >= 0){
+								Link *ll = getLink(r);
+								if(ll){
+									++ hh->jumpnum_;
+									int r2 = __kfifo_put(&ll->write_fifo_,(unsigned char*)hh,full_len);
+									if(r2 == full_len){
+										pushTailJump(ioable->pool_index_,ioable->link_id_,&ll->write_fifo_);
 									}
 								}
-							}
-							
-							if(next_router){
-								++ hh->jumpnum_;
-								int r2 = __kfifo_put(&next_router->write_fifo_,(unsigned char*)hh,full_len);
-								if(r2 == full_len){
-									pushTailJump(ioable->pool_index_,ioable->link_id_,&next_router->write_fifo_);
+								else{
+									return -1;
 								}
 							}
 							else{
-								fprintf(stderr,"NO more router\n");
-								return -1;
+								// continue route
+								// 下面的2层循环是 在本上下文里找出一个没有“经过” 过的router 
+								Link *next_router = NULL;
+								FOR(i,link_pool_size_){
+									Link *ll = link_pool_+i;
+									if(ll->isOnline() && 'R'==ll->link_id_[0]){
+										bool found = false;
+										for(int rev=hh->jumpnum_-1;rev>=0;--rev){
+											TailJump *aa = jj+rev;
+											if(0 == strncmp(ll->link_id_,aa->portal_id_,TAIL_ID_LEN)){
+												found = true;
+												break;
+											}
+										}
+										
+										if(!found){
+											next_router = ll;
+											break;
+										}
+									}
+								}
+								
+								if(next_router){
+									++ hh->jumpnum_;
+									int r2 = __kfifo_put(&next_router->write_fifo_,(unsigned char*)hh,full_len);
+									if(r2 == full_len){
+										pushTailJump(ioable->pool_index_,ioable->link_id_,&next_router->write_fifo_);
+									}
+								}
+								else{
+									fprintf(stderr,"NO more router\n");
+									return -1;
+								}
 							}
 						}
 					}
