@@ -213,6 +213,12 @@ int gx_cur_writestream_send_to(int portal_index,int message_id)
 		AStream *aa = s_gx->input_context_.ws_;
 		Link* ll = s_gx->getLink(portal_index);
 		if(ll){
+			InternalHeader &h = s_gx->input_context_.header_;
+			h.message_id_ = message_id;
+			h.len_ = INTERNAL_HEADER_LEN + aa->getwritebuflen();
+			h.flag_ = 0;
+			
+			s_gx->sendToPortal(portal_index,ll->link_id_,INTERNAL_HEADER_LEN,&h);
 			return s_gx->sendToPortal(portal_index,ll->link_id_,aa->getwritebuflen(),aa->getbuf());
 		}
 	}
