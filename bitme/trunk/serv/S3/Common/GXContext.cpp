@@ -479,7 +479,9 @@ int GXContext::syncWriteBack(int msgid,int datalen,void *data)
 	if(l){
 		kfifo *ff = &l->write_fifo_;
 		if(0 == input_context_.header_type_){
-			InternalHeader &h = input_context_.header_;
+			InternalHeader h;
+			// 这里不直接用 input_context_.header_的原因是，下面会改h，不想造成side effect 
+			memcpy(&h,&input_context_.header_,sizeof(h));
 			h.message_id_ = msgid;
 			h.len_ = INTERNAL_HEADER_LEN + datalen;
 			h.flag_ |= HEADER_FLAG_BACK;
@@ -546,7 +548,8 @@ int GXContext::packetRouteToNode(const char* destID,int msgid,int datalen,void *
 			kfifo *ff = &l->write_fifo_;
 			
 			if(0 == input_context_.header_type_){
-				InternalHeader &h = input_context_.header_;
+				InternalHeader h;
+				memcpy(&h,&input_context_.header_,sizeof(h));
 				h.message_id_ = msgid;
 				h.len_ = INTERNAL_HEADER_LEN + datalen;
 				h.flag_ = 0;
@@ -592,7 +595,8 @@ int GXContext::packetRouteToNode(const char* destID,int msgid,int datalen,void *
 			return -1;
 		}
 		
-				InternalHeader &h = input_context_.header_;
+				InternalHeader h;
+				memcpy(&h,&input_context_.header_,sizeof(h));
 				h.message_id_ = msgid;
 				h.len_ = INTERNAL_HEADER_LEN + datalen;
 				h.flag_ = 0;
