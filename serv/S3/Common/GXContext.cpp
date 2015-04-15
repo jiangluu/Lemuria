@@ -929,6 +929,24 @@ int GXContext::try_deal_one_msg_s(Link *ioable,int &begin)
 						}
 						else{
 							// 这里就是目的地 
+							// ========================================================================================
+							if(callback_){
+								// 准备好上下文
+								input_context_.reset();
+								
+								input_context_.gxc_ = this;
+								input_context_.src_link_pool_index_ = ioable->pool_index_;
+								input_context_.header_type_ = header_type_;
+								memcpy(&input_context_.header_,hh,INTERNAL_HEADER_LEN);
+								input_context_.header_.flag_ = 0;	// 重要：已经完成了一个来回，标记清空 
+								input_context_.header_.jumpnum_ = 0;
+								
+								input_context_.ws_->cleanup();
+								input_context_.rs_->reset(hh->len_-CLIENT_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
+								
+								int r = ((GXContextMessageDispatch)callback_)(this,ioable,hh,hh->len_-CLIENT_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
+							}
+							// ========================================================================================
 						}
 					}
 					else{
