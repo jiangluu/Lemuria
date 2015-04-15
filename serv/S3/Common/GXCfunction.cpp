@@ -216,7 +216,7 @@ int gx_cur_writestream_send_to(int portal_index,int message_id)
 			InternalHeader h;
 			memcpy(&h,&s_gx->input_context_.header_,sizeof(h));
 			h.message_id_ = message_id;
-			h.len_ = INTERNAL_HEADER_LEN + aa->getwritebuflen();
+			h.len_ = CLIENT_HEADER_LEN + aa->getwritebuflen();
 			h.flag_ = 0;
 			
 			s_gx->sendToPortal(portal_index,ll->link_id_,INTERNAL_HEADER_LEN,&h);
