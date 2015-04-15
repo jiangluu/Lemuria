@@ -511,7 +511,7 @@ int GXContext::syncWriteBack(int msgid,int datalen,void *data)
 		
 		if(0 == input_context_.header_type_){
 			InternalHeader &h = input_context_.header_;
-			if(0 == (h.flag_ ^ HEADER_FLAG_ROUTE)){
+			if(0 != (h.flag_ ^ HEADER_FLAG_ROUTE)){
 				__kfifo_put(ff,(unsigned char*)input_context_.tail_ptr_,TAIL_JUMP_LEN*h.jumpnum_);
 			}
 		}
