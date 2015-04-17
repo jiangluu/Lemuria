@@ -612,6 +612,9 @@ int GXContext::packetRouteToNode(const char* destID,int msgid,int datalen,void *
 				
 				pushTailJump(-1,destID,ff);
 				
+				return pushTailJump(-1,this->gx_id_,ff);
+				
+				/*
 				Link *src_link = getLink(input_context_.src_link_pool_index_);
 				if(src_link){
 					return pushTailJump(input_context_.src_link_pool_index_,src_link->link_id_,ff);
@@ -620,6 +623,7 @@ int GXContext::packetRouteToNode(const char* destID,int msgid,int datalen,void *
 					static char *s_ID = "NOID";
 					return pushTailJump(input_context_.src_link_pool_index_,s_ID,ff);
 				}
+				*/
 	}
 	
 	
@@ -923,8 +927,12 @@ int GXContext::try_deal_one_msg_s(Link *ioable,int &begin)
 							jj += hh->jumpnum_;
 							
 							int r = sendToPortal(jj->local_index_,jj->portal_id_,full_len-TAIL_JUMP_LEN,ioable->read_buf_+begin);
+							if(-1 == r){
+								r = sendToPortal(jj->portal_id_,full_len-TAIL_JUMP_LEN,ioable->read_buf_+begin);
+							}
 							if(r != full_len-TAIL_JUMP_LEN){
 								fprintf(stderr,"auto back send failed. request [%d] sent [%d]\n",full_len-TAIL_JUMP_LEN,r);
+								// TODO: 是否需要有更多处理，比方发送一个表示没有送达的回包 
 							}
 						}
 						else{
