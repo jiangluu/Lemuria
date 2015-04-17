@@ -35,6 +35,10 @@ void frame_time_driven(timetype now);
 
 
 int main(int argc, char** argv) {
+	if(argc < 2){
+		printf("argv error.\n");
+		return -1;
+	}
 	
 
 #ifdef ENABLE_ENCRYPT
@@ -61,8 +65,16 @@ int main(int argc, char** argv) {
 	
 	
 	// 初始化GX上下文
+	int config_maxconn = g_luavm->callGlobalFunc<int>("getMaxConn");
+	int config_readbuflen = g_luavm->callGlobalFunc<int>("getReadBufLen");
+	int config_writebuflen = g_luavm->callGlobalFunc<int>("getWriteBufLen");
+	
+	g_luavm->SetGlobal(LUA_GX_ID,(const char*)argv[1]);
+	std::string my_port = g_luavm->callGlobalFunc<std::string>("getMyPort");
+	
 	g_gx1 = new GXContext();
-	g_gx1->init(GXContext::typeFullFunction,"R0",1024,1024*1024*8,1024*1024*8);
+	g_gx1->init(GXContext::typeFullFunction,argv[1],config_maxconn,config_readbuflen,config_writebuflen );
+	strncpy(g_gx1->ip_and_port_,my_port.c_str(),127);
 	
 	g_gx1->registerCallback((void*)message_dispatch,0);
 	
@@ -72,7 +84,10 @@ int main(int argc, char** argv) {
 	g_gx1->enable_encrypt_ = true;
 #endif
 	 
-	
+	 
+	if(!g_gx1->start_listening()){
+		_exit(-1);
+	}
 	
 	// 进入主循环 
 	static int frame_time_max = 10;		// 每帧最多让CPU等待10个千分之一秒 
