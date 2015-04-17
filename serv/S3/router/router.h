@@ -28,6 +28,9 @@ extern GXContext *g_gx1;
 #define ARAND32 (g_rand->rand32())
 
 
+#define LUA_GX_ID "gGXContextID"
+
+
 
 #endif
 
