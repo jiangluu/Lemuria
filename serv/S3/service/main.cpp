@@ -20,6 +20,7 @@ LuaInterface *g_luavm = 0;
 GameTime *g_time = 0;
 ARand *g_rand = 0;
 GXContext *g_gx1 = 0;
+ALog *g_yylog = 0;
 
 int g_stop_loop = 0;
 
@@ -35,6 +36,10 @@ void frame_time_driven(timetype now);
 
 
 int main(int argc, char** argv) {
+	if(argc < 2){
+		printf("argv error.\n");
+		return -1;
+	}
 	
 
 #ifdef ENABLE_ENCRYPT
@@ -55,14 +60,32 @@ int main(int argc, char** argv) {
 	g_rand = new ARand((u32)g_time->getANSITime());
 	
 	
+	g_yylog = new ALog();
+	char buf1[64];
+	snprintf(buf1,60,"YY%s",argv[1]);
+	if(!g_yylog->init(buf1)){
+		printf("YYLog init error\n");
+		_exit(-1);
+	}
+	g_yylog->setTimer(g_time);
+	
+	
 	// 读取配置文件
 	g_luavm = new LuaInterface();
 	g_luavm->Init();
 	
 	
 	// 初始化GX上下文
+	int config_maxconn = g_luavm->callGlobalFunc<int>("getMaxConn");
+	int config_readbuflen = g_luavm->callGlobalFunc<int>("getReadBufLen");
+	int config_writebuflen = g_luavm->callGlobalFunc<int>("getWriteBufLen");
+	
+	g_luavm->SetGlobal(LUA_GX_ID,(const char*)argv[1]);
+	std::string my_port = g_luavm->callGlobalFunc<std::string>("getMyPort");
+	
 	g_gx1 = new GXContext();
-	g_gx1->init(GXContext::typeFullFunction,"R0",1024,1024*1024*8,1024*1024*8);
+	g_gx1->init(GXContext::typeFullFunction,argv[1],config_maxconn,config_readbuflen,config_writebuflen);
+	strncpy(g_gx1->ip_and_port_,my_port.c_str(),127);
 	
 	g_gx1->registerCallback((void*)message_dispatch,0);
 	
@@ -71,7 +94,17 @@ int main(int argc, char** argv) {
 #ifdef ENABLE_ENCRYPT
 	g_gx1->enable_encrypt_ = true;
 #endif
-	 
+	
+	if(!g_gx1->start_listening()){
+		_exit(-1);
+	}
+	
+	gx_set_context(g_gx1);
+	int init_r = g_luavm->callGlobalFunc<int>("PostInit");
+	if(0 != init_r){
+		printf("Lua PostInit() failed.\n");
+		_exit(-2);
+	}
 	
 	
 	// 进入主循环 
