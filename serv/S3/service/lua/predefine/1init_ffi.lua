@@ -68,5 +68,7 @@ int gx_get_message_id();
 
 int gx_make_portal_sync(const char* ID,const char* port);
 
+int gx_bind_portal_id(int index,const char* id);
+
 
 ]]
