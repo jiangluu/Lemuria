@@ -236,6 +236,20 @@ s32 gx_get_portal_pool_index()
 	return -1;
 }
 
+int gx_get_message_id()
+{
+	if(s_gx){
+		if(0 == s_gx->input_context_.header_type_){
+			return s_gx->input_context_.header_.message_id_;
+		}
+		else{
+			return s_gx->input_context_.header2_.message_id_;
+		}
+	}
+	
+	return -1;
+}
+
 int gx_make_portal_sync(const char* ID,const char* port)
 {
 	if(s_gx && ID && port){
