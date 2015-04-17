@@ -77,6 +77,8 @@ CF_EXPORT int gx_make_portal_sync(const char* ID,const char* port);
 
 CF_EXPORT int gx_bind_portal_id(int index,const char* id);
 
+CF_EXPORT int gx_cur_writestream_route_to(const char* destID,int message_id);
+
 }
 
 
