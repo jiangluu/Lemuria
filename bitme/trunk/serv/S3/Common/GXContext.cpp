@@ -486,7 +486,7 @@ int GXContext::syncWriteBack(int msgid,int datalen,void *data)
 			h.len_ = CLIENT_HEADER_LEN + datalen;
 			h.flag_ |= HEADER_FLAG_BACK;
 			
-			if(0 == (h.flag_ ^ HEADER_FLAG_ROUTE)){
+			if(0 == (h.flag_ & HEADER_FLAG_ROUTE)){
 				__kfifo_put(ff,(unsigned char*)&h,INTERNAL_HEADER_LEN);
 			}
 			else{
@@ -511,7 +511,7 @@ int GXContext::syncWriteBack(int msgid,int datalen,void *data)
 		
 		if(0 == input_context_.header_type_){
 			InternalHeader &h = input_context_.header_;
-			if(0 != (h.flag_ ^ HEADER_FLAG_ROUTE)){
+			if(0 != (h.flag_ & HEADER_FLAG_ROUTE)){
 				__kfifo_put(ff,(unsigned char*)input_context_.tail_ptr_,TAIL_JUMP_LEN*h.jumpnum_);
 			}
 		}
@@ -889,7 +889,7 @@ int GXContext::try_deal_one_msg_s(Link *ioable,int &begin)
 				return -1;
 			}
 			
-			if(0 == (hh->flag_ ^ HEADER_FLAG_ROUTE)){
+			if(0 == (hh->flag_ & HEADER_FLAG_ROUTE)){
 				int full_len = hh->len_+(INTERNAL_HEADER_LEN-CLIENT_HEADER_LEN);
 				if(full_len<=(end-begin)){
 					if(callback_){
@@ -914,7 +914,7 @@ int GXContext::try_deal_one_msg_s(Link *ioable,int &begin)
 			else{	// 是route包 
 				int full_len = hh->len_+(INTERNAL_HEADER_LEN-CLIENT_HEADER_LEN) + TAIL_JUMP_LEN*hh->jumpnum_;
 				if(full_len<=(end-begin)){
-					if(0 != (hh->flag_ ^ HEADER_FLAG_BACK)){
+					if(0 != (hh->flag_ & HEADER_FLAG_BACK)){
 						// 是回包 
 						if(hh->jumpnum_ > 1){
 							// 还未到达目的地 
