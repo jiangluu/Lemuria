@@ -35,6 +35,8 @@ function onMsg()
 	
 	nodes_table[node_id] = {node_id,port,portal_index,1}
 	
+	lcf.gx_bind_portal_id(portal_index,node_id)
+	
 	
 	return 0
 end

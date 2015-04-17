@@ -265,4 +265,17 @@ int gx_make_portal_sync(const char* ID,const char* port)
 	return -1;
 }
 
+int gx_bind_portal_id(int index,const char* id)
+{
+	if(s_gx && id){
+		Link *ll = s_gx->getLink(index);
+		if(ll){
+			s_gx->bindLinkWithGlobalID(id,ll);
+			return 0;
+		}
+	}
+	
+	return -1;
+}
+
 
