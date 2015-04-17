@@ -6,6 +6,8 @@ function onMsg()
 	local port = l_gx_cur_stream_get_slice()
 	local stat = lcf.gx_cur_stream_get_int16()
 	
+	print('8013',node_id,port,stat)
+	
 	l_gx_simple_ack()
 	
 	-- router只关心router
