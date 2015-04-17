@@ -33,6 +33,8 @@ int message_dispatch(GXContext *gx,Link* src_link,InternalHeader *hh,int body_le
 void on_client_cut(GXContext *gx,Link *ll,int reason,int gxcontext_type)
 {
 	gx_set_context(gx);
+	
+	int r = g_luavm->callGlobalFunc<int>("OnCut",ll->pool_index_,reason);
 }
 
 void frame_time_driven(timetype now)
