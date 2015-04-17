@@ -35,6 +35,10 @@ void on_client_cut(GXContext *gx,Link *ll,int reason,int gxcontext_type)
 	gx_set_context(gx);
 	
 	int r = g_luavm->callGlobalFunc<int>("OnCut",ll->pool_index_,reason);
+	
+	if(0 != ll->link_id_[0]){
+		gx->unbind(ll->link_id_);
+	}
 }
 
 void frame_time_driven(timetype now)
