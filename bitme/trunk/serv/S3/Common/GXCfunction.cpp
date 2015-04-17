@@ -278,4 +278,15 @@ int gx_bind_portal_id(int index,const char* id)
 	return -1;
 }
 
+int gx_cur_writestream_route_to(const char* destID,int message_id)
+{
+	if(s_gx && destID){
+		AStream *aa = s_gx->input_context_.ws_;
+		return s_gx->packetRouteToNode(destID,message_id,aa->getwritebuflen(),aa->getbuf());
+	}
+	
+	return -1;
+}
+
+
 
