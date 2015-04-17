@@ -8,7 +8,7 @@ function onMsg()
 	
 	print('8013',node_id,port,stat)
 	
-	l_gx_simple_ack()
+	--l_gx_simple_ack()
 	
 	-- router只关心router
 	if 1==stat and 'R'==string.sub(node_id,1,1) then
