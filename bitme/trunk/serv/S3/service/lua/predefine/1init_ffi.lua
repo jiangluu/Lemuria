@@ -70,5 +70,7 @@ int gx_make_portal_sync(const char* ID,const char* port);
 
 int gx_bind_portal_id(int index,const char* id);
 
+int gx_cur_writestream_route_to(const char* destID,int message_id);
+
 
 ]]
