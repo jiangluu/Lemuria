@@ -486,15 +486,7 @@ int GXContext::syncWriteBack(int msgid,int datalen,void *data)
 			h.len_ = CLIENT_HEADER_LEN + datalen;
 			h.flag_ |= HEADER_FLAG_BACK;
 			
-			if(0 == (h.flag_ & HEADER_FLAG_ROUTE)){
-				__kfifo_put(ff,(unsigned char*)&h,INTERNAL_HEADER_LEN);
-			}
-			else{
-				-- h.jumpnum_;
-			#define JUMP_SAFER 256		// 防止减成负数 OR 跳的次数过多 
-				h.jumpnum_ = h.jumpnum_<=JUMP_SAFER?h.jumpnum_:JUMP_SAFER;
-				__kfifo_put(ff,(unsigned char*)&h,INTERNAL_HEADER_LEN);
-			}
+			__kfifo_put(ff,(unsigned char*)&h,INTERNAL_HEADER_LEN);
 		}
 		else{
 			ClientHeader &h = input_context_.header2_;
@@ -601,7 +593,7 @@ int GXContext::packetRouteToNode(const char* destID,int msgid,int datalen,void *
 				h.len_ = CLIENT_HEADER_LEN + datalen;
 				h.flag_ = 0;
 				h.flag_ |= HEADER_FLAG_ROUTE;
-				h.jumpnum_ = 2;
+				h.jumpnum_ = 1;
 				
 				kfifo *ff = &first_router->write_fifo_;
 				__kfifo_put(ff,(unsigned char*)&h,INTERNAL_HEADER_LEN);
@@ -610,20 +602,7 @@ int GXContext::packetRouteToNode(const char* destID,int msgid,int datalen,void *
 					__kfifo_put(ff,(unsigned char*)data,datalen);
 				}
 				
-				pushTailJump(-1,destID,ff);
-				
-				return pushTailJump(-1,this->gx_id_,ff);
-				
-				/*
-				Link *src_link = getLink(input_context_.src_link_pool_index_);
-				if(src_link){
-					return pushTailJump(input_context_.src_link_pool_index_,src_link->link_id_,ff);
-				}
-				else{
-					static char *s_ID = "NOID";
-					return pushTailJump(input_context_.src_link_pool_index_,s_ID,ff);
-				}
-				*/
+				return pushTailJump(-1,destID,ff);
 	}
 	
 	
