@@ -141,6 +141,9 @@ int main(int argc, char** argv) {
 	printf("server inited. start running...\n");
 	
 	while(0 == g_stop_loop){
+		static u64 counter = 0;
+		++counter;
+		
 		g_time->setTime();
 		timetype now = g_time->currentTime();
 		g_time->incLocalFrame();
@@ -153,6 +156,12 @@ int main(int argc, char** argv) {
 		
 		
 		g_gx1->frame_flush(now);
+		
+		if(0 == (counter%10000)){
+			if(g_yylog){
+				g_yylog->flush();
+			}
+		}
 	}
 	
 	

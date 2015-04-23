@@ -31,6 +31,10 @@ void on_client_cut(GXContext *gx,Link *ll,int reason,int gxcontext_type)
 	if(0 != ll->link_id_[0]){
 		gx->unbind(ll->link_id_);
 	}
+	
+	if('G' == ll->link_id_[0]){		// It's gate
+		g_boxpool->flag_ |= 0x1;
+	}
 }
 
 void frame_time_driven(timetype now)

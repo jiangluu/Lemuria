@@ -14,7 +14,6 @@
 
 
 extern CBoxPool *g_boxpool;
-extern ALog *g_yylog;
 
 
 BoxProtocolTier *g_box_tier = NULL;
@@ -97,7 +96,6 @@ redisAsyncContext* redis_make_an_connection(const char* ip,int port)
 	// test
 	r1 = redisAsyncCommand(c,NULL,NULL,"SET Company ArtMe");
 	printf("redisAsyncCommand  %d\n",r1);
-	redisAsyncCommand(c,__redis_reply_callback,NULL,"GET Company");
 	
 	return c;
 }
@@ -310,6 +308,7 @@ void CBoxPool::OnRedisReplyCallback(ActorAsyncData *ad,redisReply *reply)
 			CBox *bb = a_box_+i;
 			
 			g_box_tier->box_id_ = i;
+			g_box_tier->actor_id_ = 0;
 			
 			ws_->cleanup();
 			redis_push_msg_ = reply;
@@ -334,7 +333,6 @@ void CBoxPool::OnRedisReplyCallback(ActorAsyncData *ad,redisReply *reply)
 		GXContext *gx = (GXContext*)getGX();
 		memcpy(&gx->input_context_,&ad->context_,sizeof(GXContext::InputContext));
 		memcpy(g_box_tier,&ad->box_tier_,sizeof(BoxProtocolTier));
-		// g_luacontext->header_.actor_id_ 里有正确的actor_id 
 		ws_->cleanup();
 		gx->input_context_.rs_ = NULL;	// 这时不能再读用户输入 
 		gx->input_context_.ws_ = ws_;
@@ -405,7 +403,7 @@ bool CBoxPool::post_init()
 		g_box_tier->actor_id_ = 0;
 		
 		bb->getLuaVM()->SetGlobal("g_box_id",i);
-		bb->getLuaVM()->callGlobalFunc<void>("post_init");
+		bb->getLuaVM()->callGlobalFunc<void>("box_post_init");
 	}
 	return true;
 }
@@ -447,12 +445,6 @@ void CBoxPool::onUpdate(timetype now)
 			if(L){
 				lua_gc(L,LUA_GCSTEP,5);
 			}
-		}
-	}
-	
-	if(0 == (counter%10000)){
-		if(g_yylog){
-			g_yylog->flush();
 		}
 	}
 }
