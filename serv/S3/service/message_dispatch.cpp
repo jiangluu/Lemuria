@@ -6,27 +6,19 @@
 #include "AStream.h"
 #include "GXCfunction.h"
 #include "LuaInterface.h"
+#include "CBox/CBoxPool.h"
 
 
 
 extern LuaInterface *g_luavm;
-
-AStream *ws = NULL;
+extern CBoxPool *g_boxpool;
 
 
 int message_dispatch(GXContext *gx,Link* src_link,InternalHeader *hh,int body_len,char *body)
 {
 	gx_set_context(gx);
 	
-	int msg_id = hh->message_id_;
-	if(msg_id>=8000 && msg_id<=8100){
-		int r = g_luavm->callGlobalFunc<int>("OnInternalMessage");
-	}
-	else{
-		int r = g_luavm->callGlobalFunc<int>("OnCustomMessage");
-	}
-	
-	return 0;
+	return g_boxpool->OnMessage(gx,hh);
 }
 
 // 物理连接断掉时的回调 
@@ -43,5 +35,7 @@ void on_client_cut(GXContext *gx,Link *ll,int reason,int gxcontext_type)
 
 void frame_time_driven(timetype now)
 {
+	g_boxpool->onUpdate(now);
 }
+
 
