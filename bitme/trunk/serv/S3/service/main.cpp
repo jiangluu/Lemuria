@@ -9,6 +9,7 @@
 #endif
 #include "service.h"
 #include "LuaInterface.h"
+#include "CBox/CBoxPool.h"
 
 
 
@@ -20,8 +21,10 @@ LuaInterface *g_luavm = 0;
 GameTime *g_time = 0;
 ARand *g_rand = 0;
 GXContext *g_gx1 = 0;
+ALog *g_log = 0;
 ALog *g_yylog = 0;
 
+CBoxPool *g_boxpool = 0;
 int g_stop_loop = 0;
 
 
@@ -31,7 +34,7 @@ void __installHandler();
 int message_dispatch(GXContext*,Link* src_link,InternalHeader *hh,int body_len,char *body);
 void on_client_cut(GXContext*,Link *ll,int reason,int gxcontext_type);
 
-void frame_time_driven(timetype now);
+extern void frame_time_driven(timetype now);
 
 
 
@@ -60,8 +63,16 @@ int main(int argc, char** argv) {
 	g_rand = new ARand((u32)g_time->getANSITime());
 	
 	
-	g_yylog = new ALog();
+	g_log = new ALog();
 	char buf1[64];
+	snprintf(buf1,60,"log%s",argv[1]);
+	if(!g_log->init(buf1)){
+		printf("Log init error\n");
+		_exit(-1);
+	}
+	g_log->setTimer(g_time);
+	
+	g_yylog = new ALog();
 	snprintf(buf1,60,"YY%s",argv[1]);
 	if(!g_yylog->init(buf1)){
 		printf("YYLog init error\n");
@@ -91,6 +102,11 @@ int main(int argc, char** argv) {
 	
 	g_gx1->registerLinkCutCallback(on_client_cut);
 	
+	
+	g_box_tier = new BoxProtocolTier;
+	g_box_tier->reset();
+	
+	
 #ifdef ENABLE_ENCRYPT
 	g_gx1->enable_encrypt_ = true;
 #endif
@@ -103,6 +119,18 @@ int main(int argc, char** argv) {
 	int init_r = g_luavm->callGlobalFunc<int>("PostInit");
 	if(0 != init_r){
 		printf("Lua PostInit() failed.\n");
+		_exit(-2);
+	}
+	
+	
+	g_boxpool = new CBoxPool();
+	if(!g_boxpool->init(argv[1])){
+		printf("BoxPool init failed.\n");
+		_exit(-2);
+	}
+	
+	if(!g_boxpool->post_init()){
+		printf("CBoxPool post_init error\n");
 		_exit(-2);
 	}
 	

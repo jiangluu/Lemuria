@@ -22,6 +22,7 @@ extern GameTime *g_time;
 extern ARand *g_rand;
 
 extern ALog *g_log;
+extern ALog *g_yylog;
 
 extern GXContext *g_gx1;
 
@@ -30,6 +31,21 @@ extern GXContext *g_gx1;
 
 
 #define LUA_GX_ID "gGXContextID"
+
+
+struct BoxProtocolTier{
+	int box_id_;
+	int actor_id_;
+	u64 usersn_;
+	
+	void reset(){
+		box_id_ = -1;
+		actor_id_ = -1;
+		usersn_ = -1;
+	}
+};
+
+extern  BoxProtocolTier *g_box_tier;
 
 
 #endif

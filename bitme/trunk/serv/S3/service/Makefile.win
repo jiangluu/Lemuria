@@ -4,14 +4,14 @@
 CPP      = g++.exe -D__DEBUG__
 CC       = gcc.exe -D__DEBUG__
 WINDRES  = windres.exe
-OBJ      = main.o ../Common/alog.o ../Common/bson.o ../Common/kfifo.o ../Common/lfs.o ../Common/link.o ../Common/luaconf.o ../Common/omt.o ../Common/polarssl/padlock.o ../Common/polarssl/aes.o ../Common/GXContext.o LuaInterface.o message_dispatch.o ../Common/GXCfunction.o
-LINKOBJ  = main.o ../Common/alog.o ../Common/bson.o ../Common/kfifo.o ../Common/lfs.o ../Common/link.o ../Common/luaconf.o ../Common/omt.o ../Common/polarssl/padlock.o ../Common/polarssl/aes.o ../Common/GXContext.o LuaInterface.o message_dispatch.o ../Common/GXCfunction.o
+OBJ      = main.o ../Common/alog.o ../Common/bson.o ../Common/kfifo.o ../Common/lfs.o ../Common/link.o ../Common/luaconf.o ../Common/omt.o ../Common/polarssl/padlock.o ../Common/polarssl/aes.o ../Common/GXContext.o LuaInterface.o message_dispatch.o ../Common/GXCfunction.o ../Common/ae/ae.o ../Common/hiredis/async.o ../Common/hiredis/dict.o ../Common/hiredis/hiredis.o ../Common/hiredis/net.o ../Common/hiredis/sds.o CBox/CBox.o CBox/CBoxPool.o CBox/IOLine.o cfunction.o ../Common/polarssl/md5.o
+LINKOBJ  = main.o ../Common/alog.o ../Common/bson.o ../Common/kfifo.o ../Common/lfs.o ../Common/link.o ../Common/luaconf.o ../Common/omt.o ../Common/polarssl/padlock.o ../Common/polarssl/aes.o ../Common/GXContext.o LuaInterface.o message_dispatch.o ../Common/GXCfunction.o ../Common/ae/ae.o ../Common/hiredis/async.o ../Common/hiredis/dict.o ../Common/hiredis/hiredis.o ../Common/hiredis/net.o ../Common/hiredis/sds.o CBox/CBox.o CBox/CBoxPool.o CBox/IOLine.o cfunction.o ../Common/polarssl/md5.o
 LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib32" -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib32" -static-libgcc -L"../../lib/win" -lws2_32 -llua51 -m32 -g3
 INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.8.1/include" -I"../Common" -I"../../include/tolua++"
 CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.8.1/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++" -I"../Common" -I"../../include/tolua++"
 BIN      = service.exe
-CXXFLAGS = $(CXXINCS) -m32 -g3 -fpermissive -DENABLE_ENCRYPT
-CFLAGS   = $(INCS) -m32 -g3 -fpermissive -DENABLE_ENCRYPT
+CXXFLAGS = $(CXXINCS) -m32 -g3 -fpermissive
+CFLAGS   = $(INCS) -m32 -g3 -fpermissive
 RM       = rm.exe -f
 
 .PHONY: all all-before all-after clean clean-custom
@@ -65,3 +65,36 @@ message_dispatch.o: message_dispatch.cpp
 
 ../Common/GXCfunction.o: ../Common/GXCfunction.cpp
 	$(CPP) -c ../Common/GXCfunction.cpp -o ../Common/GXCfunction.o $(CXXFLAGS)
+
+../Common/ae/ae.o: ../Common/ae/ae.c
+	$(CPP) -c ../Common/ae/ae.c -o ../Common/ae/ae.o $(CXXFLAGS)
+
+../Common/hiredis/async.o: ../Common/hiredis/async.c
+	$(CPP) -c ../Common/hiredis/async.c -o ../Common/hiredis/async.o $(CXXFLAGS)
+
+../Common/hiredis/dict.o: ../Common/hiredis/dict.c
+	$(CPP) -c ../Common/hiredis/dict.c -o ../Common/hiredis/dict.o $(CXXFLAGS)
+
+../Common/hiredis/hiredis.o: ../Common/hiredis/hiredis.c
+	$(CPP) -c ../Common/hiredis/hiredis.c -o ../Common/hiredis/hiredis.o $(CXXFLAGS)
+
+../Common/hiredis/net.o: ../Common/hiredis/net.c
+	$(CPP) -c ../Common/hiredis/net.c -o ../Common/hiredis/net.o $(CXXFLAGS)
+
+../Common/hiredis/sds.o: ../Common/hiredis/sds.c
+	$(CPP) -c ../Common/hiredis/sds.c -o ../Common/hiredis/sds.o $(CXXFLAGS)
+
+CBox/CBox.o: CBox/CBox.cpp
+	$(CPP) -c CBox/CBox.cpp -o CBox/CBox.o $(CXXFLAGS)
+
+CBox/CBoxPool.o: CBox/CBoxPool.cpp
+	$(CPP) -c CBox/CBoxPool.cpp -o CBox/CBoxPool.o $(CXXFLAGS)
+
+CBox/IOLine.o: CBox/IOLine.cpp
+	$(CPP) -c CBox/IOLine.cpp -o CBox/IOLine.o $(CXXFLAGS)
+
+cfunction.o: cfunction.cpp
+	$(CPP) -c cfunction.cpp -o cfunction.o $(CXXFLAGS)
+
+../Common/polarssl/md5.o: ../Common/polarssl/md5.c
+	$(CPP) -c ../Common/polarssl/md5.c -o ../Common/polarssl/md5.o $(CXXFLAGS)
