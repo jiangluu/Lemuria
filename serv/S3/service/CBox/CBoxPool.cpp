@@ -9,8 +9,7 @@
 
 #define BUF_LEN (1024*64)
 
-#define LOGIN_MSG 1		// 使用这个宏而不是protobuf里的定义，摆脱protobuf
-#define LOGIN_MSG_2 9
+#define IS_LOGIN_MSG(a)  (1==a || 9==a)
 
 
 extern CBoxPool *g_boxpool;
@@ -471,8 +470,50 @@ int CBoxPool::OnMessage(GXContext *gx,InternalHeader *hh)
 		
 		CBox *bb = getBox(g_box_tier->box_id_);
 		if(bb){
+			// 正常业务消息分派 
 			int r = bb->getLuaVM()->callGlobalFunc<int>("OnCustomMessage");
 			return r;
+		}
+		else{
+			// 进了这里应该是进入BOX消息 
+			if(IS_LOGIN_MSG(hh->message_id_)){
+				int err_code = 1;	// 1-每个BOX都满了 2-有未满的但是进入失败 
+				FOR(i,box_num_){
+					CBox *bb = a_box_+i;
+					if(bb && bb->current_actor_num_<bb->suggested_actor_num_){
+						g_box_tier->box_id_ = i;
+						g_box_tier->actor_id_ = -1;
+						
+						int new_actor_id = bb->getLuaVM()->callGlobalFunc<int>("OnActorEnter");		// OnActorEnter()这个函数应该尽快返回 new_actor_id，把其余事情交给其他函数做 
+						if(new_actor_id>=0){
+							g_box_tier->actor_id_ = new_actor_id;		// 重要，从此以后这个actor就是这个ID了 
+							++ bb->current_actor_num_;
+							if(new_actor_id < bb->actor_async_data_num_){
+								bb->a_actor_async_data_[new_actor_id].cleanup();
+							}
+							
+							// C里的部分只负责让actor进入BOX并自己维护一个计数器，其余不理解。只知道继续分发消息 
+							gx->input_context_.ws_->cleanup();
+							int r = bb->getLuaVM()->callGlobalFunc<int>("OnCustomMessage");
+							
+							err_code = 0;
+							break;
+						}
+						else{
+							err_code = 2;
+							break;
+						}
+					}
+				}
+				
+				if(0 != err_code){
+					// 杯具。。
+					CBox *bb = getBox(0);	// 把0号box借来一用 
+					if(bb){
+						bb->getLuaVM()->callGlobalFunc<void>("OnEnterFail",err_code);
+					}
+				}
+			}
 		}
 	}
 	
