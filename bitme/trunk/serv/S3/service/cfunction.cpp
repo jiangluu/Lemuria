@@ -7,6 +7,7 @@
 #include "LuaInterface.h"
 #include "cfunction.h"
 #include "GXContext.h"
+#include "GXCfunction.h"
 
 
 
@@ -78,6 +79,15 @@ u64 cur_game_usec()
 {
 	return g_time->localUsecTime();
 }
+
+void cur_write_stream_cleanup()
+{
+	gx_cur_writestream_cleanup();
+	if(g_box_tier){
+		gx_cur_stream_push_slice2((const char*)g_box_tier,sizeof(BoxProtocolTier));
+	}
+}
+
 
 bool log_write(int level,const char *ss,int len)
 {

@@ -466,6 +466,9 @@ int CBoxPool::OnMessage(GXContext *gx,InternalHeader *hh)
 			
 			const char* b = gx->input_context_.rs_->get_bin(sizeof(BoxProtocolTier));
 			memcpy(g_box_tier,b,sizeof(BoxProtocolTier));
+			
+			// service节点自己的规则，包头后的一段
+			gx->input_context_.ws_->push_bin(b,sizeof(BoxProtocolTier));
 		}
 		
 		CBox *bb = getBox(g_box_tier->box_id_);
@@ -494,6 +497,8 @@ int CBoxPool::OnMessage(GXContext *gx,InternalHeader *hh)
 							
 							// C里的部分只负责让actor进入BOX并自己维护一个计数器，其余不理解。只知道继续分发消息 
 							gx->input_context_.ws_->cleanup();
+							gx->input_context_.ws_->push_bin((const char*)g_box_tier,sizeof(BoxProtocolTier));
+							
 							int r = bb->getLuaVM()->callGlobalFunc<int>("OnCustomMessage");
 							
 							err_code = 0;

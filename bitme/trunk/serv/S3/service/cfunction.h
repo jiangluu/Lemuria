@@ -28,6 +28,7 @@ CF_EXPORT u32 cur_game_time();
 
 CF_EXPORT u64 cur_game_usec();
 
+CF_EXPORT void cur_write_stream_cleanup();
 
 
 // 因为传入了长度len，这个接口支持二进制数据 
