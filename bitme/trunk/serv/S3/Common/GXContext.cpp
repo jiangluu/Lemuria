@@ -504,7 +504,8 @@ int GXContext::syncWriteBack(int msgid,int datalen,void *data)
 		if(0 == input_context_.header_type_){
 			InternalHeader &h = input_context_.header_;
 			if(0 != (h.flag_ & HEADER_FLAG_ROUTE)){
-				__kfifo_put(ff,(unsigned char*)input_context_.tail_ptr_,TAIL_JUMP_LEN*h.jumpnum_);
+				int ee = TAIL_JUMP_LEN*h.jumpnum_ <= TAIL_JUMP_MEM_LEN ? TAIL_JUMP_LEN*h.jumpnum_ : TAIL_JUMP_MEM_LEN;
+				__kfifo_put(ff,(unsigned char*)input_context_.tail_mem_,ee);
 			}
 		}
 		
@@ -952,7 +953,8 @@ int GXContext::try_deal_one_msg_s(Link *ioable,int &begin)
 								input_context_.header_type_ = header_type_;
 								memcpy(&input_context_.header_,hh,INTERNAL_HEADER_LEN);
 								
-								input_context_.tail_ptr_ = (char*)jj;
+								int ee = TAIL_JUMP_LEN*hh->jumpnum_ <= TAIL_JUMP_MEM_LEN ? TAIL_JUMP_LEN*hh->jumpnum_ : TAIL_JUMP_MEM_LEN;
+								memcpy(input_context_.tail_mem_,jj,ee);
 								input_context_.ws_->cleanup();
 								input_context_.rs_->reset(hh->len_-CLIENT_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
 								

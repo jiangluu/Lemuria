@@ -38,6 +38,9 @@ struct TailJump{
 #define TAIL_JUMP_LEN 12
 
 
+#define TAIL_JUMP_MEM_LEN (TAIL_JUMP_LEN*8)		// 重要：能力2最多支持8个尾巴（跳7次） 
+
+
 #define HEADER_FLAG_BACK 0x1
 #define HEADER_FLAG_ROUTE 0x2
 
