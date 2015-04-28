@@ -4,8 +4,8 @@
 CPP      = g++.exe -D__DEBUG__
 CC       = gcc.exe -D__DEBUG__
 WINDRES  = windres.exe
-OBJ      = main.o ../Common/alog.o ../Common/bson.o ../Common/kfifo.o ../Common/lfs.o ../Common/link.o ../Common/luaconf.o ../Common/omt.o ../Common/polarssl/padlock.o ../Common/polarssl/aes.o ../Common/GXContext.o LuaInterface.o message_dispatch.o ../Common/GXCfunction.o ../Common/ae/ae.o ../Common/hiredis/async.o ../Common/hiredis/dict.o ../Common/hiredis/hiredis.o ../Common/hiredis/net.o ../Common/hiredis/sds.o CBox/CBox.o CBox/CBoxPool.o CBox/IOLine.o cfunction.o ../Common/polarssl/md5.o
-LINKOBJ  = main.o ../Common/alog.o ../Common/bson.o ../Common/kfifo.o ../Common/lfs.o ../Common/link.o ../Common/luaconf.o ../Common/omt.o ../Common/polarssl/padlock.o ../Common/polarssl/aes.o ../Common/GXContext.o LuaInterface.o message_dispatch.o ../Common/GXCfunction.o ../Common/ae/ae.o ../Common/hiredis/async.o ../Common/hiredis/dict.o ../Common/hiredis/hiredis.o ../Common/hiredis/net.o ../Common/hiredis/sds.o CBox/CBox.o CBox/CBoxPool.o CBox/IOLine.o cfunction.o ../Common/polarssl/md5.o
+OBJ      = main.o ../Common/alog.o ../Common/bson.o ../Common/kfifo.o ../Common/lfs.o ../Common/link.o ../Common/luaconf.o ../Common/omt.o ../Common/polarssl/padlock.o ../Common/polarssl/aes.o ../Common/GXContext.o LuaInterface.o message_dispatch.o ../Common/GXCfunction.o ../Common/ae/ae.o ../Common/hiredis/async.o ../Common/hiredis/dict.o ../Common/hiredis/hiredis.o ../Common/hiredis/net.o ../Common/hiredis/sds.o CBox/CBox.o CBox/CBoxPool.o CBox/IOLine.o cfunction.o ../Common/polarssl/md5.o ../Common/pbc/alloc.o ../Common/pbc/array.o ../Common/pbc/bootstrap.o ../Common/pbc/context.o ../Common/pbc/decode.o ../Common/pbc/map.o ../Common/pbc/pattern.o ../Common/pbc/proto.o ../Common/pbc/register.o ../Common/pbc/rmessage.o ../Common/pbc/stringpool.o ../Common/pbc/varint.o ../Common/pbc/wmessage.o
+LINKOBJ  = main.o ../Common/alog.o ../Common/bson.o ../Common/kfifo.o ../Common/lfs.o ../Common/link.o ../Common/luaconf.o ../Common/omt.o ../Common/polarssl/padlock.o ../Common/polarssl/aes.o ../Common/GXContext.o LuaInterface.o message_dispatch.o ../Common/GXCfunction.o ../Common/ae/ae.o ../Common/hiredis/async.o ../Common/hiredis/dict.o ../Common/hiredis/hiredis.o ../Common/hiredis/net.o ../Common/hiredis/sds.o CBox/CBox.o CBox/CBoxPool.o CBox/IOLine.o cfunction.o ../Common/polarssl/md5.o ../Common/pbc/alloc.o ../Common/pbc/array.o ../Common/pbc/bootstrap.o ../Common/pbc/context.o ../Common/pbc/decode.o ../Common/pbc/map.o ../Common/pbc/pattern.o ../Common/pbc/proto.o ../Common/pbc/register.o ../Common/pbc/rmessage.o ../Common/pbc/stringpool.o ../Common/pbc/varint.o ../Common/pbc/wmessage.o
 LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib32" -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib32" -static-libgcc -L"../../lib/win" -lws2_32 -llua51 -m32 -g3
 INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.8.1/include" -I"../Common" -I"../../include/tolua++"
 CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.8.1/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++" -I"../Common" -I"../../include/tolua++"
@@ -98,3 +98,42 @@ cfunction.o: cfunction.cpp
 
 ../Common/polarssl/md5.o: ../Common/polarssl/md5.c
 	$(CPP) -c ../Common/polarssl/md5.c -o ../Common/polarssl/md5.o $(CXXFLAGS)
+
+../Common/pbc/alloc.o: ../Common/pbc/alloc.c
+	$(CPP) -c ../Common/pbc/alloc.c -o ../Common/pbc/alloc.o $(CXXFLAGS)
+
+../Common/pbc/array.o: ../Common/pbc/array.c
+	$(CPP) -c ../Common/pbc/array.c -o ../Common/pbc/array.o $(CXXFLAGS)
+
+../Common/pbc/bootstrap.o: ../Common/pbc/bootstrap.c
+	$(CPP) -c ../Common/pbc/bootstrap.c -o ../Common/pbc/bootstrap.o $(CXXFLAGS)
+
+../Common/pbc/context.o: ../Common/pbc/context.c
+	$(CPP) -c ../Common/pbc/context.c -o ../Common/pbc/context.o $(CXXFLAGS)
+
+../Common/pbc/decode.o: ../Common/pbc/decode.c
+	$(CPP) -c ../Common/pbc/decode.c -o ../Common/pbc/decode.o $(CXXFLAGS)
+
+../Common/pbc/map.o: ../Common/pbc/map.c
+	$(CPP) -c ../Common/pbc/map.c -o ../Common/pbc/map.o $(CXXFLAGS)
+
+../Common/pbc/pattern.o: ../Common/pbc/pattern.c
+	$(CPP) -c ../Common/pbc/pattern.c -o ../Common/pbc/pattern.o $(CXXFLAGS)
+
+../Common/pbc/proto.o: ../Common/pbc/proto.c
+	$(CPP) -c ../Common/pbc/proto.c -o ../Common/pbc/proto.o $(CXXFLAGS)
+
+../Common/pbc/register.o: ../Common/pbc/register.c
+	$(CPP) -c ../Common/pbc/register.c -o ../Common/pbc/register.o $(CXXFLAGS)
+
+../Common/pbc/rmessage.o: ../Common/pbc/rmessage.c
+	$(CPP) -c ../Common/pbc/rmessage.c -o ../Common/pbc/rmessage.o $(CXXFLAGS)
+
+../Common/pbc/stringpool.o: ../Common/pbc/stringpool.c
+	$(CPP) -c ../Common/pbc/stringpool.c -o ../Common/pbc/stringpool.o $(CXXFLAGS)
+
+../Common/pbc/varint.o: ../Common/pbc/varint.c
+	$(CPP) -c ../Common/pbc/varint.c -o ../Common/pbc/varint.o $(CXXFLAGS)
+
+../Common/pbc/wmessage.o: ../Common/pbc/wmessage.c
+	$(CPP) -c ../Common/pbc/wmessage.c -o ../Common/pbc/wmessage.o $(CXXFLAGS)
