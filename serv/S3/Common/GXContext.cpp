@@ -292,9 +292,11 @@ bool GXContext::init(int type,const char* ID,int pool_size,int read_buf_len,int 
 	stat_ = 1;
 	
 	input_context_.reset();
-	input_context_.rs_ = new AStream(0,0);
+	rs_ = new AStream(0,0);
 	void* mem = calloc(1,write_buf_len);
-	input_context_.ws_ = new AStream(write_buf_len,(char*)mem);
+	ws_ = new AStream(write_buf_len,(char*)mem);
+	rs_bak_ = rs_;
+	ws_bak_ = ws_;
 	
 	map_portal_ = omt_new();
 	
@@ -885,8 +887,10 @@ int GXContext::try_deal_one_msg_s(Link *ioable,int &begin)
 						input_context_.header_type_ = header_type_;
 						memcpy(&input_context_.header_,hh,INTERNAL_HEADER_LEN);
 						
-						input_context_.ws_->cleanup();
-						input_context_.rs_->reset(full_len-INTERNAL_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
+						rs_ = rs_bak_;
+						ws_ = ws_bak_;
+						ws_->cleanup();
+						rs_->reset(full_len-INTERNAL_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
 						
 						int r = ((GXContextMessageDispatch)callback_)(this,ioable,hh,full_len-INTERNAL_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
 					}
@@ -929,8 +933,10 @@ int GXContext::try_deal_one_msg_s(Link *ioable,int &begin)
 								input_context_.header_.flag_ = 0;	// 重要：已经完成了一个来回，标记清空 
 								input_context_.header_.jumpnum_ = 0;
 								
-								input_context_.ws_->cleanup();
-								input_context_.rs_->reset(hh->len_-CLIENT_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
+								rs_ = rs_bak_;
+								ws_ = ws_bak_;
+								ws_->cleanup();
+								rs_->reset(hh->len_-CLIENT_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
 								
 								int r = ((GXContextMessageDispatch)callback_)(this,ioable,hh,hh->len_-CLIENT_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
 							}
@@ -955,8 +961,10 @@ int GXContext::try_deal_one_msg_s(Link *ioable,int &begin)
 								
 								int ee = TAIL_JUMP_LEN*hh->jumpnum_ <= TAIL_JUMP_MEM_LEN ? TAIL_JUMP_LEN*hh->jumpnum_ : TAIL_JUMP_MEM_LEN;
 								memcpy(input_context_.tail_mem_,jj,ee);
-								input_context_.ws_->cleanup();
-								input_context_.rs_->reset(hh->len_-CLIENT_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
+								rs_ = rs_bak_;
+								ws_ = ws_bak_;
+								ws_->cleanup();
+								rs_->reset(hh->len_-CLIENT_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
 								
 								int r = ((GXContextMessageDispatch)callback_)(this,ioable,hh,hh->len_-CLIENT_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
 							}
@@ -1094,8 +1102,11 @@ int GXContext::try_deal_one_msg_s(Link *ioable,int &begin)
 					input_context_.header_type_ = header_type_;
 					input_context_.header2_ = *hh;
 					//memcpy(&input_context_.header2_,hh,CLIENT_HEADER_LEN);
-					input_context_.ws_->cleanup();
-					input_context_.rs_->reset(full_len-CLIENT_HEADER_LEN,ioable->read_buf_+begin+CLIENT_HEADER_LEN);
+					
+					rs_ = rs_bak_;
+					ws_ = ws_bak_;
+					ws_->cleanup();
+					rs_->reset(full_len-CLIENT_HEADER_LEN,ioable->read_buf_+begin+CLIENT_HEADER_LEN);
 					
 					r = ((GXContextMessageDispatch2)callback_)(this,ioable,hh,full_len-CLIENT_HEADER_LEN,ioable->read_buf_+begin+CLIENT_HEADER_LEN);
 				}

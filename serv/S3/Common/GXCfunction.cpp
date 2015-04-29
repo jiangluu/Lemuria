@@ -59,43 +59,43 @@ void gx_set_context(struct GXContext *aa)
 
 bool gx_cur_stream_is_end()
 {
-	if(s_gx) return s_gx->input_context_.rs_->is_end();
+	if(s_gx) return s_gx->rs_->is_end();
 	return true;
 }
 
 s16 gx_cur_stream_get_int8()
 {
-	if(s_gx) return (s16)s_gx->input_context_.rs_->get<char>();
+	if(s_gx) return (s16)s_gx->rs_->get<char>();
 	return 0;
 }
 
 s16 gx_cur_stream_get_int16()
 {
-	if(s_gx) return s_gx->input_context_.rs_->get<s16>();
+	if(s_gx) return s_gx->rs_->get<s16>();
 	return 0;
 }
 
 s32 gx_cur_stream_get_int32()
 {
-	if(s_gx) return s_gx->input_context_.rs_->get<s32>();
+	if(s_gx) return s_gx->rs_->get<s32>();
 	return 0;
 }
 
 s64 gx_cur_stream_get_int64()
 {
-	if(s_gx) return s_gx->input_context_.rs_->get<s64>();
+	if(s_gx) return s_gx->rs_->get<s64>();
 	return 0;
 }
 
 f32 gx_cur_stream_get_float32()
 {
-	if(s_gx) return s_gx->input_context_.rs_->get<f32>();
+	if(s_gx) return s_gx->rs_->get<f32>();
 	return 0.0f;
 }
 
 f64 gx_cur_stream_get_float64()
 {
-	if(s_gx) return s_gx->input_context_.rs_->get<f64>();
+	if(s_gx) return s_gx->rs_->get<f64>();
 	return 0.0f;
 }
 
@@ -106,9 +106,9 @@ struct Slice gx_cur_stream_get_slice()
 	aa.mem_ = NULL;
 	
 	if(s_gx){
-		s16 len = s_gx->input_context_.rs_->get<s16>();
+		s16 len = s_gx->rs_->get<s16>();
 		if(len>0 && len<(MAX_A_STR_LEN-40)){
-			const char *cc = s_gx->input_context_.rs_->get_bin(len);
+			const char *cc = s_gx->rs_->get_bin(len);
 			if(cc){
 				memcpy(s_buf1+32,cc,len);
 				s_buf1[len+32] = 0;
@@ -123,31 +123,31 @@ struct Slice gx_cur_stream_get_slice()
 
 s16 gx_cur_stream_peek_int16()
 {
-	if(s_gx) return s_gx->input_context_.rs_->peek<s16>();
+	if(s_gx) return s_gx->rs_->peek<s16>();
 	return 0;
 }
 
 bool gx_cur_stream_push_int16(s16 v)
 {
-	if(s_gx) return s_gx->input_context_.ws_->set<s16>(v);
+	if(s_gx) return s_gx->ws_->set<s16>(v);
 	return false;
 }
 
 bool gx_cur_stream_push_int32(s32 v)
 {
-	if(s_gx) return s_gx->input_context_.ws_->set<s32>(v);
+	if(s_gx) return s_gx->ws_->set<s32>(v);
 	return false;
 }
 
 bool gx_cur_stream_push_int64(s64 v)
 {
-	if(s_gx) return s_gx->input_context_.ws_->set<s64>(v);
+	if(s_gx) return s_gx->ws_->set<s64>(v);
 	return false;
 }
 
 bool gx_cur_stream_push_float32(f32 v)
 {
-	if(s_gx) return s_gx->input_context_.ws_->set<f32>(v);
+	if(s_gx) return s_gx->ws_->set<f32>(v);
 	return false;
 }
 
@@ -168,8 +168,8 @@ bool gx_cur_stream_push_slice2(const char* v,int len)
 			real_len = strlen(v);
 		}
 		
-		s_gx->input_context_.ws_->set<s16>((s16)real_len);
-		return s_gx->input_context_.ws_->push_bin(v,real_len);
+		s_gx->ws_->set<s16>((s16)real_len);
+		return s_gx->ws_->push_bin(v,real_len);
 	}
 	
 	return false;
@@ -177,7 +177,7 @@ bool gx_cur_stream_push_slice2(const char* v,int len)
 
 void gx_cur_writestream_cleanup()
 {
-	if(s_gx) s_gx->input_context_.ws_->cleanup();
+	if(s_gx) s_gx->ws_->cleanup();
 }
 
 
@@ -185,7 +185,7 @@ void gx_cur_writestream_cleanup()
 int gx_cur_writestream_syncback()
 {
 	if(s_gx){
-		AStream *aa = s_gx->input_context_.ws_;
+		AStream *aa = s_gx->ws_;
 		if(0 == s_gx->input_context_.header_type_){
 			return s_gx->syncWriteBack(s_gx->input_context_.header_.message_id_+1,aa->getwritebuflen(),aa->getbuf());
 		}
@@ -200,7 +200,7 @@ int gx_cur_writestream_syncback()
 int gx_cur_writestream_syncback2(int message_id)
 {
 	if(s_gx){
-		AStream *aa = s_gx->input_context_.ws_;
+		AStream *aa = s_gx->ws_;
 		return s_gx->syncWriteBack(message_id,aa->getwritebuflen(),aa->getbuf());
 	}
 	
@@ -210,7 +210,7 @@ int gx_cur_writestream_syncback2(int message_id)
 int gx_cur_writestream_send_to(int portal_index,int message_id)
 {
 	if(s_gx){
-		AStream *aa = s_gx->input_context_.ws_;
+		AStream *aa = s_gx->ws_;
 		Link* ll = s_gx->getLink(portal_index);
 		if(ll){
 			InternalHeader h;
@@ -281,7 +281,7 @@ int gx_bind_portal_id(int index,const char* id)
 int gx_cur_writestream_route_to(const char* destID,int message_id)
 {
 	if(s_gx && destID){
-		AStream *aa = s_gx->input_context_.ws_;
+		AStream *aa = s_gx->ws_;
 		return s_gx->packetRouteToNode(destID,message_id,aa->getwritebuflen(),aa->getbuf());
 	}
 	
