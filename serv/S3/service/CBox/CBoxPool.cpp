@@ -224,12 +224,6 @@ bool CBoxPool::init(char *global_id)
 	
 	if(!ioline_undefined_.init(9999,1024*256,1024*64)) return false;
 	
-	{
-		int len = 1024*64;
-		void *mem = malloc(len);
-		ws_ = new AStream(len,(char*)mem);
-		if(0 == ws_) return false;
-	}
 	
 	gx_context_ = g_gx1;
 	
@@ -269,7 +263,6 @@ int CBoxPool::boxRedisAsyncCommand(redisAsyncContext *ac,const char *format, va_
 	GXContext *gx = (GXContext*)getGX();
 	memcpy(&actor_async_data->context_,&gx->input_context_,sizeof(GXContext::InputContext));
 	memcpy(&actor_async_data->box_tier_,g_box_tier,sizeof(BoxProtocolTier));
-	actor_async_data->context_.rs_ = NULL;
 	actor_async_data->typee_ = 0;
 	++actor_async_data->serial_[0];
 	
@@ -298,9 +291,8 @@ void CBoxPool::OnRedisReplyCallback(ActorAsyncData *ad,redisReply *reply)
 		memcpy(&gx->input_context_,&ad->context_,sizeof(GXContext::InputContext));
 		memcpy(g_box_tier,&ad->box_tier_,sizeof(BoxProtocolTier));
 		
-		ws_->cleanup();
-		gx->input_context_.rs_ = NULL;	// 这时不能再读用户输入 
-		gx->input_context_.ws_ = ws_;
+		gx->rs_ = NULL;	// 这时不能再读用户输入 
+		gx->ws_->cleanup();
 		
 		bool found = false;
 		FOR(i,box_num_){
@@ -309,7 +301,7 @@ void CBoxPool::OnRedisReplyCallback(ActorAsyncData *ad,redisReply *reply)
 			g_box_tier->box_id_ = i;
 			g_box_tier->actor_id_ = 0;
 			
-			ws_->cleanup();
+			gx->ws_->cleanup();
 			redis_push_msg_ = reply;
 			int r = bb->getLuaVM()->callGlobalFunc<int>("OnRedisReply",1);
 			if(1 == r){
@@ -332,9 +324,9 @@ void CBoxPool::OnRedisReplyCallback(ActorAsyncData *ad,redisReply *reply)
 		GXContext *gx = (GXContext*)getGX();
 		memcpy(&gx->input_context_,&ad->context_,sizeof(GXContext::InputContext));
 		memcpy(g_box_tier,&ad->box_tier_,sizeof(BoxProtocolTier));
-		ws_->cleanup();
-		gx->input_context_.rs_ = NULL;	// 这时不能再读用户输入 
-		gx->input_context_.ws_ = ws_;
+		
+		gx->rs_ = NULL;	// 这时不能再读用户输入 
+		gx->ws_->cleanup();
 		
 		redis_reply_ = reply;
 		int r = box->getLuaVM()->callGlobalFunc<int>("OnRedisReply",0);
@@ -464,11 +456,11 @@ int CBoxPool::OnMessage(GXContext *gx,InternalHeader *hh)
 		if(g_box_tier){
 			g_box_tier->reset();
 			
-			const char* b = gx->input_context_.rs_->get_bin(sizeof(BoxProtocolTier));
+			const char* b = gx->rs_->get_bin(sizeof(BoxProtocolTier));
 			memcpy(g_box_tier,b,sizeof(BoxProtocolTier));
 			
 			// service节点自己的规则，包头后的一段
-			gx->input_context_.ws_->push_bin(b,sizeof(BoxProtocolTier));
+			gx->ws_->push_bin(b,sizeof(BoxProtocolTier));
 		}
 		
 		CBox *bb = getBox(g_box_tier->box_id_);
@@ -496,8 +488,8 @@ int CBoxPool::OnMessage(GXContext *gx,InternalHeader *hh)
 							}
 							
 							// C里的部分只负责让actor进入BOX并自己维护一个计数器，其余不理解。只知道继续分发消息 
-							gx->input_context_.ws_->cleanup();
-							gx->input_context_.ws_->push_bin((const char*)g_box_tier,sizeof(BoxProtocolTier));
+							gx->ws_->cleanup();
+							gx->ws_->push_bin((const char*)g_box_tier,sizeof(BoxProtocolTier));
 							
 							int r = bb->getLuaVM()->callGlobalFunc<int>("OnCustomMessage");
 							
