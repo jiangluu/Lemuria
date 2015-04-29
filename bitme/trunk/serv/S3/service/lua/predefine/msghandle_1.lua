@@ -22,7 +22,7 @@ function OnInternalMessage()
 end
 
 
-function regAllHandlers()
+function regMsgHandlers()
 	o.handle = {}
 	-- 注册消息handler
 	local the_dir = g_lua_dir..'msg_internal/'
@@ -39,4 +39,4 @@ function regAllHandlers()
 	end
 end
 
-regAllHandlers()
+regMsgHandlers()
