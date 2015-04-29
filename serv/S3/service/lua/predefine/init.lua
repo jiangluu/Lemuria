@@ -1,4 +1,9 @@
 
+function isServ()
+	return true
+end
+
+
 local this_dir = g_lua_dir..'predefine/'
 
 for file in lfs.dir(this_dir) do

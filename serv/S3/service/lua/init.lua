@@ -17,6 +17,7 @@ end
 
 
 g_lua_dir = "lua/"
+g_data_dir = "data/"
 
 
 jlpcall(dofile,g_lua_dir.."predefine/init.lua")

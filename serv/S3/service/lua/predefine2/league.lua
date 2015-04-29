@@ -410,17 +410,19 @@ end
 
 -- 下面是回调函数
 
-box.reg_todo_handle('setarena',function(me,dd)
-	me.basic.arena_id = dd.id
-	me.basic.arena_cloud = '0000'
-	me.basic.arena_f = me.basic.flag
-	return 0
-end)
+function o.post_init()
+	box.reg_todo_handle('setarena',function(me,dd)
+		me.basic.arena_id = dd.id
+		me.basic.arena_cloud = '0000'
+		me.basic.arena_f = me.basic.flag
+		return 0
+	end)
 
-box.reg_todo_handle('league_award',function(me,dd)
-	me.basic.arena_r = dd.rank
-	me.basic.arena_last_id = me.basic.arena_id
-	me.basic.arena_last_flag = me.basic.arena_f
-	return 0
-end)
+	box.reg_todo_handle('league_award',function(me,dd)
+		me.basic.arena_r = dd.rank
+		me.basic.arena_last_id = me.basic.arena_id
+		me.basic.arena_last_flag = me.basic.arena_f
+		return 0
+	end)
+end
 
