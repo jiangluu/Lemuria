@@ -4,7 +4,7 @@ local lcf = ffi.C
 
 
 -- CombatStart 	21 	NULL 	开始一次PVP战斗
-box.reg_handle(21,function(me)
+function onMsg(me)
 	local ta_usersn = nil
 	
 	local index = lcf.cur_stream_get_int32()
@@ -127,5 +127,5 @@ box.reg_handle(21,function(me)
 	yylog.log(string.format('pvpstart,usersn%d,targetsn%d',me.basic.usersn,ta_usersn))
 	
 	return 0
-end)
+end
 

@@ -812,7 +812,7 @@ end
 
 
 -- CombatEnd 	23 	<<(WORD)way<<(string)json_string 	结束一次PVP战斗 way:0-正常完成 1-中途退出的 其他待定 json_string：描述战斗结果的json串
-box.reg_handle(23,function(me)
+function onMsg(me)
 
 	local function err_ack(err)
 		lcf.cur_write_stream_cleanup()
@@ -838,5 +838,5 @@ box.reg_handle(23,function(me)
 	err_ack(ret1)
 	
 	return 0
-end)
+end
 

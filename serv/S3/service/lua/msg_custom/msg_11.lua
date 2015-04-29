@@ -4,7 +4,7 @@ local lcf = ffi.C
 
 
 -- HeartBeat
-box.reg_handle(11,function(me)
+function onMsg(me)
 	
 	-- 先把一些系统要做的事情做了
 	local now = lcf.cur_game_time()
@@ -76,5 +76,5 @@ box.reg_handle(11,function(me)
 	lcf.cur_stream_write_back()
 	
 	return 0
-end)
+end
 

@@ -24,14 +24,14 @@ end
 
 
 -- Offline 1000
-box.reg_handle(1000,function(me)
+function onMsg(me)
 
 	pcall(before_offline,me)
 	
 	box.on_player_offline(me)
 	
 	return 0
-end)
+end
 
 
 box.add_exit_message(1000)

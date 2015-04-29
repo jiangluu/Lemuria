@@ -6,7 +6,7 @@ local stat_taken = -2
 
 
 -- Reconnect 	9
-box.reg_handle(9,function(me)
+function onMsg(me)
 	
 	local login_key = l_cur_stream_get_slice()
 	local session_key = l_cur_stream_get_slice()
@@ -114,5 +114,5 @@ box.reg_handle(9,function(me)
 	end
 	
 	return 0
-end)
+end
 
