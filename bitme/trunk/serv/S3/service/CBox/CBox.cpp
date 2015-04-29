@@ -6,15 +6,15 @@
 
 
 bool CBox::init(int id,int num_of_ioline,int line_a_size,int line_b_size,int suggested_actor_num)
-{
-	if(num_of_ioline<=0) return false;
-	
+{	
 	id_ = id;
 	
 	suggested_actor_num_ = suggested_actor_num;
 	
-	ioline_ = new IOLine[num_of_ioline];
-	if(0 == ioline_) return false;
+	ioline_ = NULL;
+	if(num_of_ioline>0){
+		ioline_ = new IOLine[num_of_ioline];
+	}
 	
 	ioline_num_ = num_of_ioline;
 	
