@@ -3,7 +3,7 @@ local lcf = ffi.C
 
 
 -- Trusted-pull 	17 	<<(string)key 	客户端从服务端拉取数据
-box.reg_handle(17,function(me)
+function onMsg(me)
 	
 	local key = l_cur_stream_get_slice()
 	
@@ -21,5 +21,5 @@ box.reg_handle(17,function(me)
 	daily.push_data_to_c(key,ss)
 	
 	return 0
-end)
+end
 

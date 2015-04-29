@@ -5,7 +5,7 @@ local o = {}
 o.handles = {}
 
 -- from controlpanel  1101
-box.reg_handle(1101,function(me)
+function onMsg(me)
 	
 	local skey = l_cur_stream_get_slice()
 	local tag = lcf.cur_stream_get_int32()
@@ -28,7 +28,7 @@ box.reg_handle(1101,function(me)
 	end
 	
 	return 0
-end)
+end
 
 
 function o.reg_cmd(cmd,func)

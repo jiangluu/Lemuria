@@ -4,7 +4,7 @@ local lcf = ffi.C
 
 
 -- ChatNoTarget 	13 	<<(WORD)chat_type<<(string)text 	chat_type:1-本服 text：聊天内容
-box.reg_handle(13,function(me)
+function onMsg(me)
 	
 	local chat_type = lcf.cur_stream_get_int16()
 	local bin = l_cur_stream_get_slice()
@@ -69,5 +69,5 @@ box.reg_handle(13,function(me)
 	
 	
 	return 0
-end)
+end
 

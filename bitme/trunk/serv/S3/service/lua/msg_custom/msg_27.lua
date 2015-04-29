@@ -10,7 +10,7 @@ local prefix_fb_nick = 'fb_nick_'
 
 
 -- bindID 	27 	<<(WORD)type<<(string)id 	绑定苹果或者谷歌ID type:gamecenter=1,google+=2
-box.reg_handle(27,function(me)
+function onMsg(me)
 	local typee = lcf.cur_stream_get_int16()
 	local strid = l_cur_stream_get_slice()
 	local s_mail = l_cur_stream_get_slice()
@@ -111,5 +111,5 @@ box.reg_handle(27,function(me)
 	end
 	
 	return 0
-end)
+end
 

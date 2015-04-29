@@ -261,7 +261,7 @@ end
 
 
 -- Trusted-push 	15 	<<(string)key<<(string)json_string 	可信任的直接修改数据，服务端不做验证的。具体数据由json串描述
-box.reg_handle(15,function(me)
+function onMsg(me)
 	
 	local key = l_cur_stream_get_slice()
 	local is_zip = lcf.cur_stream_get_int16()
@@ -305,5 +305,5 @@ box.reg_handle(15,function(me)
 	lcf.cur_stream_write_back()
 	
 	return 0
-end)
+end
 

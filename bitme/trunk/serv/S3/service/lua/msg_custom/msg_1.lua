@@ -21,7 +21,7 @@ local function gen_random()
 	return string.char(unpack(t))
 end
 
-box.reg_handle(1,function(me)
+function onMsg(me)
 	
 	local function ack_err(err)
 		lcf.cur_write_stream_cleanup()
@@ -195,5 +195,5 @@ box.reg_handle(1,function(me)
 	end
 	
 	return 0
-end)
+end
 

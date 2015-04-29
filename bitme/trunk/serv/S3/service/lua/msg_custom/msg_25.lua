@@ -4,7 +4,7 @@ local lcf = ffi.C
 
 
 -- observe 	25 	<<(string)usersn 	要观察的目标玩家usersn
-box.reg_handle(25,function(me)
+function onMsg(me)
 	
 	local function err_ack(err)
 		lcf.cur_write_stream_cleanup()
@@ -50,5 +50,5 @@ box.reg_handle(25,function(me)
 	
 	
 	return 0
-end)
+end
 
