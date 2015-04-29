@@ -1,6 +1,11 @@
 
+local lcf = ffi.C
+
 -- 这是个全局函数，C里面会调用
 function box_post_init()
+	league.post_init()
+
+
 	-- 订阅本BOX系统频道
 	local actor_id = tonumber(lcf.cur_actor_id())
 	print('box_post_init',g_box_id,actor_id)
