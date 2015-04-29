@@ -1,6 +1,8 @@
 
 local lcf = ffi.C
 
+local guild_subscribe_redis_index = 3
+
 -- 这是个全局函数，C里面会调用
 function box_post_init()
 	league.post_init()
