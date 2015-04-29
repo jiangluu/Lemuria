@@ -105,21 +105,14 @@ function getHappenedTime()
 end
 
 
-function regAllHandlers()
-	if isServ() then
-		-- 注册消息handler
-		for file in lfs.dir(g_lua_dir..'msg/') do
-			if string.match(file,'%.lua') then
-				jlpcall(dofile,g_lua_dir..'msg/'..file)
-			end
-		end
-		
+function regAllEvents()
+	if isServ() then		
 		-- 注册UserEvent
 		for file in lfs.dir(g_lua_dir..'events/') do
 			if string.match(file,'%.lua') then
 				local aa = string.gsub(file,'%.lua','')
 				local hash = lcf.string_hash(aa)
-				print(aa,'--->',bson.type(hash))
+				print(aa,'--->',hash)
 				
 				jlpcall(dofile,g_lua_dir..'events/'..file)
 				o.regHandle(hash,onEvent)
@@ -129,6 +122,6 @@ function regAllHandlers()
 	end
 end
 
-regAllHandlers()
+regAllEvents()
 
 
