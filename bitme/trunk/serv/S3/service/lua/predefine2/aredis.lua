@@ -36,7 +36,7 @@ function o.init()
 end
 
 function o.get_conn(redis_index)
-	if redis_index>= #redis_port then
+	if redis_index >= #redis_port then
 		print('redis_index too big')
 		return nil
 	end
