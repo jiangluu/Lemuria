@@ -21,7 +21,7 @@
 
 class CBoxPool{
 public:
-	CBoxPool():box_num_(0),a_box_(0),buf_(0),ae_loop_(0),ws_(0),redis_reply_(0),redis_push_msg_(0),flag_(0),gx_context_(0){
+	CBoxPool():box_num_(0),a_box_(0),buf_(0),ae_loop_(0),redis_reply_(0),redis_push_msg_(0),flag_(0),gx_context_(0){
 		FOR(i,BOX_SHARED_PTR_NUM){
 			a_ptr_[i] = 0;
 		}
@@ -69,8 +69,6 @@ private:
 	
 	
 	IOLine ioline_undefined_;
-	
-	AStream *ws_;
 	
 	void *gx_context_;
 	
