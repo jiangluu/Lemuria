@@ -72,8 +72,7 @@ struct GXContext{
 		char tail_mem_[TAIL_JUMP_MEM_LEN];
 		u16 flag_;
 		
-		AStream *rs_;
-		AStream *ws_;
+		
 		
 		void reset(){	// 不释放内存，只是为了复用 
 			gxc_ = 0;
@@ -88,10 +87,13 @@ struct GXContext{
 	
 	InputContext input_context_;
 	
+	AStream *rs_;
+	AStream *ws_;
+	
 	
 	GXContext():type_(0),layer_(0),header_type_(0),stat_(0),enable_encrypt_(false),link_pool_size_conf_(0),
 	link_pool_size_(0),read_buf_len_(0),write_fifo_len_(0),listening_socket_(-1),
-	callback_(0),link_cut_callback_(0),link_pool_(NULL),map_portal_(NULL),
+	callback_(0),link_cut_callback_(0),link_pool_(NULL),map_portal_(NULL),rs_(0),ws_(0),rs_bak_(0),ws_bak_(0),
 	#ifdef __USING_WINDOWS_IOCP
 		iocp_handle_(0)
 	#else
@@ -155,6 +157,9 @@ struct GXContext{
 	
 private:
 	int try_deal_one_msg_s(Link *ioable,int &begin);
+	
+	AStream *rs_bak_;
+	AStream *ws_bak_;
 };
 
 
