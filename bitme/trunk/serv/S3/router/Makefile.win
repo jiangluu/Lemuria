@@ -10,8 +10,8 @@ LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib32" -L"C:/Program Files 
 INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.8.1/include" -I"../Common" -I"../../include/tolua++"
 CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.8.1/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++" -I"../Common" -I"../../include/tolua++"
 BIN      = router.exe
-CXXFLAGS = $(CXXINCS) -m32 -g3 -fpermissive -DENABLE_ENCRYPT -O
-CFLAGS   = $(INCS) -m32 -g3 -fpermissive -DENABLE_ENCRYPT -O
+CXXFLAGS = $(CXXINCS) -m32 -g3 -fpermissive -O
+CFLAGS   = $(INCS) -m32 -g3 -fpermissive -O
 RM       = rm.exe -f
 
 .PHONY: all all-before all-after clean clean-custom
