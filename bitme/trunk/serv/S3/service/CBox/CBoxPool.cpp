@@ -275,6 +275,13 @@ void CBoxPool::OnRedisReplyCallback(ActorAsyncData *ad,redisReply *reply)
 	//printf("CBoxPool::OnRedisReplyCallback  %x  %x\n",ad,reply);
 	if(0==ad) return;
 	
+	// 恢复上下文
+	GXContext *gx = (GXContext*)getGX();
+	memcpy(&gx->input_context_,&ad->context_,sizeof(GXContext::InputContext));
+	memcpy(g_box_tier,&ad->box_tier_,sizeof(BoxProtocolTier));
+	
+	gx->rs_ = NULL;	// 这时不能再读用户输入 
+	gx->ws_->cleanup();
 	
 	// 先判断是否订阅消息 
 	redis_push_msg_ = reply;
@@ -286,13 +293,6 @@ void CBoxPool::OnRedisReplyCallback(ActorAsyncData *ad,redisReply *reply)
 	bool is_push_msg = box->getLuaVM()->callGlobalFunc<bool>("isPushMsg");
 	if(is_push_msg){
 		// 要分发到每个BOX
-		
-		GXContext *gx = (GXContext*)getGX();
-		memcpy(&gx->input_context_,&ad->context_,sizeof(GXContext::InputContext));
-		memcpy(g_box_tier,&ad->box_tier_,sizeof(BoxProtocolTier));
-		
-		gx->rs_ = NULL;	// 这时不能再读用户输入 
-		gx->ws_->cleanup();
 		
 		bool found = false;
 		FOR(i,box_num_){
@@ -320,13 +320,6 @@ void CBoxPool::OnRedisReplyCallback(ActorAsyncData *ad,redisReply *reply)
 		++ad->serial_[1];
 		if(ad->serial_[0] != ad->serial_[1]) return;
 		
-		// 恢复上下文
-		GXContext *gx = (GXContext*)getGX();
-		memcpy(&gx->input_context_,&ad->context_,sizeof(GXContext::InputContext));
-		memcpy(g_box_tier,&ad->box_tier_,sizeof(BoxProtocolTier));
-		
-		gx->rs_ = NULL;	// 这时不能再读用户输入 
-		gx->ws_->cleanup();
 		
 		redis_reply_ = reply;
 		int r = box->getLuaVM()->callGlobalFunc<int>("OnRedisReply",0);
@@ -457,6 +450,7 @@ int CBoxPool::OnMessage(GXContext *gx,InternalHeader *hh)
 			g_box_tier->reset();
 			
 			const char* b = gx->rs_->get_bin(sizeof(BoxProtocolTier));
+			if(!b) return -1;
 			memcpy(g_box_tier,b,sizeof(BoxProtocolTier));
 			
 			// service节点自己的规则，包头后的一段
@@ -510,6 +504,8 @@ int CBoxPool::OnMessage(GXContext *gx,InternalHeader *hh)
 						bb->getLuaVM()->callGlobalFunc<void>("OnEnterFail",err_code);
 					}
 				}
+				
+				return 0;
 			}
 		}
 	}
