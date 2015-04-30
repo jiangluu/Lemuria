@@ -2,16 +2,340 @@
 #include <stdlib.h>
 #include <string.h>
 #include <string>
+#include <assert.h>
 #include "gate.h"
 #include "AStream.h"
 #include "GXCfunction.h"
 #include "LuaInterface.h"
+#include "omt.h"
+
+
+
+#define OFFLINE_TIMEOUT 60000	// 60秒没有任何消息算下线 
+
+#define DUANLIANJIE_TIMEOUT 120000	// 120秒之内短连接不算失效 
 
 
 
 extern LuaInterface *g_luavm;
 
-AStream *ws = NULL;
+
+static struct omt_tree *table1 = NULL;
+
+struct DuanLianJie_Imprint{
+	int last_pool_id_;
+	timetype last_time_;
+	s32		session_link_index_; 	// 此session在哪个link 
+	u16		app_box_id_;
+	u16		app_actor_id_;
+};
+
+
+int server_kick_client(Link *ll,int reason);
+
+
+
+// 客户端来的消息，包头是ClientHeader 
+int message_dispatch_2(GXContext*,Link* src_link,ClientHeader *hh,int body_len,char *body)
+{
+	int message_id = hh->message_id_;
+	
+	
+	// 短连接相关
+#define DUAN_LIANJIE_OPEN_ID 9001
+	if(g_duanlianjie>=1 &&  DUAN_LIANJIE_OPEN_ID == message_id){
+		AStream rs(body_len,body);	// rs means read stream
+		std::string session_id = rs.getStr();
+		
+		if(NULL == table1){
+			table1 = omt_new();
+			assert(table1);
+		}
+		
+		// 防止 table1 无限增长 
+		if(table1->free_idx > 50000){
+			printf("re-generate table1...\n");
+			struct omt_tree *new_tree = omt_new();
+			assert(new_tree);
+			
+			timetype now = g_time->getANSITime();
+			
+			FOR(i,table1->free_idx){
+				struct omt_node &node = table1->nodes[i];
+				if(0 != node.value->val){
+					DuanLianJie_Imprint *p = (DuanLianJie_Imprint*)node.value->val;
+					if(now <= p->last_time_+DUANLIANJIE_TIMEOUT){
+						omt_insert(new_tree,node.value);
+					}
+				}
+			}
+			
+			omt_free(table1);
+			table1 = new_tree;
+			printf("re-generate table1 over. new tree has [%d] leaf\n",table1->free_idx);
+		}
+		// ================
+		
+		if(0 == src_link->link_id_[0]){
+			
+			struct slice *v = NULL;
+			int r = omt_get(table1,session_id.c_str(),&v);
+			bool need_new_session = true;
+			if(-1 == r && v->val){	// found
+				DuanLianJie_Imprint *p = (DuanLianJie_Imprint*)v->val;
+				timetype now = g_time->getANSITime();
+				if(now <= p->last_time_+DUANLIANJIE_TIMEOUT){
+					need_new_session = false;
+					
+					p->last_time_ = now;
+					p->last_pool_id_ = src_link->pool_index_;
+					
+					src_link->session_link_index_ = p->session_link_index_;
+					src_link->app_box_id_ = p->app_box_id_;
+					src_link->app_actor_id_ = p->app_actor_id_;
+					
+					strncpy(src_link->link_id_,session_id.c_str(),LINK_ID_LEN);
+				}
+			}
+			
+			if(need_new_session){
+				// gen a random string
+				static char *buf = NULL;
+				if(NULL == buf){
+					buf = (char*)malloc(32);
+				}
+				memset(buf,0,32);
+				
+				FOR(i,LINK_ID_LEN){
+					buf[i] = 'A' + (g_rand->rand32()%26);
+				}
+				
+				DuanLianJie_Imprint im;
+				memset(&im,0,sizeof(im));
+				
+				im.last_pool_id_ = src_link->pool_index_;
+				im.last_time_ = g_time->getANSITime();
+				omt_put(table1,buf,sizeof(im),(char*)&im);
+				
+				strncpy(src_link->link_id_,buf,LINK_ID_LEN);
+			}
+			
+		}
+	}
+	
+	// 流控、安全性等加在这里 
+#define LK_LIMIT_TIMES 200
+#define LK_LIMIT_TRAFFIC	1024*100
+	if(src_link->lk_times_+1<=LK_LIMIT_TIMES && (s64)(src_link->lk_traffic_)+body_len+CLIENT_HEADER_LEN<=LK_LIMIT_TRAFFIC){
+		++ src_link->lk_times_;
+		src_link->lk_traffic_ += body_len+CLIENT_HEADER_LEN;
+		
+		src_link->last_active_time_ = g_time->currentTime();
+		
+		if(0 == src_link->first_packet_time_){	// init it
+			src_link->first_packet_time_ = (u32)g_time->getANSITime();
+		}
+		src_link->total_traffic_ += body_len+CLIENT_HEADER_LEN+20;
+	}
+	else{
+		// 额外日志
+		static char *buf = NULL;
+		if(NULL == buf){
+			buf = (char*)malloc(256);
+		}
+		memset(buf,0,256);
+		if(src_link->lk_times_+1 > LK_LIMIT_TIMES){
+			sprintf(buf,"too many packets in short time. actor_id[%d]",src_link->app_actor_id_);
+		}
+		else{
+			sprintf(buf,"traffic flowup. actor_id[%d]",src_link->app_actor_id_);
+		}
+		g_log->write(1,buf,strlen(buf));
+		g_log->flush();
+		
+		// 认为不合法，踢掉此玩家 
+		server_kick_client(src_link,2);
+		return -1;
+	}
+	
+	if(g_duanlianjie>=1 &&  DUAN_LIANJIE_OPEN_ID == message_id){
+		kfifo *ff = &src_link->write_fifo_;
+		ClientHeader bb;
+		bb.message_id_ = DUAN_LIANJIE_OPEN_ID+1;
+		
+		u16 len = LINK_ID_LEN;
+		bb.len_ = CLIENT_HEADER_LEN+len+2;
+		
+		__kfifo_put(ff,(unsigned char*)&bb,CLIENT_HEADER_LEN);
+		__kfifo_put(ff,(unsigned char*)&len,2);
+		__kfifo_put(ff,(unsigned char*)src_link->link_id_,len);
+		
+		return 0;	// gate拦截此消息 
+	}
+	
+	
+	if(message_id>0 && message_id < 50000){	// 这个之前的认为应该转发到Service 
+		// 现在还没有真正的定位能力 
+		if(src_link->session_link_index_ < 0){
+			// 还没有确定session给哪一个service，给它分配一个 。这里先用一种很简单的random分配 
+			const int piece_num = 2;
+			int whom = ARAND32 % piece_num;
+			
+			int counter = 0;
+			int result = -1;
+			int first_met = -1;
+			FOR(i,g_gx1->link_pool_size_){
+				Link *aa = g_gx1->link_pool_ + i;
+				if(1==aa->pool_stat_ && aa->isService()){
+					if(first_met < 0){
+						first_met = i;
+					}
+					
+					if(counter == whom){
+						result = i;
+						break;
+					}
+					else{
+						++counter;
+					}
+				}
+			}
+			
+			if(result>=0){
+				src_link->session_link_index_ = result;
+			}
+			else{
+				src_link->session_link_index_ = first_met;
+			}
+		}
+		
+		Link *ll = g_gx1->getLink(src_link->session_link_index_);
+		if(ll){
+			static char* buffer = NULL;
+			if(NULL == buffer){
+				buffer = (char*)malloc(g_gx1->read_buf_len_ * 2);
+			}
+			static char* buffer3 = NULL;
+			if(NULL == buffer3){
+				buffer3 = (char*)malloc(128);
+				memset(buffer3,0,128);
+			}
+			
+			
+			
+					kfifo *ff = &ll->write_fifo_;
+					InternalHeader *tt = (InternalHeader*)buffer;
+					memcpy(tt,hh,CLIENT_HEADER_LEN);
+					tt->flag_ = 0;
+					tt->jumpnum_ = 0;
+					
+					BoxProtocolTier *bt = (BoxProtocolTier*)(buffer+INTERNAL_HEADER_LEN);
+					bt->reset();
+					bt->box_id_ = src_link->app_box_id_;
+					bt->actor_id_ = src_link->app_actor_id_;
+					bt->gate_pool_index_ = src_link->pool_index_;
+					bt->padding_ = 0;
+					bt->usersn_ = src_link->usersn_;
+					
+					tt->len_ += sizeof(BoxProtocolTier);
+					
+					
+					memcpy(buffer+INTERNAL_HEADER_LEN+sizeof(BoxProtocolTier),body,body_len);
+					
+#define IS_LOGIN_MESSAGE(id) (1==id || 9==id)
+					if(! IS_LOGIN_MESSAGE(message_id)){
+						__kfifo_put(ff,(unsigned char*)buffer,INTERNAL_HEADER_LEN+sizeof(BoxProtocolTier)+body_len);
+					}
+					else{
+						nc_get_ip(src_link->sock_,buffer3,127);
+						int len = strlen(buffer3);
+						// append 一个字符串在最后 
+						u16 *uu = (u16*)(buffer+INTERNAL_HEADER_LEN+sizeof(BoxProtocolTier)+body_len);
+						*uu = len;
+						memcpy(buffer+INTERNAL_HEADER_LEN+sizeof(BoxProtocolTier)+body_len+sizeof(u16),buffer3,len);
+						tt->len_ += sizeof(u16)+len;
+						
+						__kfifo_put(ff,(unsigned char*)buffer,INTERNAL_HEADER_LEN+sizeof(BoxProtocolTier)+body_len+sizeof(u16)+len);
+					}
+		}
+	}
+	else{
+		printf("message_id out of range:%d\n",message_id);
+	}
+	
+	return 0;
+}
+
+void on_client_cut_2(GXContext*,Link *ll,int reason,int gxcontext_type)
+{
+	printf("on_client_cut  link_index [%d]  reason [%d]  gxcontext_type[%d]\n",ll->pool_index_,reason,gxcontext_type);
+	
+	if(0 != ll->first_packet_time_){
+		static char *buf2 = NULL;
+		static int counter = 0;
+		
+		++counter;
+		if(0 == buf2){
+			buf2 = (char*)malloc(2048);
+		}
+		
+		int inteval = g_time->getANSITime() - ll->first_packet_time_;
+		if(0 == inteval){
+			inteval = 1;
+		}
+		sprintf(buf2,"traffic-report  tps[%d] total[%u] timeremain[%d] link_index[%d] reason[%d]",
+		ll->total_traffic_/inteval,ll->total_traffic_,inteval,ll->pool_index_,reason);
+		
+		g_log->write(1,buf2,strlen(buf2));
+		if(counter >= 100){
+			g_log->flush();
+			counter = 0;
+		}
+	}
+	
+	{
+		bool send_nodify = true;
+		if(g_duanlianjie >= 1 && table1){
+			char buf[32];
+			strcpy(buf,ll->link_id_);
+			struct slice *v = NULL;
+			int r = omt_get(table1,buf,&v);
+			if(-1 == r && v->val){
+				DuanLianJie_Imprint *p = (DuanLianJie_Imprint*)v->val;
+				p->last_pool_id_ = ll->pool_index_;
+				p->last_time_ = g_time->getANSITime();
+				p->session_link_index_ = ll->session_link_index_;
+				p->app_box_id_ = ll->app_box_id_;
+				p->app_actor_id_ = ll->app_actor_id_;
+				
+				send_nodify = false;
+			}
+		}
+		
+		if(send_nodify){
+			// 是客户端断线，发消息 
+			Link *ta_service = g_gx1->getLink(ll->session_link_index_);
+			if(ta_service){
+				InternalHeader tt;
+				tt.message_id_ = 1000;
+				tt.len_ = CLIENT_HEADER_LEN;
+				tt.flag_ = 0;
+				tt.jumpnum_ = 0;
+				
+				BoxProtocolTier bt;
+				bt.reset();
+				bt.box_id_ = ll->app_box_id_;
+				bt.actor_id_ = ll->app_actor_id_;
+				bt.gate_pool_index_ = ll->pool_index_;
+				bt.padding_ = 0;
+				bt.usersn_ = ll->usersn_;
+				
+				__kfifo_put(&ta_service->write_fifo_,(unsigned char*)&tt,INTERNAL_HEADER_LEN);
+				__kfifo_put(&ta_service->write_fifo_,(unsigned char*)&bt,sizeof(BoxProtocolTier));
+			}
+		}
+	}
+}
 
 
 int message_dispatch(GXContext *gx,Link* src_link,InternalHeader *hh,int body_len,char *body)
@@ -23,7 +347,18 @@ int message_dispatch(GXContext *gx,Link* src_link,InternalHeader *hh,int body_le
 		int r = g_luavm->callGlobalFunc<int>("OnInternalMessage");
 	}
 	else{
-		int r = g_luavm->callGlobalFunc<int>("OnCustomMessage");
+		BoxProtocolTier *bt = (BoxProtocolTier*)body;
+		Link *ll = g_gx2->getLink(bt->gate_pool_index_);
+		if(ll){
+					ll->app_box_id_ = bt->box_id_;
+					ll->app_actor_id_ = bt->actor_id_;
+					if(bt->usersn_ != (u64)-1) ll->usersn_ = bt->usersn_;
+					kfifo *ff = &ll->write_fifo_;
+					__kfifo_put(ff,(unsigned char*)hh,CLIENT_HEADER_LEN);
+					__kfifo_put(ff,(unsigned char*)(bt+1),body_len-sizeof(BoxProtocolTier));
+					
+					ll->total_traffic_ += body_len+CLIENT_HEADER_LEN+20;
+		}
 	}
 	
 	return 0;
@@ -41,7 +376,87 @@ void on_client_cut(GXContext *gx,Link *ll,int reason,int gxcontext_type)
 	}
 }
 
+// 服务端主动踢掉一个人 
+int server_kick_client(Link *ll,int reason)
+{
+	// 给service发消息通知下线
+	on_client_cut_2(g_gx2,ll,reason,1);
+	
+	// 释放它
+	g_gx2->forceCutLink(ll);
+	 
+	return 0;
+}
+
+int check_client_links(timetype now)
+{
+	static timetype pre_point_1 = 0;
+	if(0 == pre_point_1){
+		pre_point_1 = now;
+		return 0;
+	}
+	
+	if(now >= pre_point_1+5000){
+		pre_point_1 = now;
+		
+		FOR(i,g_gx2->link_pool_size_){
+			Link *ll = g_gx2->getLink(i);
+			if(ll){
+				ll->lk_times_ = 0;
+				ll->lk_traffic_ = 0;
+			}
+			if(ll && 0!=ll->last_active_time_ && ll->last_active_time_+OFFLINE_TIMEOUT<now){
+				// 认为断线，踢掉之 
+				server_kick_client(ll,3);
+			}
+		}
+		
+		if(g_duanlianjie >= 1 && table1){
+			FOR(i,table1->free_idx){
+				struct omt_node &node = table1->nodes[i];
+				if(0 != node.value->val){
+					DuanLianJie_Imprint *p = (DuanLianJie_Imprint*)node.value->val;
+					if(now > p->last_time_+DUANLIANJIE_TIMEOUT){
+						// send notify 
+						Link *ta_service = g_gx2->getLink(p->session_link_index_);
+						if(ta_service){
+							InternalHeader tt;
+							tt.message_id_ = 1000;
+							tt.len_ = CLIENT_HEADER_LEN;
+							tt.flag_ = 0;
+							tt.jumpnum_ = 0;
+							
+							BoxProtocolTier bt;
+							bt.reset();
+							bt.box_id_ = p->app_box_id_;
+							bt.actor_id_ = p->app_actor_id_;
+							bt.gate_pool_index_ = p->last_pool_id_;
+							bt.padding_ = 0;
+							bt.usersn_ = 0;
+							
+							__kfifo_put(&ta_service->write_fifo_,(unsigned char*)&tt,INTERNAL_HEADER_LEN);
+							__kfifo_put(&ta_service->write_fifo_,(unsigned char*)&bt,sizeof(BoxProtocolTier));
+						}
+					}
+					
+					// cleanup  node.value->val
+					free(node.value->val);
+					node.value->val = 0;
+					node.value->size2 = 0;
+					
+				}
+			}
+		}
+		
+	}
+	
+	
+	return 0;
+}
+
+
 void frame_time_driven(timetype now)
 {
+	check_client_links(now);
 }
 
