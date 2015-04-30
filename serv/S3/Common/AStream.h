@@ -14,7 +14,6 @@ public:
 	void cleanup(){
 		offset_read_ = 0;
 		offset_write_ = 0;
-		data_len_ = 0;
 	}
 	
 	void reset(s32 len,char *data){
