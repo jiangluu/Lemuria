@@ -318,7 +318,7 @@ void on_client_cut_2(GXContext*,Link *ll,int reason,int gxcontext_type)
 			if(ta_service){
 				InternalHeader tt;
 				tt.message_id_ = 1000;
-				tt.len_ = CLIENT_HEADER_LEN;
+				tt.len_ = CLIENT_HEADER_LEN+sizeof(BoxProtocolTier);
 				tt.flag_ = 0;
 				tt.jumpnum_ = 0;
 				
@@ -350,6 +350,7 @@ int message_dispatch(GXContext *gx,Link* src_link,InternalHeader *hh,int body_le
 		BoxProtocolTier *bt = (BoxProtocolTier*)body;
 		Link *ll = g_gx2->getLink(bt->gate_pool_index_);
 		if(ll){
+					hh->len_ -= sizeof(BoxProtocolTier);
 					ll->app_box_id_ = bt->box_id_;
 					ll->app_actor_id_ = bt->actor_id_;
 					if(bt->usersn_ != (u64)-1) ll->usersn_ = bt->usersn_;
@@ -422,7 +423,7 @@ int check_client_links(timetype now)
 						if(ta_service){
 							InternalHeader tt;
 							tt.message_id_ = 1000;
-							tt.len_ = CLIENT_HEADER_LEN;
+							tt.len_ = CLIENT_HEADER_LEN+sizeof(BoxProtocolTier);
 							tt.flag_ = 0;
 							tt.jumpnum_ = 0;
 							
