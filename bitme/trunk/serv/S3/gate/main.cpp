@@ -108,6 +108,12 @@ int main(int argc, char** argv) {
 	
 	gx_set_context(g_gx1);
 	
+	int init_r = g_luavm->callGlobalFunc<int>("PostInit");
+	if(0 != init_r){
+		printf("Lua PostInit() failed.\n");
+		_exit(-2);
+	}
+	
 	
 	// 开启第二个GX上下文，为客户端准备的 
 	my_port = g_luavm->callGlobalFunc<std::string>("getMyPort2");
