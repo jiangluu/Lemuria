@@ -8,6 +8,8 @@ function onMsg()
 	local port = l_gx_cur_stream_get_slice()
 	local portal_index = lcf.gx_get_portal_pool_index()
 	
+	print('msg8011',node_id,port)
+	
 	l_gx_simple_ack()
 	
 	-- TODO: 通知其他可能关心的节点
