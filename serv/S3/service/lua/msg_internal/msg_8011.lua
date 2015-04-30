@@ -1,6 +1,8 @@
 
 local lcf = ffi.C
 
+nodes_table = {}	-- 全局节点map
+
 function onMsg()
 	local node_id = l_gx_cur_stream_get_slice()
 	local port = l_gx_cur_stream_get_slice()
