@@ -19,8 +19,11 @@ char *g_e_key = NULL;
 LuaInterface *g_luavm = 0;
 GameTime *g_time = 0;
 ARand *g_rand = 0;
+ALog *g_log = 0;
 GXContext *g_gx1 = 0;
+GXContext *g_gx2 = 0;
 
+int g_duanlianjie = 0;
 int g_stop_loop = 0;
 
 
@@ -29,6 +32,9 @@ void __installHandler();
 
 int message_dispatch(GXContext*,Link* src_link,InternalHeader *hh,int body_len,char *body);
 void on_client_cut(GXContext*,Link *ll,int reason,int gxcontext_type);
+
+int message_dispatch_2(GXContext*,Link* src_link,ClientHeader *hh,int body_len,char *body);
+void on_client_cut_2(GXContext*,Link *ll,int reason,int gxcontext_type);
 
 void frame_time_driven(timetype now);
 
@@ -49,6 +55,13 @@ int main(int argc, char** argv) {
 	}
 #endif	
 	
+	FOR(i,argc){
+		if(0 == strcmp(argv[i],"--duan")){
+			g_duanlianjie = 1;
+			printf("use duanlianjie mode\n");
+		}
+	}
+	
 	__installHandler();
 	
 	
@@ -57,6 +70,15 @@ int main(int argc, char** argv) {
 	g_time->init();
 	
 	g_rand = new ARand((u32)g_time->getANSITime());
+	
+	g_log = new ALog();
+	char buf1[64];
+	snprintf(buf1,60,"log%s",argv[1]);
+	if(!g_log->init(buf1)){
+		printf("Log init error\n");
+		_exit(-1);
+	}
+	g_log->setTimer(g_time);
 	
 	
 	// 读取配置文件
@@ -73,21 +95,40 @@ int main(int argc, char** argv) {
 	std::string my_port = g_luavm->callGlobalFunc<std::string>("getMyPort");
 	
 	g_gx1 = new GXContext();
-	g_gx1->init(GXContext::typeFullFunction,argv[1],config_maxconn,config_readbuflen,config_writebuflen );
+	g_gx1->init(GXContext::typeFullFunction,argv[1],8,1024*1024*8,1024*1024*8);
 	strncpy(g_gx1->ip_and_port_,my_port.c_str(),127);
 	
 	g_gx1->registerCallback((void*)message_dispatch,0);
 	
 	g_gx1->registerLinkCutCallback(on_client_cut);
 	
-#ifdef ENABLE_ENCRYPT
-	g_gx1->enable_encrypt_ = true;
-#endif
-	 
-	 
 	if(!g_gx1->start_listening()){
 		_exit(-1);
 	}
+	
+	gx_set_context(g_gx1);
+	
+	
+	// 开启第二个GX上下文，为客户端准备的 
+	my_port = g_luavm->callGlobalFunc<std::string>("getMyPort2");
+	
+	g_gx2 = new GXContext();
+	g_gx2->init(GXContext::typeFullFunction,argv[1],config_maxconn,config_readbuflen,config_writebuflen);
+	strncpy(g_gx2->ip_and_port_,my_port.c_str(),127);
+	
+	g_gx2->registerCallback((void*)message_dispatch_2,1);
+	
+	g_gx2->registerLinkCutCallback(on_client_cut_2);
+	
+#ifdef ENABLE_ENCRYPT
+	g_gx2->enable_encrypt_ = true;
+#endif
+	
+	if(!g_gx2->start_listening()){
+		_exit(-1);
+	}
+	
+
 	
 	// 进入主循环 
 	static int frame_time_max = 10;		// 每帧最多让CPU等待10个千分之一秒 
@@ -100,12 +141,13 @@ int main(int argc, char** argv) {
 		g_time->incLocalFrame();
 		
 		
-		g_gx1->frame_poll(now,frame_time_max);
+		g_gx2->frame_poll(now,frame_time_max/2);
+		g_gx1->frame_poll(now,frame_time_max/2);
 		
 		// 内部时间驱动
 		frame_time_driven(now);
 		
-		
+		g_gx2->frame_flush(now);
 		g_gx1->frame_flush(now);
 	}
 	
