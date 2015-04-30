@@ -34,13 +34,17 @@ extern GXContext *g_gx1;
 
 
 struct BoxProtocolTier{
-	int box_id_;
-	int actor_id_;
+	u16 box_id_;
+	u16 actor_id_;
+	u16 gate_pool_index_;
+	u16 padding_;
 	u64 usersn_;
 	
 	void reset(){
 		box_id_ = -1;
 		actor_id_ = -1;
+		gate_pool_index_ = -1;
+		padding_ = 0;
 		usersn_ = -1;
 	}
 };
