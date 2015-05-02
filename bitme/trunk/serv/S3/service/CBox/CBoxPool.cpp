@@ -282,6 +282,7 @@ void CBoxPool::OnRedisReplyCallback(ActorAsyncData *ad,redisReply *reply)
 	
 	gx->rs_ = NULL;	// 这时不能再读用户输入 
 	gx->ws_->cleanup();
+	gx->ws_->push_bin((const char*)g_box_tier,sizeof(BoxProtocolTier));
 	
 	// 先判断是否订阅消息 
 	redis_push_msg_ = reply;
@@ -302,6 +303,8 @@ void CBoxPool::OnRedisReplyCallback(ActorAsyncData *ad,redisReply *reply)
 			g_box_tier->actor_id_ = 0;
 			
 			gx->ws_->cleanup();
+			gx->ws_->push_bin((const char*)g_box_tier,sizeof(BoxProtocolTier));
+			
 			redis_push_msg_ = reply;
 			int r = bb->getLuaVM()->callGlobalFunc<int>("OnRedisReply",1);
 			if(1 == r){
