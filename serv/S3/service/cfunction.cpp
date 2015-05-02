@@ -181,7 +181,7 @@ void cur_write_stream_cleanup()
 {
 	gx_cur_writestream_cleanup();
 	if(g_box_tier){
-		gx_cur_stream_push_slice2((const char*)g_box_tier,sizeof(BoxProtocolTier));
+		g_gx1->ws_->push_bin((const char*)g_box_tier,sizeof(BoxProtocolTier));
 	}
 }
 
