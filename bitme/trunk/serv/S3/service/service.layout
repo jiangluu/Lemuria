@@ -32,8 +32,8 @@ CursorRow=107
 TopLine=52
 LeftChar=1
 [Editor_29]
-CursorCol=1
-CursorRow=160
+CursorCol=16
+CursorRow=172
 TopLine=144
 LeftChar=1
 [Editor_30]
@@ -57,9 +57,9 @@ CursorRow=39
 TopLine=6
 LeftChar=1
 [Editor_46]
-CursorCol=83
-CursorRow=463
-TopLine=433
+CursorCol=69
+CursorRow=274
+TopLine=266
 LeftChar=1
 [Editor_47]
 CursorCol=55
@@ -67,8 +67,8 @@ CursorRow=24
 TopLine=22
 LeftChar=1
 [Editor_50]
-CursorCol=1
-CursorRow=192
+CursorCol=10
+CursorRow=184
 TopLine=168
 LeftChar=1
 [Editor_51]
