@@ -270,6 +270,9 @@ int CBoxPool::boxRedisAsyncCommand(redisAsyncContext *ac,const char *format, va_
 	return redisvAsyncCommand(aa,__redis_reply_callback,actor_async_data,format,ap);
 }
 
+#define GX_WS_CLEANUP_AND_BOX_TIER gx->ws_->cleanup();\
+	gx->ws_->push_bin((const char*)g_box_tier,sizeof(BoxProtocolTier));
+
 void CBoxPool::OnRedisReplyCallback(ActorAsyncData *ad,redisReply *reply)
 {
 	//printf("CBoxPool::OnRedisReplyCallback  %x  %x\n",ad,reply);
@@ -281,8 +284,7 @@ void CBoxPool::OnRedisReplyCallback(ActorAsyncData *ad,redisReply *reply)
 	memcpy(g_box_tier,&ad->box_tier_,sizeof(BoxProtocolTier));
 	
 	gx->rs_ = NULL;	// 这时不能再读用户输入 
-	gx->ws_->cleanup();
-	gx->ws_->push_bin((const char*)g_box_tier,sizeof(BoxProtocolTier));
+	GX_WS_CLEANUP_AND_BOX_TIER
 	
 	// 先判断是否订阅消息 
 	redis_push_msg_ = reply;
@@ -302,8 +304,7 @@ void CBoxPool::OnRedisReplyCallback(ActorAsyncData *ad,redisReply *reply)
 			g_box_tier->box_id_ = i;
 			g_box_tier->actor_id_ = 0;
 			
-			gx->ws_->cleanup();
-			gx->ws_->push_bin((const char*)g_box_tier,sizeof(BoxProtocolTier));
+			GX_WS_CLEANUP_AND_BOX_TIER
 			
 			redis_push_msg_ = reply;
 			int r = bb->getLuaVM()->callGlobalFunc<int>("OnRedisReply",1);
@@ -457,7 +458,7 @@ int CBoxPool::OnMessage(GXContext *gx,InternalHeader *hh)
 			memcpy(g_box_tier,b,sizeof(BoxProtocolTier));
 			
 			// service节点自己的规则，包头后的一段
-			gx->ws_->push_bin(b,sizeof(BoxProtocolTier));
+			GX_WS_CLEANUP_AND_BOX_TIER
 		}
 		
 		CBox *bb = getBox(g_box_tier->box_id_);
@@ -485,8 +486,7 @@ int CBoxPool::OnMessage(GXContext *gx,InternalHeader *hh)
 							}
 							
 							// C里的部分只负责让actor进入BOX并自己维护一个计数器，其余不理解。只知道继续分发消息 
-							gx->ws_->cleanup();
-							gx->ws_->push_bin((const char*)g_box_tier,sizeof(BoxProtocolTier));
+							GX_WS_CLEANUP_AND_BOX_TIER
 							
 							int r = bb->getLuaVM()->callGlobalFunc<int>("OnCustomMessage");
 							
