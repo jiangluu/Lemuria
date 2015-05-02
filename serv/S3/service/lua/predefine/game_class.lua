@@ -6,6 +6,15 @@ local o2 = {}
 
 local lcf = ffi.C
 
+
+function g_reload_sd()
+	o2 = {}
+	o.init()
+	o.test2()
+end
+
+
+
 function o.travel_table(t)
 	for k,v in pairs(t) do
 		if type(v)=='table' then
@@ -254,26 +263,4 @@ end
 
 --o.test3()
 
-
 o2 = nil
-
-
---[[
-local aa = g_sd.finddata('scene','TO')
-g_sd.travel_table(aa)
-print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
-print(bson.type(aa.name))
-print(bson.type(aa.block_type))
-print('aa.gates[1].direction',bson.type(aa.gates[1].direction))
-
-
-aa.gates[1].direction = 33
-
-print('BBBBBBBBBBBBBBBBBBBBBBBBB')
-aa.name = 'caichen'
-aa.block_type = 333
-
-g_sd.travel_table(aa)
---]]
-
-
