@@ -32,13 +32,6 @@ local function scan_sort_then_do(this_dir)
 		print('loading ',file)
 		jlpcall(dofile,this_dir..file)
 	end
-	
-	for file in lfs.dir(this_dir) do
-		if 'init.lua'~=file and string.match(file,'%.lua') then
-			print('loading ',file)
-			jlpcall(dofile,this_dir..file)
-		end
-	end
 end
 
 scan_sort_then_do('predefine/')
