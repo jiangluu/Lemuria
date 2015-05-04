@@ -2,7 +2,7 @@
 #define __GXCONTEXT_H
 
 
-#include <string>
+#include <string.h>
 #include "GameTime.h"
 #include "packet_header.h"
 #include "AStream.h"
