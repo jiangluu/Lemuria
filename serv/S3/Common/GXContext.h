@@ -3,6 +3,7 @@
 
 
 #include <string.h>
+#include <string>
 #include "GameTime.h"
 #include "packet_header.h"
 #include "AStream.h"
