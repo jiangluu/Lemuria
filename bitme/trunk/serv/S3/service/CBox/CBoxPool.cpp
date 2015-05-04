@@ -446,6 +446,18 @@ int CBoxPool::OnMessage(GXContext *gx,InternalHeader *hh)
 		CBox *bb = getBox(0);	// 把0号box借来一用 
 		if(bb){
 			int r = bb->getLuaVM()->callGlobalFunc<int>("OnInternalMessage");
+			
+			if(-10051 == r){
+				for(int i=1;i<box_num_;++i){
+					CBox *bb2 = a_box_+i;
+					
+					gx->rs_->cleanup();
+					gx->ws_->cleanup();
+					
+					bb2->getLuaVM()->callGlobalFunc<int>("OnInternalMessage");
+				}
+			}
+			
 			return r;
 		}
 	}
