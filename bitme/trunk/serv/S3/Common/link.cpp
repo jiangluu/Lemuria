@@ -1,9 +1,9 @@
 #include "link.h"
-#include "frontend.h"
+#include "GXContext.h"
 
 
 #ifndef __USING_WINDOWS_IOCP
-int Link::register_read_event(FrontEnd *nc){
+int Link::register_read_event(GXContext *nc){
 	ev_.events = EPOLLIN;
 	ev_.data.ptr = this;
 	int r = epoll_ctl(nc->epoll_fd_, EPOLL_CTL_ADD, sock_, &ev_);
