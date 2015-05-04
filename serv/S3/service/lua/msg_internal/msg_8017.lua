@@ -18,5 +18,5 @@ function onMsg()
 	end
 	
 	
-	return 0
+	return -10051
 end
