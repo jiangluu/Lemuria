@@ -146,7 +146,7 @@ if isServ() then
 				local old = me.addition.daily.mc_time or l_cur_game_time()
 				me.addition.daily.mc_time = old + (sd.misc.default.mc_day*24*3600)
 				
-				me.var.cd.mc = l_cur_game_time() + 10*24*3600
+				me.var.cd.mc = l_cur_game_time() + (conf.cd_time or 25*24*3600)
 				
 				ach.key_inc3(me,'cpayamount',1001)
 				
