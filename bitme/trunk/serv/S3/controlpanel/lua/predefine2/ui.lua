@@ -5,8 +5,10 @@ local o = {}
 
 ui = o
 
-o.cmds = {{'reload handles','reload handles'},
-	{'reload all','reload all'},
+o.cmds = {{'reload handle',{8017,'handle'}},
+	{'reload data',{8017,'data'}},
+	{'reload all',{8017,'all'}},
+	
 	{'onlinenum','onlinenum'},
 	{'league start','league start'},
 	{'league end','league end'},
@@ -20,10 +22,30 @@ o.cmds = {{'reload handles','reload handles'},
 function o.post_init()
 	o.text1 = iup.multiline{READONLY='yes',VISIBLELINES=40,VISIBLECOLUMNS=80}
 	
-	local function send_cmd(cmd)
-		lcf.cur_write_stream_cleanup()
-		lcf.cur_stream_push_int32(-1)
-		lcf.cur_stream_push_string(cmd,0)
+	local function send_cmd(cmd,btn_title)
+		if 'table'==type(cmd) and #cmd>=1 and nil~=tonumber(cmd[1]) then
+			l_gx_cur_writestream_cleanup()
+			
+			local msg_id = tonumber(cmd[1])
+			for i=2,#cmd do
+				local aa = cmd[i]
+				if aa then
+					if 'number'==type(aa) then
+						lcf.gx_cur_stream_push_int32(aa)
+					elseif 'string'==type(aa) then
+						l_gx_cur_writestream_put_slice(aa)
+					end
+				end
+			end
+			
+			lcf.gx_cur_writestream_route_to('S0',msg_id)
+		else
+			return
+		end
+		
+		
+		
+		
 		
 		if 'broadcast'==cmd then
 			iup.SetGlobal('UTF8MODE','yes')
@@ -73,14 +95,6 @@ function o.post_init()
 			return
 		end
 		
-		if string.match(cmd,'league') then
-			lcf.cur_stream_write_2_link(g_link_id,1101,0)
-			return
-		end
-		
-		for i=1,50 do
-			lcf.cur_stream_write_2_link(g_link_id,1101,i-1)
-		end
 	end
 	
 	
@@ -88,14 +102,8 @@ function o.post_init()
 	
 	local function preprocess_btns()
 		for i,v in pairs(o.cmds) do
-			table.insert(btns,iup.button{active="yes",title=v[1],action=function() send_cmd(v[2]) end})
+			table.insert(btns,iup.button{active="yes",title=v[1],action=function() jlpcall(send_cmd,v[2],v[1]) end})
 		end
-		
-		table.insert(btns,iup.button{active="yes",title='re-configs',action=function()
-			lcf.cur_write_stream_cleanup()
-			lcf.cur_stream_push_int32(-1)
-			lcf.cur_stream_write_2_link(g_link_id,1103,0)
-		end})
 	end
 	
 	preprocess_btns()
@@ -105,7 +113,7 @@ function o.post_init()
 	o.main_dlg:showxy (iup.CENTER,iup.CENTER)
 end
 
-function o.on_ack(box_id,cmd,ack)
-	o.text1.append = string.format('BOX:[%d]  CMD:[%s]  ACK:[%s]',box_id,cmd,ack)
+function o.on_ack(s)
+	o.text1.append = s
 end
 
