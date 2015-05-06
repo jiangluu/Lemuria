@@ -9,6 +9,7 @@ function onMsg()
 	if 'handle'==op then
 		regMsgHandlers()
 		regMsgHandlers2()
+		regAllEvents()
 	elseif 'data'==op then
 		g_reload_sd()
 	elseif 'all'==op then
