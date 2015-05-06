@@ -22,7 +22,28 @@ o.cmds = {{'reload handle',{8017,'handle'}},
 function o.post_init()
 	o.text1 = iup.multiline{READONLY='yes',VISIBLELINES=40,VISIBLECOLUMNS=80}
 	
+	local function make_sure_target()
+		if nil==o.target_app then
+			local aa = iup.GetText('Set services which you want to send msg to','')
+			
+			local t = {}
+			for dd in string.gmatch(aa,'(%w+)') do
+				table.insert(t,dd)
+			end
+			
+			if #t>0 then
+				o.target_app = t
+			end
+		end
+		
+		return nil~=o.target_app
+	end
+	
 	local function send_cmd(cmd,btn_title)
+		if not make_sure_target() then
+			error('NO target set')
+		end
+		
 		if 'table'==type(cmd) and #cmd>=1 and nil~=tonumber(cmd[1]) then
 			l_gx_cur_writestream_cleanup()
 			
@@ -38,7 +59,10 @@ function o.post_init()
 				end
 			end
 			
-			lcf.gx_cur_writestream_route_to('S0',msg_id)
+			for i=1,#o.target_app do
+				local aa = o.target_app[i]
+				lcf.gx_cur_writestream_route_to(aa,msg_id)
+			end
 		else
 			return
 		end
