@@ -382,7 +382,7 @@ pconv(lua_State *L) {
 		// never get here
 	}
 
-	luaL_checkstack(L, ctx->string_index + 3, NULL);
+	//luaL_checkstack(L, ctx->string_index + 3, "yunfengAAAAA");
 	lua_settop(L,1);
 
 	return 1;
