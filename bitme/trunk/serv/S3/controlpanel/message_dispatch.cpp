@@ -43,5 +43,6 @@ void on_client_cut(GXContext *gx,Link *ll,int reason,int gxcontext_type)
 
 void frame_time_driven(timetype now)
 {
+	g_luavm->callGlobalFunc<int>("OnFrame");
 }
 
