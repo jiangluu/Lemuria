@@ -169,6 +169,8 @@ function o.init()
 	o.read_and_set('lotterycount',g_data_dir..'lotterycount.bytes')
 	o.read_and_set('rank',g_data_dir..'rank.bytes')
 	o.read_and_set('quality',g_data_dir..'quality.bytes')
+	o.read_and_set('item',g_data_dir..'item.bytes')
+	o.read_and_set('craft',g_data_dir..'craft.bytes')
 	io.close()
 	
 	end
