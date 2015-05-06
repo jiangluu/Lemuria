@@ -20,7 +20,7 @@ function PostInit()
 	
 	
 	-- TEST
-	if 'S1'==gGXContextID then
+	if 'C0'==gGXContextID then
 		l_gx_cur_writestream_cleanup()
 		lcf.gx_cur_stream_push_int16(88)
 		
@@ -28,6 +28,8 @@ function PostInit()
 		print('gx_cur_writestream_route_to',r)
 	end
 	
+	
+	ui.post_init()
 	
 	return 0
 end
