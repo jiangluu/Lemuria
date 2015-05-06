@@ -1,0 +1,67 @@
+# Project: controlpanel
+# Makefile created by Dev-C++ 5.9.2
+
+CPP      = g++.exe -D__DEBUG__
+CC       = gcc.exe -D__DEBUG__
+WINDRES  = windres.exe
+OBJ      = main.o ../Common/alog.o ../Common/bson.o ../Common/kfifo.o ../Common/lfs.o ../Common/link.o ../Common/luaconf.o ../Common/omt.o ../Common/polarssl/padlock.o ../Common/polarssl/aes.o ../Common/GXContext.o LuaInterface.o message_dispatch.o ../Common/GXCfunction.o
+LINKOBJ  = main.o ../Common/alog.o ../Common/bson.o ../Common/kfifo.o ../Common/lfs.o ../Common/link.o ../Common/luaconf.o ../Common/omt.o ../Common/polarssl/padlock.o ../Common/polarssl/aes.o ../Common/GXContext.o LuaInterface.o message_dispatch.o ../Common/GXCfunction.o
+LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib32" -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib32" -static-libgcc -L"../../lib/win" -lws2_32 -llua51 -m32 -g3
+INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.8.1/include" -I"../Common" -I"../../include/tolua++"
+CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.8.1/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++" -I"../Common" -I"../../include/tolua++"
+BIN      = controlpanel.exe
+CXXFLAGS = $(CXXINCS) -m32 -g3 -fpermissive -O
+CFLAGS   = $(INCS) -m32 -g3 -fpermissive -O
+RM       = rm.exe -f
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before $(BIN) all-after
+
+clean: clean-custom
+	${RM} $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CPP) $(LINKOBJ) -o $(BIN) $(LIBS)
+
+main.o: main.cpp
+	$(CPP) -c main.cpp -o main.o $(CXXFLAGS)
+
+../Common/alog.o: ../Common/alog.cpp
+	$(CPP) -c ../Common/alog.cpp -o ../Common/alog.o $(CXXFLAGS)
+
+../Common/bson.o: ../Common/bson.c
+	$(CPP) -c ../Common/bson.c -o ../Common/bson.o $(CXXFLAGS)
+
+../Common/kfifo.o: ../Common/kfifo.cpp
+	$(CPP) -c ../Common/kfifo.cpp -o ../Common/kfifo.o $(CXXFLAGS)
+
+../Common/lfs.o: ../Common/lfs.cpp
+	$(CPP) -c ../Common/lfs.cpp -o ../Common/lfs.o $(CXXFLAGS)
+
+../Common/link.o: ../Common/link.cpp
+	$(CPP) -c ../Common/link.cpp -o ../Common/link.o $(CXXFLAGS)
+
+../Common/luaconf.o: ../Common/luaconf.c
+	$(CPP) -c ../Common/luaconf.c -o ../Common/luaconf.o $(CXXFLAGS)
+
+../Common/omt.o: ../Common/omt.c
+	$(CPP) -c ../Common/omt.c -o ../Common/omt.o $(CXXFLAGS)
+
+../Common/polarssl/padlock.o: ../Common/polarssl/padlock.c
+	$(CPP) -c ../Common/polarssl/padlock.c -o ../Common/polarssl/padlock.o $(CXXFLAGS)
+
+../Common/polarssl/aes.o: ../Common/polarssl/aes.c
+	$(CPP) -c ../Common/polarssl/aes.c -o ../Common/polarssl/aes.o $(CXXFLAGS)
+
+../Common/GXContext.o: ../Common/GXContext.cpp
+	$(CPP) -c ../Common/GXContext.cpp -o ../Common/GXContext.o $(CXXFLAGS)
+
+LuaInterface.o: LuaInterface.cpp
+	$(CPP) -c LuaInterface.cpp -o LuaInterface.o $(CXXFLAGS)
+
+message_dispatch.o: message_dispatch.cpp
+	$(CPP) -c message_dispatch.cpp -o message_dispatch.o $(CXXFLAGS)
+
+../Common/GXCfunction.o: ../Common/GXCfunction.cpp
+	$(CPP) -c ../Common/GXCfunction.cpp -o ../Common/GXCfunction.o $(CXXFLAGS)
