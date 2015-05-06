@@ -8,8 +8,10 @@
 	#include <signal.h>
 #endif
 #include "controlpanel.h"
+#include "GXCfunction.h"
 #include "LuaInterface.h"
-
+#include "iup.h"
+#include "iuplua.h"
 
 
 
@@ -61,6 +63,7 @@ int main(int argc, char** argv) {
 	
 	// 读取配置文件
 	g_luavm = new LuaInterface();
+	iuplua_open(g_luavm->luaState());
 	g_luavm->Init();
 	
 	
@@ -85,12 +88,17 @@ int main(int argc, char** argv) {
 #endif
 	 
 	 
-	if(!g_gx1->start_listening()){
-		_exit(-1);
+	gx_set_context(g_gx1);
+	
+	int init_r = g_luavm->callGlobalFunc<int>("PostInit");
+	if(0 != init_r){
+		printf("Lua PostInit() failed.\n");
+		_exit(-2);
 	}
 	
+	
 	// 进入主循环 
-	static int frame_time_max = 10;		// 每帧最多让CPU等待10个千分之一秒 
+	static int frame_time_max = 30;		// 每帧最多让CPU等待10个千分之一秒 
 	
 	printf("server inited. start running...\n");
 	
