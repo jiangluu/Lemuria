@@ -1,4 +1,4 @@
 
-function onFrame()
+function OnFrame()
 	iup.LoopStep()
 end
