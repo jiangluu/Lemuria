@@ -45,6 +45,8 @@ function o.post_init()
 		end
 		
 		if 'table'==type(cmd) and #cmd>=1 and nil~=tonumber(cmd[1]) then
+			ssh.update_all_file(getRouterPort())
+			
 			l_gx_cur_writestream_cleanup()
 			
 			local msg_id = tonumber(cmd[1])
