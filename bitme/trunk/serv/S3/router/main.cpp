@@ -8,6 +8,7 @@
 	#include <signal.h>
 #endif
 #include "router.h"
+#include "GXCfunction.h"
 #include "LuaInterface.h"
 
 
@@ -87,6 +88,13 @@ int main(int argc, char** argv) {
 	 
 	if(!g_gx1->start_listening()){
 		_exit(-1);
+	}
+	
+	gx_set_context(g_gx1);
+	int init_r = g_luavm->callGlobalFunc<int>("PostInit");
+	if(0 != init_r){
+		printf("Lua PostInit() failed.\n");
+		_exit(-2);
 	}
 	
 	// 进入主循环 
