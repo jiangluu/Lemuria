@@ -902,6 +902,8 @@ int GXContext::try_deal_one_msg_s(Link *ioable,int &begin)
 			else{	// 是route包 
 				int full_len = hh->len_+(INTERNAL_HEADER_LEN-CLIENT_HEADER_LEN) + TAIL_JUMP_LEN*hh->jumpnum_;
 				if(full_len<=(end-begin)){
+					begin += full_len;
+					
 					if(0 != (hh->flag_ & HEADER_FLAG_BACK)){
 						// 是回包 
 						if(hh->jumpnum_ > 1){
@@ -1025,7 +1027,7 @@ int GXContext::try_deal_one_msg_s(Link *ioable,int &begin)
 					}
 					
 					
-					begin += full_len;
+					
 					return 1;
 				}
 			}
