@@ -326,6 +326,7 @@ int omt_insert(struct omt_tree *tree, struct slice *val)
 		// update the value.
 		struct slice *sl = tree->nodes[idx].value;
 		sl->size2 = val->size2;
+		free(sl->val);
 		sl->val = val->val;
 	}
 
