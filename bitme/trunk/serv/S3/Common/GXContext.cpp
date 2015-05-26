@@ -3,6 +3,8 @@
 #include "CAS.h"
 
 
+#define GX_PORTAL_MAP "GXPortalMap"
+
 
 extern ARand *g_rand;
 
@@ -298,7 +300,15 @@ bool GXContext::init(int type,const char* ID,int pool_size,int read_buf_len,int 
 	rs_bak_ = rs_;
 	ws_bak_ = ws_;
 	
-	map_portal_ = omt_new();
+	// init luaVM only for self
+	{
+		lua_vm_ = luaL_newstate();
+		luaopen_base(lua_vm_);
+		luaopen_table(lua_vm_);
+		
+		lua_newtable(lua_vm_);
+		lua_setglobal(lua_vm_,GX_PORTAL_MAP);
+	}
 	
 	return true;
 }
@@ -384,37 +394,32 @@ void GXContext::bindLinkWithGlobalID(char *gid,Link *l)
 	
 	strncpy(l->link_id_,gid,LINK_ID_LEN-1);
 	
-	struct PortalPrint aa;
-	aa.stat_ = 1;
-	aa.pool_index_ = l->pool_index_;
-	
-	omt_put(map_portal_,gid,sizeof(aa),(char*)&aa);
+	lua_getglobal(lua_vm_, GX_PORTAL_MAP);
+    lua_pushinteger(lua_vm_,l->pool_index_);
+    lua_setfield(lua_vm_,-2,(const char*)gid);
 }
 
 void GXContext::unbind(char *gid)
-{
-	struct slice *v = NULL;
-	omt_get(map_portal_,gid,&v);
-	if(v){
-		PortalPrint *aa = (PortalPrint*)v->val;
-		aa->stat_ = 0;
-	}
+{	
+	lua_getglobal(lua_vm_, GX_PORTAL_MAP);
+    lua_pushnil(lua_vm_);
+    lua_setfield(lua_vm_,-2,(const char*)gid);
 }
 
 int GXContext::findPortal(int typee,const char* ID)
 {
-	struct slice *v = NULL;
-	omt_get(map_portal_,ID,&v);
-	if(v){
-		PortalPrint *aa = (PortalPrint*)v->val;
+	lua_getglobal(lua_vm_, GX_PORTAL_MAP);
+	lua_getfield(lua_vm_,-1,ID);
+	
+	if(lua_isnumber(lua_vm_,-1)){
+		lua_Integer r = lua_tointeger(lua_vm_,-1);
+		lua_pop(lua_vm_,1);
 		
-		if(aa && 1 == aa->stat_){
-			return aa->pool_index_;
-		}
+		return r;
 	}
-	
-	
-	return -1;
+	else{
+		return -1;
+	}
 }
 
 int GXContext::createPortal(int typee,const char* ID)
