@@ -19,16 +19,6 @@ function PostInit()
 	lcf.gx_cur_writestream_send_to(r,8011)
 	
 	
-	-- TEST
-	if 'C0'==gGXContextID then
-		l_gx_cur_writestream_cleanup()
-		lcf.gx_cur_stream_push_int16(88)
-		
-		local r = lcf.gx_cur_writestream_route_to('S0',2221)
-		print('gx_cur_writestream_route_to',r)
-	end
-	
-	
 	ui.post_init()
 	
 	return 0

@@ -5,9 +5,11 @@ local o = {}
 
 ui = o
 
-o.cmds = {{'reload handle',{8017,'handle'}},
+o.cmds = {{'PING',{2221,88}},
+	{'reload handle',{8017,'handle'}},
 	{'reload data',{8017,'data'}},
 	{'reload all',{8017,'all'}},
+	{'global_phb_fill',{2225}},
 	
 	{'onlinenum','onlinenum'},
 	{'league start','league start'},
@@ -21,6 +23,8 @@ o.cmds = {{'reload handle',{8017,'handle'}},
 
 function o.post_init()
 	o.text1 = iup.multiline{READONLY='yes',VISIBLELINES=40,VISIBLECOLUMNS=80}
+	
+	o.magic = ffi.new('char[?]',16)
 	
 	local function make_sure_target()
 		if nil==o.target_app then
@@ -50,6 +54,10 @@ function o.post_init()
 			l_gx_cur_writestream_cleanup()
 			
 			local msg_id = tonumber(cmd[1])
+			if not (msg_id>=8000 and msg_id<8100) then
+				lcf.gx_cur_stream_push_slice2(o.magic,16)
+			end
+			
 			for i=2,#cmd do
 				local aa = cmd[i]
 				if aa then
