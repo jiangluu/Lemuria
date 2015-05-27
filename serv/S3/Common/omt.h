@@ -13,8 +13,7 @@
 struct slice {
 	int size;
 	char *data;
-	int size2;
-	char *val;
+	void *v_;
 };
 
 struct omt_val {
@@ -50,17 +49,5 @@ int omt_insert(struct omt_tree *tree, struct slice *val);
 int omt_find_order(struct omt_tree *tree, struct slice *val, uint32_t *order);
 
 void omt_free(struct omt_tree *tree);
-
-
-// easy API below.  Where key must be a string
-
-void slice_init(struct slice *s);
-
-int omt_put(struct omt_tree *tree,char *key,int valuelen,char *value);
-
-int omt_get(struct omt_tree *tree,char *key,struct slice **v);
-
-
-
 
 #endif

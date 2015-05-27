@@ -3,6 +3,7 @@
 #include <string.h>
 #include <string>
 #include <assert.h>
+#include <stdint.h>
 #include "gate.h"
 #include "AStream.h"
 #include "GXCfunction.h"
@@ -30,9 +31,30 @@ struct DuanLianJie_Imprint{
 	u16		app_actor_id_;
 };
 
+#define IMPRINT_POOL_NUM 60000
+static struct DuanLianJie_Imprint *a_imprint = NULL;
+static int imprint_free_offset = 0;
+
 
 int server_kick_client(Link *ll,int reason);
 
+
+DuanLianJie_Imprint* help_omt_get_imprint(omt_tree* tr,const char* key)
+{
+	struct slice s1;
+	s1.size = strlen(key);
+	s1.data = key;
+	s1.v_ = 0;
+	
+	u32 index = -1;
+	
+	int r = omt_find_order(tr,&s1,&index);
+	if(-1 == r){
+		return (DuanLianJie_Imprint*)tr->nodes[index].value->v_;
+	}
+	
+	return NULL;
+}
 
 
 // 客户端来的消息，包头是ClientHeader 
@@ -50,6 +72,9 @@ int message_dispatch_2(GXContext*,Link* src_link,ClientHeader *hh,int body_len,c
 		if(NULL == table1){
 			table1 = omt_new();
 			assert(table1);
+			
+			a_imprint = new struct DuanLianJie_Imprint[IMPRINT_POOL_NUM];
+			assert(a_imprint);
 		}
 		
 		// 防止 table1 无限增长 
@@ -62,8 +87,8 @@ int message_dispatch_2(GXContext*,Link* src_link,ClientHeader *hh,int body_len,c
 			
 			FOR(i,table1->free_idx){
 				struct omt_node &node = table1->nodes[i];
-				if(0 != node.value->val){
-					DuanLianJie_Imprint *p = (DuanLianJie_Imprint*)node.value->val;
+				if(0 != node.value->v_){
+					DuanLianJie_Imprint *p = (DuanLianJie_Imprint*)node.value->v_;
 					if(now <= p->last_time_+DUANLIANJIE_TIMEOUT){
 						omt_insert(new_tree,node.value);
 					}
@@ -79,10 +104,9 @@ int message_dispatch_2(GXContext*,Link* src_link,ClientHeader *hh,int body_len,c
 		if(0 == src_link->link_id_[0]){
 			
 			struct slice *v = NULL;
-			int r = omt_get(table1,session_id.c_str(),&v);
+			DuanLianJie_Imprint *p = help_omt_get_imprint(table1,session_id.c_str());
 			bool need_new_session = true;
-			if(-1 == r && v->val){	// found
-				DuanLianJie_Imprint *p = (DuanLianJie_Imprint*)v->val;
+			if(NULL != p){	// found
 				timetype now = g_time->getANSITime();
 				if(now <= p->last_time_+DUANLIANJIE_TIMEOUT){
 					need_new_session = false;
@@ -110,14 +134,32 @@ int message_dispatch_2(GXContext*,Link* src_link,ClientHeader *hh,int body_len,c
 					buf[i] = 'A' + (g_rand->rand32()%26);
 				}
 				
-				DuanLianJie_Imprint im;
-				memset(&im,0,sizeof(im));
-				
-				im.last_pool_id_ = src_link->pool_index_;
-				im.last_time_ = g_time->getANSITime();
-				omt_put(table1,buf,sizeof(im),(char*)&im);
-				
 				strncpy(src_link->link_id_,buf,LINK_ID_LEN);
+				
+				// alloc a free imprint
+				struct DuanLianJie_Imprint *im = NULL;
+				FOR(i,IMPRINT_POOL_NUM){
+					int idx = imprint_free_offset + i;
+					idx = idx<IMPRINT_POOL_NUM?idx:(idx-IMPRINT_POOL_NUM);
+					if(-2 == a_imprint[idx].session_link_index_){
+						im = a_imprint+idx;
+						break;
+					}
+				}
+				
+				if(im){
+					im->last_pool_id_ = src_link->pool_index_;
+					im->last_time_ = g_time->getANSITime();
+					
+					struct slice sl;
+					sl.data = buf;
+					sl.size = LINK_ID_LEN;
+					sl.v_ = im;
+					
+					omt_insert(table1,&sl);
+					++ imprint_free_offset;
+					imprint_free_offset = imprint_free_offset<IMPRINT_POOL_NUM?imprint_free_offset:(imprint_free_offset-IMPRINT_POOL_NUM);
+				}
 			}
 			
 		}
@@ -298,10 +340,8 @@ void on_client_cut_2(GXContext*,Link *ll,int reason,int gxcontext_type)
 		if(g_duanlianjie >= 1 && table1){
 			char buf[32];
 			strcpy(buf,ll->link_id_);
-			struct slice *v = NULL;
-			int r = omt_get(table1,buf,&v);
-			if(-1 == r && v->val){
-				DuanLianJie_Imprint *p = (DuanLianJie_Imprint*)v->val;
+			DuanLianJie_Imprint *p = help_omt_get_imprint(table1,buf);
+			if(NULL != p){
 				p->last_pool_id_ = ll->pool_index_;
 				p->last_time_ = g_time->getANSITime();
 				p->session_link_index_ = ll->session_link_index_;
@@ -415,8 +455,8 @@ int check_client_links(timetype now)
 		if(g_duanlianjie >= 1 && table1){
 			FOR(i,table1->free_idx){
 				struct omt_node &node = table1->nodes[i];
-				if(0 != node.value->val){
-					DuanLianJie_Imprint *p = (DuanLianJie_Imprint*)node.value->val;
+				if(0 != node.value->v_){
+					DuanLianJie_Imprint *p = (DuanLianJie_Imprint*)node.value->v_;
 					if(now > p->last_time_+DUANLIANJIE_TIMEOUT){
 						// send notify 
 						Link *ta_service = g_gx2->getLink(p->session_link_index_);
@@ -441,9 +481,10 @@ int check_client_links(timetype now)
 					}
 					
 					// cleanup  node.value->val
-					free(node.value->val);
-					node.value->val = 0;
-					node.value->size2 = 0;
+					// free(node.value->v_);	need NO free
+					struct DuanLianJie_Imprint *im = (struct DuanLianJie_Imprint*)node.value->v_;
+					im->session_link_index_ = -2;	// mark as free
+					node.value->v_ = 0;
 					
 				}
 			}

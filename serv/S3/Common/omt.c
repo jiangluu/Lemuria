@@ -10,26 +10,12 @@
 #include <string.h>
 #include <assert.h>
 #include <inttypes.h>
-#ifdef WIN32
-	#include <malloc.h>
-#else
-	#include <alloca.h>
-#endif
 
 #include "omt.h"
 
 #define FACTOR (4)
 #define CAPACITY (256)
 #define IDXNULL (0xffffffffU)
-
-
-
-void slice_init(struct slice *s)
-{
-	if(!s) return;
-	
-	memset(s,0,sizeof(struct slice));
-}
 
 struct slice *_slice_clone(struct slice *s) {
 	struct slice *clone;
@@ -40,13 +26,7 @@ struct slice *_slice_clone(struct slice *s) {
 	clone->size = s->size;
 	clone->data = calloc(s->size, sizeof(char));
 	memcpy(clone->data, s->data, s->size);
-	
-	clone->size2 = s->size2;
-	if(clone->size2 > 0){
-		clone->val = calloc(s->size2, sizeof(char));
-		memcpy(clone->val, s->val, s->size2);
-	}
-	
+	clone->v_ = s->v_;
 
 	return clone;
 }
@@ -325,9 +305,7 @@ int omt_insert(struct omt_tree *tree, struct slice *val)
 	else if(-1 == r){
 		// update the value.
 		struct slice *sl = tree->nodes[idx].value;
-		sl->size2 = val->size2;
-		free(sl->val);
-		sl->val = val->val;
+		sl->v_ = val->v_;
 	}
 
 	return r;
@@ -341,57 +319,11 @@ void omt_free(struct omt_tree *tree)
 		if (tree->nodes[i].value) {
 			struct slice *s = tree->nodes[i].value;
 
-			if (s->data){
+			if (s->data)
 				free(s->data);
-			}
-			if(s->val){
-				free(s->val);
-			}
-			
 			free(s);
 		}
 	}
 	free(tree->nodes);
 	free(tree);
 }
-
-
-int omt_put(struct omt_tree *tree,char *key,int valuelen,char *value)
-{
-	if(NULL == value || valuelen<=0) return -2;
-	
-	struct slice sl;
-	slice_init(&sl);
-	sl.size = strlen(key);
-	sl.data = calloc(sl.size, sizeof(char));
-	memcpy(sl.data,key,sl.size);
-	
-	sl.size2 = valuelen;
-	sl.val = calloc(valuelen, sizeof(char));
-	memcpy(sl.val,value,valuelen);
-	
-	
-	return omt_insert(tree, &sl);
-}
-
-int omt_get(struct omt_tree *tree,char *key,struct slice **v)
-{
-	struct slice sl;
-	slice_init(&sl);
-	sl.size = strlen(key);
-	sl.data = alloca(sl.size * sizeof(char));
-	memcpy(sl.data,key,sl.size);
-	
-	uint32_t order = 0;
-	
-	*v = NULL;
-	
-	int r = omt_find_order(tree, &sl, &order);
-	if(-1 == r){
-		*v = tree->nodes[order].value;
-	}
-	
-	return r;
-}
-
-
