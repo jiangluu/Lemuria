@@ -172,24 +172,16 @@ function o.on_message(message_id)
 	else
 		-- we have an actor ^-^
 		local skip_hanging = false
-		local hangup_this_msg = false
 		
 		if nil~=o.exit_message[tonumber(message_id)] then
 			-- 退出消息，退出必须成功，强制中止当前事务
 			transaction.force_abort_transaction(actor)
 			skip_hanging = true
-		else
-			if transaction.is_in_transaction(actor) then
-				print('is_in_transaction',actor_id,tonumber(message_id),actor._cur_tran)
-				hangup_this_msg = true
-			end
+			actor.__hanging = {}	-- cleanup it
 		end
 		
-		if (not skip_hanging) and actor.__hanging and #actor.__hanging>0 then
-			hangup_this_msg = true
-		end
-		
-		if hangup_this_msg then
+		-- push the msg to hanging
+		if true then
 			local sl = lcf.cur_read_stream_backup()
 			local bin = ffi.string(sl.mem_,sl.len_)
 			local to_hangup = { tonumber(message_id),bin }
@@ -201,25 +193,25 @@ function o.on_message(message_id)
 			table.insert(actor.__hanging,to_hangup)
 		end
 		
-		if (not skip_hanging) and actor.__hanging and #actor.__hanging>0 then
-			-- restore msg
-			local aa = table.remove(actor.__hanging,1)
-			message_id = aa[1]
-			lcf.cur_read_stream_restore(aa[2])
-		end
-		
-		if not transaction.is_in_transaction(actor) then
+		-- process msgs
+		local first_hanging = nil
+		while ((not transaction.is_in_transaction(actor)) and #actor.__hanging>0) do
+			first_hanging = table.remove(actor.__hanging,1)
+			message_id = first_hanging[1]
+			lcf.cur_read_stream_restore(first_hanging[2])
+			
 			local hd = o.handle[tonumber(message_id)]
 			if hd then
 				-- 新消息到来时，总是启动一个新的事务
 				transaction.new(actor,hd)
 				local ret = transaction.wakeup(actor)
-				
-				return ret
 			else
 				print(string.format('message [%d] has NO handle.',message_id))
-				return 2
 			end
+		end
+		
+		if #actor.__hanging>0 then
+			print('is_in_transaction',actor_id,tonumber(message_id),actor._cur_tran)
 		end
 		
 		return 3
