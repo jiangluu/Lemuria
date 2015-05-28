@@ -225,6 +225,23 @@ int cur_message_loopback()
 	return -1;
 }
 
+struct Slice cur_read_stream_backup()
+{
+	struct Slice r;
+	AStream *aa = g_gx1->rs_;
+	r.len_ = aa->getreadbuflen();
+	r.mem_ = aa->getbuf();
+	
+	return r;
+}
+
+void cur_read_stream_restore(struct Slice s)
+{
+	if(0 == s.len_ || 0 == s.mem_) return;
+	
+	AStream *aa = g_gx1->rs_;
+	aa->reset(s.len_,s.mem_);
+}
 
 void MD5( const unsigned char *input, size_t ilen, unsigned char output[16] )
 {
