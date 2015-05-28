@@ -151,55 +151,78 @@ end
 
 
 function o.on_message(message_id)
-	local hd = o.handle[tonumber(message_id)]
-	if hd then
-		local actor_id = tonumber(lcf.cur_actor_id())
-		local actor = o.get_actor(actor_id)
-		
-		if nil==actor then
-			if message_id>=1000 then
-				-- 如果没有actor，暂不支持事务
-				local err,ret = pcall(hd,nil)
-				if false==err then
-					return 1
-				else
-					return ret
-				end
+	local actor_id = tonumber(lcf.cur_actor_id())
+	local actor = o.get_actor(actor_id)
+	
+	if nil==actor then
+		-- 如果没有actor，暂不支持事务
+		local hd = o.handle[tonumber(message_id)]
+		if hd then
+			local ok,ret = pcall(hd,nil)
+			if false==ok then
+				print(ret)
+				return 1
 			else
-				return 3
+				return ret
 			end
+		else
+			print(string.format('message [%d] has NO handle.',message_id))
+			return 2
 		end
-		
-		
-		-- 重要：如果此actor当前有事务，那么本message延后处理
-		if transaction.is_in_transaction(actor) then
-			if nil~=o.exit_message[tonumber(message_id)] then
-				-- 除非是actor退出消息，退出必须成功，强制中止当前事务
-				transaction.force_abort_transaction(actor)
-			else
-				print('is_in_transaction',actor_id,tonumber(message_id),actor._cur_tran)
-				local loopback_times = actor._lb or 0
-				if loopback_times<10 then
-					lcf.cur_message_loopback()	-- 当前内容写回
-					actor._lb = loopback_times+1
-				else
-					actor._lb = nil
-					-- 丢掉此消息
-				end
-				return 4
-			end
-		end
-		
-		
-		--regAllHandlers()	-- just for quick debug, to be removed
-		-- 新消息到来时，总是启动一个新的事务
-		transaction.new(actor,hd)
-		local ret = transaction.wakeup(actor)
-		
-		return ret
 	else
-		print(string.format('message [%d] has NO handle.',message_id))
-		return 2
+		-- we have an actor ^-^
+		local skip_hanging = false
+		local hangup_this_msg = false
+		
+		if nil~=o.exit_message[tonumber(message_id)] then
+			-- 退出消息，退出必须成功，强制中止当前事务
+			transaction.force_abort_transaction(actor)
+			skip_hanging = true
+		else
+			if transaction.is_in_transaction(actor) then
+				print('is_in_transaction',actor_id,tonumber(message_id),actor._cur_tran)
+				hangup_this_msg = true
+			end
+		end
+		
+		if (not skip_hanging) and actor.__hanging and #actor.__hanging>0 then
+			hangup_this_msg = true
+		end
+		
+		if hangup_this_msg then
+			local sl = lcf.cur_read_stream_backup()
+			local bin = ffi.string(sl.mem_,sl.len_)
+			local to_hangup = { tonumber(message_id),bin }
+			
+			if nil==actor.__hanging then
+				actor.__hanging = {}
+			end
+			
+			table.insert(actor.__hanging,to_hangup)
+		end
+		
+		if (not skip_hanging) and actor.__hanging and #actor.__hanging>0 then
+			-- restore msg
+			local aa = table.remove(actor.__hanging,1)
+			message_id = aa[1]
+			lcf.cur_read_stream_restore(aa[2])
+		end
+		
+		if not transaction.is_in_transaction(actor) then
+			local hd = o.handle[tonumber(message_id)]
+			if hd then
+				-- 新消息到来时，总是启动一个新的事务
+				transaction.new(actor,hd)
+				local ret = transaction.wakeup(actor)
+				
+				return ret
+			else
+				print(string.format('message [%d] has NO handle.',message_id))
+				return 2
+			end
+		end
+		
+		return 3
 	end
 end
 
