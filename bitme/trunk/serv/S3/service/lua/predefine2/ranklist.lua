@@ -88,8 +88,11 @@ function o.random(rank)
 end
 
 
+local global_phb_redis = 5
+local need_inform_s = {'S0','S10',}
+
 -- 根据积分天梯生成排行榜
-function o.gen_phb(from_rank,to_rank)
+function o.gen_phb(from_rank,to_rank,is_global)
 --[[
 			local phb_total = 210
 			local ret = {}
@@ -129,7 +132,12 @@ function o.gen_phb(from_rank,to_rank)
 		return ret
 	end
 	
-	local redis_data = {redis.command_and_wait(1,'ZREVRANGE %s %s %s WITHSCORES',phb_redis_name,tostring(from_rank-1),tostring(to_rank-2))}
+	local phb_redis = 1
+	if true==is_global then
+		phb_redis = global_phb_redis
+	end
+	
+	local redis_data = {redis.command_and_wait(phb_redis,'ZREVRANGE %s %s %s WITHSCORES',phb_redis_name,tostring(from_rank-1),tostring(to_rank-2))}
 	--print('ZREVRANGE GET NUM',#redis_data)
 	if #redis_data>=2 then
 		for ii=1,(#redis_data)/2 do
@@ -161,4 +169,36 @@ function o.query_my_rank(usersn)
 	local aa = redis.command_and_wait(1,'ZREVRANK %s %s',phb_redis_name,tostring(usersn))
 	return tonumber(aa)
 end
+
+
+local lcf = ffi.C
+
+function o.global_phb_fill()
+	local redis_data = {redis.command_and_wait(1,'ZREVRANGE %s 0 99 WITHSCORES',phb_redis_name)}
+	if #redis_data>=2 then
+		for ii=1,(#redis_data)/2 do
+			local usersn = tostring(redis_data[ii*2-1])
+			local score = tonumber(redis_data[ii*2])
+			
+			local basic_bin = db.hget(usersn,'basic')
+			local map_bin = db.hget(usersn,'map')
+			if nil~=basic_bin then
+				-- 把此人放入世界排行榜
+				lcf.cur_write_stream_cleanup()
+				l_gx_cur_writestream_put_slice('phb')
+				local gusersn = string.format('%sU%s',g_app_id,usersn)
+				l_gx_cur_writestream_put_slice(gusersn)
+				l_gx_cur_writestream_put_slice(basic_bin)
+				l_gx_cur_writestream_put_slice(map_bin)
+				
+				for i=1,#need_inform_s do
+					local r = lcf.gx_cur_writestream_route_to(need_inform_s[i],2223)
+				end
+		
+				redis.command_and_wait(global_phb_redis,'ZADD %s %s %s',phb_redis_name,tostring(score),gusersn)
+			end
+		end
+	end
+end
+
 
