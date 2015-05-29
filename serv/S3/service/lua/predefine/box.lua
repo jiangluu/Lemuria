@@ -228,6 +228,27 @@ function o.on_message(message_id)
 	end
 end
 
+function o.wipe_actor(aid)		-- 催促aid号actor完成他的工作
+	local ac = o.get_actor(aid)
+	if ac and nil~=ac.__hanging then
+		local first_hanging = nil
+		while ((not transaction.is_in_transaction(ac)) and #ac.__hanging>0) do
+			first_hanging = table.remove(ac.__hanging,1)
+			local message_id = first_hanging[1]
+			lcf.cur_read_stream_restore(first_hanging[2])
+			
+			local hd = o.handle[tonumber(message_id)]
+			if hd then
+				transaction.new(ac,hd)
+				local ret = transaction.wakeup(ac)
+			else
+				print(string.format('message [%d] has NO handle.',message_id))
+			end
+		end
+		
+	end
+end
+
 
 function o.on_actor_enter()
 	local new_id = o.new_actor()
