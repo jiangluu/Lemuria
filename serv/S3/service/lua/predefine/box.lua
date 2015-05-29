@@ -34,6 +34,9 @@ end
 
 function OnRedisReply(a)
 	local err,ret = pcall(o.on_redis_reply_select,a)
+	
+	pcall(o.wipe_actor,0)
+	
 	if false==err then
 		print(ret)
 		return 1
