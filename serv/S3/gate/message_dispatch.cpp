@@ -387,19 +387,37 @@ int message_dispatch(GXContext *gx,Link* src_link,InternalHeader *hh,int body_le
 		int r = g_luavm->callGlobalFunc<int>("OnInternalMessage");
 	}
 	else{
-		BoxProtocolTier *bt = (BoxProtocolTier*)body;
-		Link *ll = g_gx2->getLink(bt->gate_pool_index_);
-		if(ll){
-					hh->len_ -= sizeof(BoxProtocolTier);
-					ll->app_box_id_ = bt->box_id_;
-					ll->app_actor_id_ = bt->actor_id_;
-					if(bt->usersn_ != (u64)-1) ll->usersn_ = bt->usersn_;
-					kfifo *ff = &ll->write_fifo_;
-					__kfifo_put(ff,(unsigned char*)hh,CLIENT_HEADER_LEN);
-					__kfifo_put(ff,(unsigned char*)(bt+1),body_len-sizeof(BoxProtocolTier));
-					
-					ll->total_traffic_ += body_len+CLIENT_HEADER_LEN+20;
+		if(0 == (hh->flag_ & HEADER_FLAG_BROADCAST)){
+			BoxProtocolTier *bt = (BoxProtocolTier*)body;
+			Link *ll = g_gx2->getLink(bt->gate_pool_index_);
+			if(ll){
+						hh->len_ -= sizeof(BoxProtocolTier);
+						ll->app_box_id_ = bt->box_id_;
+						ll->app_actor_id_ = bt->actor_id_;
+						if(bt->usersn_ != (u64)-1) ll->usersn_ = bt->usersn_;
+						kfifo *ff = &ll->write_fifo_;
+						__kfifo_put(ff,(unsigned char*)hh,CLIENT_HEADER_LEN);
+						__kfifo_put(ff,(unsigned char*)(bt+1),body_len-sizeof(BoxProtocolTier));
+						
+						ll->total_traffic_ += body_len+CLIENT_HEADER_LEN+20;
+			}
 		}
+		else{
+			// BROADCAST
+			BoxProtocolTier *bt = (BoxProtocolTier*)body;
+			hh->len_ -= sizeof(BoxProtocolTier);
+			FOR(i,g_gx2->link_pool_size_){
+				Link *ll = g_gx2->getLink(i);
+				if(ll){
+						kfifo *ff = &ll->write_fifo_;
+						__kfifo_put(ff,(unsigned char*)hh,CLIENT_HEADER_LEN);
+						__kfifo_put(ff,(unsigned char*)(bt+1),body_len-sizeof(BoxProtocolTier));
+						
+						ll->total_traffic_ += body_len+CLIENT_HEADER_LEN+20;
+				}
+			}
+		}
+		
 	}
 	
 	return 0;

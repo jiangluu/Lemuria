@@ -43,6 +43,7 @@ struct TailJump{
 
 #define HEADER_FLAG_BACK 0x1
 #define HEADER_FLAG_ROUTE 0x2
+#define HEADER_FLAG_BROADCAST 0x4
 
 
 

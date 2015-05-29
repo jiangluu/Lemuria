@@ -140,7 +140,8 @@ void cur_stream_write_back2(int message_id)
 
 void cur_stream_broadcast(int message_id)
 {
-	// @TODO
+	g_gx1->input_context_.header_.flag_ |= HEADER_FLAG_BROADCAST;
+	gx_cur_writestream_syncback2(message_id);
 }
 
 
