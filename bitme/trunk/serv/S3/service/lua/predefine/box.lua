@@ -172,6 +172,7 @@ function o.on_message(message_id)
 	else
 		-- we have an actor ^-^
 		local skip_hanging = false
+		local is_optimized = false
 		
 		if nil~=o.exit_message[tonumber(message_id)] then
 			-- 退出消息，退出必须成功，强制中止当前事务
@@ -181,24 +182,33 @@ function o.on_message(message_id)
 		end
 		
 		-- push the msg to hanging
-		if true then
+		if nil==actor.__hanging then
+			actor.__hanging = {}
+		end
+		
+		if (not transaction.is_in_transaction(actor)) and 0==#actor.__hanging then
+			is_optimized = true
+		end
+		
+		if not is_optimized then
 			local sl = lcf.cur_read_stream_backup()
 			local bin = ffi.string(sl.mem_,sl.len_)
 			local to_hangup = { tonumber(message_id),bin }
-			
-			if nil==actor.__hanging then
-				actor.__hanging = {}
-			end
-			
 			table.insert(actor.__hanging,to_hangup)
+		else
+			table.insert(actor.__hanging,tonumber(message_id))
 		end
 		
 		-- process msgs
 		local first_hanging = nil
 		while ((not transaction.is_in_transaction(actor)) and #actor.__hanging>0) do
 			first_hanging = table.remove(actor.__hanging,1)
-			message_id = first_hanging[1]
-			lcf.cur_read_stream_restore(first_hanging[2])
+			if not is_optimized then
+				message_id = first_hanging[1]
+				lcf.cur_read_stream_restore(first_hanging[2])
+			else
+				is_optimized = false	-- 只有第一次并且唯一一次优化机会
+			end
 			
 			local hd = o.handle[tonumber(message_id)]
 			if hd then
