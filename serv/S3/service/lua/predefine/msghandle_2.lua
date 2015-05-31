@@ -5,8 +5,6 @@ function OnCustomMessage()
 	local msg_id = lcf.gx_get_message_id()
 	local err,ret = pcall(box.on_message,msg_id)
 	
-	pcall(box.wipe_actor,0)
-	
 	if false==err then
 		print(ret)
 		return 1
