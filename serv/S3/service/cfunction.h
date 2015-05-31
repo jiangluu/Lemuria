@@ -82,6 +82,8 @@ CF_EXPORT int string_hash(const char *str);
 
 CF_EXPORT int cur_message_loopback();
 
+CF_EXPORT int cur_stream_get_readbuf_len();
+
 
 CF_EXPORT void MD5( const unsigned char *input, size_t ilen, unsigned char output[16] );
 
