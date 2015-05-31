@@ -3,8 +3,6 @@
 #include "CAS.h"
 
 
-#define GX_PORTAL_MAP "GXPortalMap"
-
 
 extern ARand *g_rand;
 
@@ -306,8 +304,10 @@ bool GXContext::init(int type,const char* ID,int pool_size,int read_buf_len,int 
 		luaopen_base(lua_vm_);
 		luaopen_table(lua_vm_);
 		
-		lua_newtable(lua_vm_);
-		lua_setglobal(lua_vm_,GX_PORTAL_MAP);
+		FOR(i,GX_LUA_INDICATOR_NUM){
+			lua_newtable(lua_vm_);
+			lua_indicator_[i] = lua_gettop(lua_vm_);
+		}
 	}
 	
 	return true;
@@ -394,22 +394,19 @@ void GXContext::bindLinkWithGlobalID(char *gid,Link *l)
 	
 	strncpy(l->link_id_,gid,LINK_ID_LEN-1);
 	
-	lua_getglobal(lua_vm_, GX_PORTAL_MAP);
     lua_pushinteger(lua_vm_,l->pool_index_);
-    lua_setfield(lua_vm_,-2,(const char*)gid);
+    lua_setfield(lua_vm_,lua_indicator_[0],(const char*)gid);
 }
 
 void GXContext::unbind(char *gid)
 {	
-	lua_getglobal(lua_vm_, GX_PORTAL_MAP);
     lua_pushnil(lua_vm_);
-    lua_setfield(lua_vm_,-2,(const char*)gid);
+    lua_setfield(lua_vm_,lua_indicator_[0],(const char*)gid);
 }
 
 int GXContext::findPortal(int typee,const char* ID)
 {
-	lua_getglobal(lua_vm_, GX_PORTAL_MAP);
-	lua_getfield(lua_vm_,-1,ID);
+	lua_getfield(lua_vm_,lua_indicator_[0],ID);
 	
 	if(lua_isnumber(lua_vm_,-1)){
 		lua_Integer r = lua_tointeger(lua_vm_,-1);

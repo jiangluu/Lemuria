@@ -68,7 +68,9 @@ struct GXContext{
 	int	link_pool_size_;
 	Link *link_pool_;
 	
+#define GX_LUA_INDICATOR_NUM 4
 	lua_State *lua_vm_;
+	int lua_indicator_[GX_LUA_INDICATOR_NUM];
 	
 	struct InputContext{
 		struct GXContext *gxc_;
