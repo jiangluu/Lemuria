@@ -134,10 +134,6 @@ int string_hash(const char *str);
 
 int cur_message_loopback();
 
-struct Slice cur_read_stream_backup();
-
-void cur_read_stream_restore(struct Slice s);
-
 void MD5( const unsigned char *input, size_t ilen, unsigned char output[16] );
 
 
