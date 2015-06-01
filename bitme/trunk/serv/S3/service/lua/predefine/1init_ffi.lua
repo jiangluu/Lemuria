@@ -134,6 +134,8 @@ int string_hash(const char *str);
 
 int cur_message_loopback();
 
+int cur_stream_get_readbuf_len();
+
 void MD5( const unsigned char *input, size_t ilen, unsigned char output[16] );
 
 
