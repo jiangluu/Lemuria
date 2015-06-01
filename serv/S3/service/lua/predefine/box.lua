@@ -149,6 +149,7 @@ function o.actor_num()
 	return c
 end
 
+local transaction_max_retry_times = 100
 
 function o.on_message(message_id)
 	local hd = o.handle[tonumber(message_id)]
@@ -179,7 +180,7 @@ function o.on_message(message_id)
 			else
 				print('is_in_transaction',actor_id,tonumber(message_id),actor._cur_tran)
 				local loopback_times = actor._lb or 0
-				if loopback_times<10 then
+				if loopback_times<transaction_max_retry_times then
 					lcf.cur_message_loopback()	-- 当前内容写回
 					actor._lb = loopback_times+1
 				else
@@ -190,6 +191,7 @@ function o.on_message(message_id)
 			end
 		end
 		
+		actor._lb = nil
 		
 		--regAllHandlers()	-- just for quick debug, to be removed
 		-- 新消息到来时，总是启动一个新的事务
