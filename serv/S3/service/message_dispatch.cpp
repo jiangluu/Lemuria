@@ -40,6 +40,55 @@ void on_client_cut(GXContext *gx,Link *ll,int reason,int gxcontext_type)
 void frame_time_driven(timetype now)
 {
 	g_boxpool->onUpdate(now);
+	
+	
+	// the darkside of cur_message_loopback()
+	lua_State *L = g_gx1->lua_vm_;
+	int the_table = g_gx1->lua_indicator_[1];
+	
+	const int limiter = 10;	// 一帧最多那么多个 
+	size_t bin_len = 0;
+	int i = 0;
+	size_t head = 0;
+	size_t tail = 0;
+	
+	lua_pushnil(L);
+    while (i<limiter && lua_next(L, the_table) != 0) {
+    	tail = lua_tointeger(L,-2);
+    	if(0 == i){
+    		head = tail;
+		}
+    	++i;
+    	
+    	const char *bin = lua_tolstring(L,-1,&bin_len);
+    	if(bin && bin_len>=INTERNAL_HEADER_LEN){
+    		// @TODO  call OnMessage
+    		InternalHeader *hh = (InternalHeader*)bin;
+    		memcpy(&g_gx1->input_context_.header_,hh,INTERNAL_HEADER_LEN);
+    		g_gx1->input_context_.header_type_ = 0;
+    		
+    		TailJump *jj = (TailJump*)(bin+hh->len_+(INTERNAL_HEADER_LEN-CLIENT_HEADER_LEN));
+    		int ee = TAIL_JUMP_LEN*hh->jumpnum_ <= TAIL_JUMP_MEM_LEN ? TAIL_JUMP_LEN*hh->jumpnum_ : TAIL_JUMP_MEM_LEN;
+			memcpy(g_gx1->input_context_.tail_mem_,jj,ee);
+			
+			g_gx1->rs_ = g_gx1->rs_bak_;
+			g_gx1->ws_ = g_gx1->ws_bak_;
+			g_gx1->ws_->cleanup();
+			g_gx1->rs_->reset(hh->len_-CLIENT_HEADER_LEN,bin+INTERNAL_HEADER_LEN);
+			
+			gx_set_context(g_gx1);
+	
+			int r = g_boxpool->OnMessage(g_gx1,hh);
+		}
+    	
+    	lua_pop(L, 1);
+    }
+    
+    // cleanup used
+    for(int i=head;i<=tail;++i){
+    	lua_pushnil(L);
+    	lua_rawseti(L,the_table,i);
+	}
 }
 
 

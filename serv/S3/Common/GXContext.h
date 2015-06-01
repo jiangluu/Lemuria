@@ -98,6 +98,8 @@ struct GXContext{
 	
 	AStream *rs_;
 	AStream *ws_;
+	AStream *rs_bak_;
+	AStream *ws_bak_;
 	
 	
 	GXContext():type_(0),layer_(0),header_type_(0),stat_(0),enable_encrypt_(false),link_pool_size_conf_(0),
@@ -167,8 +169,6 @@ struct GXContext{
 private:
 	int try_deal_one_msg_s(Link *ioable,int &begin);
 	
-	AStream *rs_bak_;
-	AStream *ws_bak_;
 };
 
 

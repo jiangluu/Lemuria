@@ -232,9 +232,10 @@ int cur_message_loopback()
 			memcpy(s_mem+INTERNAL_HEADER_LEN,aa->getbuf(),aa->getreadbuflen());
 			
 			// save it
-			lua_pushlstring(g_gx1->lua_vm_,s_mem,aa->getreadbuflen()+INTERNAL_HEADER_LEN);
+			lua_State *L = g_gx1->lua_vm_;
+			lua_pushlstring(L,s_mem,aa->getreadbuflen()+INTERNAL_HEADER_LEN);
 			int the_table = g_gx1->lua_indicator_[1];
-			lua_rawseti(g_gx1->lua_vm_,the_table,lua_objlen(g_gx1->lua_vm_,the_table)+1);
+			lua_rawseti(L,the_table,lua_objlen(L,the_table)+1);
 			
 			return aa->getreadbuflen()+INTERNAL_HEADER_LEN;
 		}
