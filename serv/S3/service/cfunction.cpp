@@ -220,28 +220,12 @@ int string_hash(const char *str)
 	return string_hash_with_client(str);
 }
 
-#define LOOPBACK_BUF_LEN (1024*256)
+
 int cur_message_loopback()
 {
-	if(g_gx1->rs_){
-		static char *s_mem = (char*)calloc(LOOPBACK_BUF_LEN,1);
-		
-		AStream *aa = g_gx1->rs_;
-		if(aa->getreadbuflen() <= (LOOPBACK_BUF_LEN-INTERNAL_HEADER_LEN-TAIL_JUMP_MEM_LEN)){
-			memcpy(s_mem,&g_gx1->input_context_.header_,INTERNAL_HEADER_LEN);
-			memcpy(s_mem+INTERNAL_HEADER_LEN,aa->getbuf(),aa->getreadbuflen());
-			
-			// save it
-			lua_State *L = g_gx1->lua_vm_;
-			lua_pushlstring(L,s_mem,aa->getreadbuflen()+INTERNAL_HEADER_LEN);
-			int the_table = g_gx1->lua_indicator_[1];
-			lua_rawseti(L,the_table,lua_objlen(L,the_table)+1);
-			
-			return aa->getreadbuflen()+INTERNAL_HEADER_LEN;
-		}
-	}
+	g_gx1->input_context_.flag_ |= 0x2;
 	
-	return -1;
+	return 0;
 }
 
 int cur_stream_get_readbuf_len()
