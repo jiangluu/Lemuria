@@ -77,6 +77,22 @@ __ENTER_FUNCTION
 __LEAVE_FUNCTION
 }
 
+template<>
+void LuaInterface::callGlobalFunc<void>(const char* func)
+{
+    //LOKI_STATIC_CHECK(TypeTraits<R>::isReference==false,must_use_a_value)
+	__ENTER_FUNCTION
+
+	// to protect lua stack
+    size_t before = lua_gettop(lua_state_);
+    lua_getglobal(lua_state_, func);
+    
+    _Call<void>(0);
+    lua_settop(lua_state_,before);
+    
+	__LEAVE_FUNCTION
+}
+
 
 #define C_ENV_SHARED_LIGHTUD_LEN 512
 

@@ -54,13 +54,14 @@ void frame_time_driven(timetype now)
 		lua_State *L = g_gx1->lua_vm_;
 		int the_table = g_gx1->lua_indicator_[1];
 		
+		size_t stack_num = lua_gettop(L);
 		const int limiter = 30;	// 一帧最多那么多个 
 		size_t bin_len = 0;
 		int i = 0;
 		size_t head = 0;
 		size_t tail = 0;
 		
-		int the_last = lua_objlen(L,the_table);
+		size_t the_last = lua_objlen(L,the_table);
 		
 		lua_pushnil(L);
 	    while (i<limiter && tail<the_last && lua_next(L, the_table) != 0) {
@@ -93,6 +94,7 @@ void frame_time_driven(timetype now)
 	    	
 	    	lua_pop(L, 1);
 	    }
+	    lua_settop(L,stack_num);
 	    
 	    // cleanup used
 	    for(int i=head;i<=tail;++i){
