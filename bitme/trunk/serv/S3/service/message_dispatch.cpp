@@ -118,7 +118,7 @@ void frame_time_driven(timetype now)
 					
 					if(0 == (g_gx1->input_context_.flag_ & 0x2)){
 						lua_pushnil(L);
-						lua_rawseti(L,the_table,i);
+						lua_rawseti(L,the_table,i-1);
 					}
 					else{
 						g_gx1->input_context_.flag_ = 0;
