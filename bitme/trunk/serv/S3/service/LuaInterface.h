@@ -342,16 +342,20 @@ public:
         //LOKI_STATIC_CHECK(TypeTraits<R>::isReference==false,must_use_a_value)
 		__ENTER_FUNCTION
 
-        
-        
+		// to protect lua stack
+        size_t before = lua_gettop(lua_state_);
         lua_getglobal(lua_state_, func);
 
-        return _Call<R>(0);
+        R r = _Call<R>(0);
+        lua_settop(lua_state_,before);
+        
+        return r;
 
 		__LEAVE_FUNCTION
 
 		return R();
     }
+    
     /**
     *    调用脚本中定义的全局函数(一个参数版本)。
     *    @param func 成员函数的名字
@@ -904,10 +908,10 @@ protected:
 };
 
 
-//#ifndef WIN32
 template<>
 void LuaInterface::_Call<void>(int);
-//#endif
+template<>
+void LuaInterface::callGlobalFunc<void>(const char* func);
 
 
 #endif
