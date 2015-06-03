@@ -102,6 +102,8 @@ void frame_time_driven(timetype now)
 	    	lua_rawseti(L,the_table,i);
 		}
 		
+		lua_gc(L,LUA_GCSTEP,5);
+		
 	}
 }
 
