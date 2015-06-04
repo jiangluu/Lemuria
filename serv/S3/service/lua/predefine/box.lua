@@ -149,7 +149,7 @@ function o.actor_num()
 	return c
 end
 
-local transaction_max_retry_times = 100
+local transaction_max_retry_times = 20
 
 function o.on_message(message_id)
 	local hd = o.handle[tonumber(message_id)]
@@ -178,13 +178,13 @@ function o.on_message(message_id)
 				-- 除非是actor退出消息，退出必须成功，强制中止当前事务
 				transaction.force_abort_transaction(actor)
 			else
-				print('is_in_transaction',actor_id,tonumber(message_id),actor._cur_tran)
 				local loopback_times = actor._lb or 0
-				if loopback_times<transaction_max_retry_times then
+				if 0==actor_id or loopback_times<transaction_max_retry_times then
 					lcf.cur_message_loopback()	-- 当前内容写回
 					actor._lb = loopback_times+1
 				else
 					actor._lb = nil
+					print('drop msg',actor_id,message_id)
 					-- 丢掉此消息
 				end
 				return 4
