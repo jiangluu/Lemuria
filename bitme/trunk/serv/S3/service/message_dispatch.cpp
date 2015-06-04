@@ -86,7 +86,6 @@ void frame_time_driven(timetype now)
 		
 		size_t the_last = lua_objlen(L,the_table);
 		
-		lua_pushnil(L);
 	    while (counter<limiter && i<=the_last){
 	    	lua_rawgeti(L,the_table,i);
 	    	++i;
