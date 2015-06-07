@@ -61,6 +61,8 @@ CF_EXPORT bool gx_cur_stream_push_slice2(const char* v,int len);
 
 CF_EXPORT bool gx_cur_stream_push_bin(const char* v,int len);
 
+CF_EXPORT const char* gx_cur_stream_get_bin(int len);	// 获取bin块（事先知道len） 
+
 
 CF_EXPORT void gx_cur_writestream_cleanup();
 
