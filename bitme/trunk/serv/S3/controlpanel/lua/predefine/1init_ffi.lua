@@ -53,6 +53,8 @@ bool gx_cur_stream_push_slice(struct Slice s);
 
 bool gx_cur_stream_push_slice2(const char* v,int len);
 
+bool gx_cur_stream_push_bin(const char* v,int len);
+
 void gx_cur_writestream_cleanup();
 
 // 同步原路返回。messageid 是req的+1，内容是push到 stream里的内容。 
