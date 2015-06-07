@@ -184,6 +184,15 @@ bool gx_cur_stream_push_bin(const char* v,int len)
 	return false;
 }
 
+const char* gx_cur_stream_get_bin(int len)
+{
+	if(s_gx && len>0){
+		return s_gx->rs_->get_bin(len);
+	}
+	
+	return NULL;
+}
+
 void gx_cur_writestream_cleanup()
 {
 	if(s_gx) s_gx->ws_->cleanup();
