@@ -59,6 +59,8 @@ CF_EXPORT bool gx_cur_stream_push_slice(struct Slice s);
 
 CF_EXPORT bool gx_cur_stream_push_slice2(const char* v,int len);
 
+CF_EXPORT bool gx_cur_stream_push_bin(const char* v,int len);
+
 
 CF_EXPORT void gx_cur_writestream_cleanup();
 

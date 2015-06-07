@@ -175,6 +175,15 @@ bool gx_cur_stream_push_slice2(const char* v,int len)
 	return false;
 }
 
+bool gx_cur_stream_push_bin(const char* v,int len)
+{
+	if(s_gx && v && len>0){
+		return s_gx->ws_->push_bin(v,len);
+	}
+	
+	return false;
+}
+
 void gx_cur_writestream_cleanup()
 {
 	if(s_gx) s_gx->ws_->cleanup();
