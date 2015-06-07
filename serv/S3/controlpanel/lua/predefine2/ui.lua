@@ -55,7 +55,7 @@ function o.post_init()
 			
 			local msg_id = tonumber(cmd[1])
 			if not (msg_id>=8000 and msg_id<8100) then
-				lcf.gx_cur_stream_push_slice2(o.magic,16)
+				lcf.gx_cur_stream_push_bin(o.magic,16)
 			end
 			
 			for i=2,#cmd do
