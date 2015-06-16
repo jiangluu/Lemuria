@@ -31,6 +31,8 @@ CF_EXPORT bool gx_env_set_shared_ptr(int index,void *p);
 
 CF_EXPORT bool gx_cur_stream_is_end();
 
+CF_EXPORT int gx_cur_stream_get_readbuf_len();
+
 CF_EXPORT s16 gx_cur_stream_get_int8();
 
 CF_EXPORT s16 gx_cur_stream_get_int16();
