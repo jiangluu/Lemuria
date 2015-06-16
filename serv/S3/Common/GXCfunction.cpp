@@ -63,6 +63,15 @@ bool gx_cur_stream_is_end()
 	return true;
 }
 
+int gx_cur_stream_get_readbuf_len()
+{
+	if(s_gx && s_gx->rs_){
+		return s_gx->rs_->getreadbuflen();
+	}
+	
+	return -1;
+}
+
 s16 gx_cur_stream_get_int8()
 {
 	if(s_gx) return (s16)s_gx->rs_->get<char>();
