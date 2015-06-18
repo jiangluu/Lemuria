@@ -75,4 +75,53 @@ int gx_bind_portal_id(int index,const char* id);
 int gx_cur_writestream_route_to(const char* destID,int message_id);
 
 
+// PBC部分
+struct pbc_slice {
+	void *buffer;
+	int len;
+};
+
+struct pbc_env{
+	int32_t __fake; 
+};
+struct pbc_rmessage{
+	int32_t __fake; 
+};
+struct pbc_wmessage{
+	int32_t __fake; 
+};
+
+struct pbc_env * pbc_new(void);
+void pbc_delete(struct pbc_env *);
+int pbc_register(struct pbc_env *, struct pbc_slice * slice);
+const char * pbc_error(struct pbc_env *);
+
+struct pbc_wmessage * pbc_wmessage_new(struct pbc_env * env, const char *type_name);
+void pbc_wmessage_delete(struct pbc_wmessage *);
+// jianglu add for reuse a wmessage. 注意只能复用同一个proto的消息 
+void pbc_wmessage_reset(struct pbc_wmessage *m);
+
+// for negative integer, pass -1 to hi
+int pbc_wmessage_integer(struct pbc_wmessage *, const char *key, uint32_t low, uint32_t hi);
+int pbc_wmessage_real(struct pbc_wmessage *, const char *key, double v);
+int pbc_wmessage_string(struct pbc_wmessage *, const char *key, const char * v, int len);
+struct pbc_wmessage * pbc_wmessage_message(struct pbc_wmessage *, const char *key);
+void * pbc_wmessage_buffer(struct pbc_wmessage *, struct pbc_slice * slice);
+
+union pbc_value {
+	struct {
+		uint32_t low;
+		uint32_t hi;
+	} i;
+	double f;
+	struct pbc_slice s;
+	struct {
+		int id;
+		const char * name;
+	} e;
+};
+
+typedef void (*pbc_decoder)(void *ud, int type, const char * type_name, union pbc_value *v, int id, const char *key);
+int pbc_decode(struct pbc_env * env, const char * type_name , struct pbc_slice * slice, pbc_decoder f, void *ud);
+
 ]]
