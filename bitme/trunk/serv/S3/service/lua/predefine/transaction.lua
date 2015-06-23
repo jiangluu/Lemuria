@@ -16,24 +16,24 @@ local err_transaction_lua_error = -10012	-- 事务发生程序错误时的返回
 
 
 function o.new(actor,f)
-	actor.co = coroutine.create(f)
+	actor._co = coroutine.create(f)
 end
 
 function o.wakeup(actor,...)
-	actor.transaction = 8
-	local err,ret = coroutine.resume(actor.co,actor,...)
-	actor.transaction = 1
+	actor._transaction = 8
+	local err,ret = coroutine.resume(actor._co,actor,...)
+	actor._transaction = 1
 	
 	if false==err then
 		print(ret)
-		actor.co = nil
-		actor.transaction = nil
+		actor._co = nil
+		actor._transaction = nil
 		
 		return err_transaction_lua_error
 	else
-		if 'dead'==coroutine.status(actor.co) then
-			actor.co = nil
-			actor.transaction = nil
+		if 'dead'==coroutine.status(actor._co) then
+			actor._co = nil
+			actor._transaction = nil
 			
 			if ret == err_transaction_hung_up then
 				-- 不允许用户在事务结束时返回这个值
@@ -50,12 +50,12 @@ function o.wait()
 end
 
 function o.is_in_transaction(actor)
-	return nil~=actor.transaction
+	return nil~=actor._transaction
 end
 
 
 function o.force_abort_transaction(actor)
-	actor.co = nil
-	actor.transaction = nil
+	actor._co = nil
+	actor._transaction = nil
 end
 
