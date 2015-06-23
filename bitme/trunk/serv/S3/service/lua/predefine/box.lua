@@ -93,10 +93,6 @@ function o.reg_handle(message_id,f)
 		pcall(ach.check_all,ac)
 		pcall(daily.check_all,ac)
 		
-		local tran_name = string.format('msg%d',message_id)
-		prof.incr_counter(tran_name)
-		prof.commit_transaction(tran_name,begin_time)
-		
 		return r
 	end
 	
