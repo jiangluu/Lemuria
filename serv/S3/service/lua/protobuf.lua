@@ -244,8 +244,10 @@ local encode_type_cache = {}
 local function encode_message(CObj, message_type, t)
 	local type = encode_type_cache[message_type]
 	for k,v in pairs(t) do
-		local func = type[k]
-		func(CObj, k , v)
+			if '_'~=string.sub(k,1,1) then
+				local func = type[k]
+				func(CObj, k , v)
+			end
 	end
 end
 
