@@ -357,7 +357,7 @@ void on_client_cut_2(GXContext*,Link *ll,int reason,int gxcontext_type)
 			Link *ta_service = g_gx1->getLink(ll->session_link_index_);
 			if(ta_service){
 				InternalHeader tt;
-				tt.message_id_ = 1000;
+				tt.message_id_ = 1001;
 				tt.len_ = CLIENT_HEADER_LEN+sizeof(BoxProtocolTier);
 				tt.flag_ = 0;
 				tt.jumpnum_ = 0;
