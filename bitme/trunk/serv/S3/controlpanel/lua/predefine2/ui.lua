@@ -5,7 +5,8 @@ local o = {}
 
 ui = o
 
-o.cmds = {{'PING',{2221,88}},
+o.cmds = {{'PING',{2221,1}},
+	{'BOX',{2227,89}},
 	{'reload handle',{8017,'handle'}},
 	{'reload data',{8017,'data'}},
 	{'reload all',{8017,'all'}},
@@ -74,6 +75,31 @@ function o.post_init()
 				lcf.gx_cur_writestream_route_to(aa,msg_id)
 			end
 		else
+			if 'smail'==cmd then
+				iup.SetGlobal('UTF8MODE','yes')
+				local ok,usersn,type2,icon,title,text = iup.GetParam('input system-mail',nil,'to usersn%i\ntype%l|1|2|\nicon%s\ntitle%s\ntext%s\n',1,0,'1','','')
+				print(ok,usersn,type2,icon,title,text)
+				
+				if true==ok then
+					l_gx_cur_writestream_cleanup()
+					lcf.gx_cur_stream_push_bin(o.magic,16)
+					
+					l_gx_cur_writestream_put_slice(cmd)
+					l_gx_cur_writestream_put_slice(tostring(usersn))
+					lcf.gx_cur_stream_push_int32(type2)
+					l_gx_cur_writestream_put_slice(icon,0)
+					l_gx_cur_writestream_put_slice(title,0)
+					l_gx_cur_writestream_put_slice(text,0)
+					
+					for i=1,#o.target_app do
+						local aa = o.target_app[i]
+						lcf.gx_cur_writestream_route_to(aa,1101)
+					end
+				end
+				
+				return
+			end
+			
 			return
 		end
 		
@@ -92,23 +118,23 @@ function o.post_init()
 			return
 		end
 		
-		if 'smail'==cmd then
-			iup.SetGlobal('UTF8MODE','yes')
-			local ok,usersn,type2,icon,title,text = iup.GetParam('input system-mail',nil,'to usersn%i\ntype%l|1|2|\nicon%s\ntitle%s\ntext%s\n',1,0,'1','','')
-			print(ok,usersn,type2,icon,title,text)
+		-- if 'smail'==cmd then
+			-- iup.SetGlobal('UTF8MODE','yes')
+			-- local ok,usersn,type2,icon,title,text = iup.GetParam('input system-mail',nil,'to usersn%i\ntype%l|1|2|\nicon%s\ntitle%s\ntext%s\n',1,0,'1','','')
+			-- print(ok,usersn,type2,icon,title,text)
 			
-			if true==ok then
-				lcf.cur_stream_push_string(tostring(usersn),0)
-				lcf.cur_stream_push_int32(type2)
-				lcf.cur_stream_push_string(icon,0)
-				lcf.cur_stream_push_string(title,0)
-				lcf.cur_stream_push_string(text,0)
+			-- if true==ok then
+				-- lcf.cur_stream_push_string(tostring(usersn),0)
+				-- lcf.cur_stream_push_int32(type2)
+				-- lcf.cur_stream_push_string(icon,0)
+				-- lcf.cur_stream_push_string(title,0)
+				-- lcf.cur_stream_push_string(text,0)
 				
-				lcf.cur_stream_write_2_link(g_link_id,1101,0)
-			end
+				-- lcf.cur_stream_write_2_link(g_link_id,1101,0)
+			-- end
 			
-			return
-		end
+			-- return
+		-- end
 		
 		if 'smail_all_online'==cmd then
 			iup.SetGlobal('UTF8MODE','yes')
