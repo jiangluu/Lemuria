@@ -32,7 +32,18 @@ function regMsgHandlers()
 			onMsg = nil
 			jlpcall(dofile,the_dir..file)
 			if nil~=onMsg then
-				o.handle[tonumber(msg_id)] = onMsg
+				local f = onMsg
+				local function func_wrap(actor)
+					if actor then
+						actor._cur_tran = tonumber(msg_id)
+						
+						local r = f(actor)
+						
+						return r
+					end
+				end
+
+				box.reg_handle(tonumber(msg_id),func_wrap)
 			end
 			onMsg = nil
 		end
