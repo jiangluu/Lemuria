@@ -28,15 +28,15 @@ function regMsgHandlers2()
 				local function func_wrap(actor)
 					if actor then
 						actor._cur_tran = tonumber(msg_id)
-						
-						local r = f(actor)
-						
-						-- 检查成就
-						-- pcall(ach.check_all,ac)
-						-- pcall(daily.check_all,ac)
-						
-						return r
 					end
+					
+					local r = f(actor)
+					
+					-- 检查成就
+					-- pcall(ach.check_all,ac)
+					-- pcall(daily.check_all,ac)
+					
+					return r
 				end
 
 				box.reg_handle(tonumber(msg_id),func_wrap)
