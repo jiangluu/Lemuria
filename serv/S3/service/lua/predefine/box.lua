@@ -81,22 +81,7 @@ o.exit_message = {}
 
 
 function o.reg_handle(message_id,f)
-	local function wraper(ac)
-		if ac then
-			ac._cur_tran = tonumber(message_id)
-		end
-		local begin_time = prof.cur_usec()
-		
-		local r = f(ac)
-		
-		-- 检查成就
-		pcall(ach.check_all,ac)
-		pcall(daily.check_all,ac)
-		
-		return r
-	end
-	
-	o.handle[tonumber(message_id)] = wraper
+	o.handle[tonumber(message_id)] = f
 end
 
 function o.get_actor(id)
