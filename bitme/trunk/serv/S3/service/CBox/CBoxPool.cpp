@@ -209,8 +209,8 @@ bool CBoxPool::init(char *global_id)
 	
 	
 	FOR(i,box_num_){
-		// 参数解释：每个BOX 1个IO通道 ，a方向缓冲大小256K ，b方向缓冲大小64K，box内actor上限100个 
-		bool r = a_box_[i].init(i,0,1024*256,1024*64,100);
+		// 参数解释：每个BOX 1个IO通道 ，a方向缓冲大小256K ，b方向缓冲大小64K，box内actor上限250个 
+		bool r = a_box_[i].init(i,0,1024*256,1024*64,250);
 		
 		if(!r){
 			printf("CBox init error\n");
