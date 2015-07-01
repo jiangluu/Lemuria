@@ -110,7 +110,7 @@ local function reg_all_pipeline_filter()
 end
 
 
-jlpcall(dofile,g_lua_dir.."pipeline_define.lua")
+jlpcall(dofile,g_lua_dir.."predefine2/pipeline_define.lua")
 
 reg_all_pipeline_filter()
 
