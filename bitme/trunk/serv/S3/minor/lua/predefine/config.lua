@@ -4,11 +4,11 @@ function getMaxConn()
 end
 
 function getReadBufLen()
-	return 1024*1024*8
+	return 1024*128
 end
 
 function getWriteBufLen()
-	return 1024*1024*8
+	return 1024*128
 end
 
 
