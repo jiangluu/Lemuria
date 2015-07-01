@@ -12,13 +12,10 @@ o.cmds = {{'PING',{2221,1}},
 	{'reload all',{8017,'all'}},
 	{'global_phb_fill',{2225}},
 	
-	{'onlinenum','onlinenum'},
-	{'league start','league start'},
-	{'league end','league end'},
-	{'broadcast','broadcast'},
-	{'smail','smail'},
-	{'smail_all_online','smail_all_online'},
-	{'save all','save all'},
+	{'league start',{1101,'league start'} },
+	{'league end',{1101,'league end'} },
+	{'broadcast',{1101,'league end'} },
+	{'smail',{1101,'smail'} },
 }
 
 
@@ -70,34 +67,24 @@ function o.post_init()
 				end
 			end
 			
-			for i=1,#o.target_app do
-				local aa = o.target_app[i]
-				lcf.gx_cur_writestream_route_to(aa,msg_id)
-			end
-		else
-			if 'smail'==cmd then
+			-- 有更多参数的
+			if 'smail'==cmd[2] then
 				iup.SetGlobal('UTF8MODE','yes')
 				local ok,usersn,type2,icon,title,text = iup.GetParam('input system-mail',nil,'to usersn%i\ntype%l|1|2|\nicon%s\ntitle%s\ntext%s\n',1,0,'1','','')
 				print(ok,usersn,type2,icon,title,text)
 				
 				if true==ok then
-					l_gx_cur_writestream_cleanup()
-					lcf.gx_cur_stream_push_bin(o.magic,16)
-					
-					l_gx_cur_writestream_put_slice(cmd)
 					l_gx_cur_writestream_put_slice(tostring(usersn))
 					lcf.gx_cur_stream_push_int32(type2)
 					l_gx_cur_writestream_put_slice(icon,0)
 					l_gx_cur_writestream_put_slice(title,0)
 					l_gx_cur_writestream_put_slice(text,0)
-					
-					for i=1,#o.target_app do
-						local aa = o.target_app[i]
-						lcf.gx_cur_writestream_route_to(aa,1101)
-					end
 				end
-				
-				return
+			end
+			
+			for i=1,#o.target_app do
+				local aa = o.target_app[i]
+				lcf.gx_cur_writestream_route_to(aa,msg_id)
 			end
 			
 			return
