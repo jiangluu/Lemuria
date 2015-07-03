@@ -1,27 +1,10 @@
 
-local curl = ffi.load("libcurl")
-print('curl',curl)
-
 local lcf = ffi.C
 
-local buf = ffi.new('unsigned char[2048]')
-local offset = 0
-
-local function cb(ptr,size1,num,__)
-	ffi.copy(buf+offset,ptr,size1*num)
-	offset = offset + size1*num
-	
-	return size1*num
-end
-
+local hd = curl.new()
 
 -- ////////////////////////////////////
 local refresh_token_arg = '--data grant_type=refresh_token --data client_id=519274754341-ng9cq2lsh4ve812g7ic2c3io15dq46qp.apps.googleusercontent.com --data client_secret=BKIhze3ycbuo1j2GwmAZmidc --data refresh_token="1/Hwf8OZxGGqhYJPHBWAO87VC8f-9Ic4HHFpnKVor69eA" https://accounts.google.com/o/oauth2/token'
-local curl_exe = 'curl -k'
-if "Windows"==ffi.os then
-	curl_exe = 'curl.exe -k'
-end
-local out_file_name = 'google_access_token_ret.txt'
 -- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 
@@ -87,14 +70,7 @@ function onEvent(binlog,date_and_time)
 		end
 		
 		
-		local cmd = string.format('%s %s > %s',curl_exe,refresh_token_arg,out_file_name)
-		os.execute(cmd)
-		
-		local fh = io.open(out_file_name,'r')
-		assert(fh)
-		local google_ret_access_token = fh:read('*a')
-		fh:close()
-		
+		local google_ret_access_token = curl.http_get(hd,refresh_token_arg)
 		print(google_ret_access_token)
 		
 		local access_token = string.match(google_ret_access_token,'"access_token"%s+:%s+"([^"]+)"')
@@ -108,24 +84,7 @@ function onEvent(binlog,date_and_time)
 		
 		local url = string.format('https://www.googleapis.com/androidpublisher/v2/applications/com.artme.hf/purchases/products/%s/tokens/%s?access_token=%s',product_id,token,access_token)
 		
-		
-		local hd = curl.curl_easy_init()
-		
-		curl.curl_easy_setopt(hd,10002,url)
-		
-		curl.curl_easy_setopt(hd,20011,ffi.cast('CURL_WRITE_CB',cb))	-- WRITEFUNCTION
-		
-		curl.curl_easy_setopt(hd,64,0)	-- CA off
-		
-		offset = 0
-		ffi.fill(buf,2048)
-		
-		curl.curl_easy_perform(hd)
-		
-		curl.curl_easy_cleanup(hd)
-		
-		print('get result')
-		local google_ret = ffi.string(buf)
+		local google_ret = curl.http_get(hd,url)
 		print(google_ret)
 		
 		local err = 999
