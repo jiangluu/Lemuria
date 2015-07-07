@@ -34,7 +34,7 @@ void on_client_cut(GXContext*,Link *ll,int reason,int gxcontext_type);
 void frame_time_driven(timetype now);
 
 
-extern "C" int luaopen_atablepointer(lua_State *L);
+extern int luaopen_atablepointer(lua_State *L);
 
 int main(int argc, char** argv) {
 	if(argc < 2){
