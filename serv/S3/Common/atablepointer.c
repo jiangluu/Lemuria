@@ -27,44 +27,62 @@ struct Hack_lua_State {
 #define LJ_TTAB			(~11u)
 // END ================================
 
+#define C_ENV_SHARED_LIGHTUD_LEN 512
 
-
-/*
-	table
-	return pointer
- */
-static int
-ltopointer(lua_State *L) {
-	luaL_checktype(L, 1, LUA_TTABLE);
-	const void * t = lua_topointer(L, 1);
-	lua_pushlightuserdata(L, (void *)t);
-	return 1;
+void** __make_sure_c_env_get_shared_lightud_exists()
+{
+	static void** aa = NULL;
+	if(NULL == aa){
+		int len = sizeof(void*) * C_ENV_SHARED_LIGHTUD_LEN;
+		aa = (void**)malloc(len);
+		memset(aa,0,len);
+	}
+	return aa;
 }
 
-/*
-	pointer
-	return table
- */
-static int
-lrestoretable(lua_State *L) {
-	luaL_checktype(L, 1, LUA_TLIGHTUSERDATA);
-	void *pp = lua_touserdata(L, 1);
+
+static int ltopointer(lua_State *L) {
+	luaL_checktype(L, 2, LUA_TTABLE);
+	lua_Integer index = lua_tointeger(L,1);
+	const void * t = lua_topointer(L, 2);
 	
-	struct Hack_lua_State *hl = (struct Hack_lua_State*)L;
-	
-	// hack below
-	lua_pushlightuserdata(L, (void *)0);
-	TValue *to_hack = hl->top - 1;
-	
-	to_hack->gcr = (uint32_t)pp;
-	to_hack->it = LJ_TTAB;
-	
+	if(index>0 && index<=C_ENV_SHARED_LIGHTUD_LEN){
+		void **a = __make_sure_c_env_get_shared_lightud_exists();
+		a[index-1] = t;
+		
+		lua_pushboolean(L,1);
+	}
+	else{
+		lua_pushboolean(L,0);
+	}
 	
 	return 1;
 }
 
-int
-luaopen_atablepointer(lua_State *L) {
+
+static int lrestoretable(lua_State *L) {
+	lua_Integer index = lua_tointeger(L,1);
+	
+	if(index>0 && index<=C_ENV_SHARED_LIGHTUD_LEN){
+		void **a = __make_sure_c_env_get_shared_lightud_exists();
+		
+		struct Hack_lua_State *hl = (struct Hack_lua_State*)L;
+		
+		// hack below
+		lua_pushlightuserdata(L, (void *)0);
+		TValue *to_hack = hl->top - 1;
+		
+		to_hack->gcr = (uint32_t)(a[index-1]);
+		to_hack->it = LJ_TTAB;
+	}
+	else{
+		lua_pushboolean(L,0);
+	}
+	
+	return 1;
+}
+
+int luaopen_atablepointer(lua_State *L) {
 	luaL_Reg l[] = {
 		{ "topointer", ltopointer },
 		{ "restoretable", lrestoretable },
