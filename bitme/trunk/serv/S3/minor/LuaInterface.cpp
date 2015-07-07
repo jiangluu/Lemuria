@@ -11,7 +11,6 @@
 
 extern int luaopen_bson(lua_State *L);
 extern int luaopen_protobuf_c(lua_State *L);
-extern int luaopen_conf_core(lua_State *L);
 
 
 //#define NOPREFIXCALL 
@@ -58,7 +57,6 @@ __ENTER_FUNCTION
     luaopen_lfs(lua_state_);
     luaopen_bson(lua_state_);
     luaopen_protobuf_c(lua_state_);
-    luaopen_conf_core(lua_state_);
     
     lua_settop(lua_state_, 0);
 __LEAVE_FUNCTION
