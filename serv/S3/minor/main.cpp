@@ -34,6 +34,7 @@ void on_client_cut(GXContext*,Link *ll,int reason,int gxcontext_type);
 void frame_time_driven(timetype now);
 
 
+extern "C" int luaopen_atablepointer(lua_State *L);
 
 int main(int argc, char** argv) {
 	if(argc < 2){
@@ -62,7 +63,16 @@ int main(int argc, char** argv) {
 	
 	// 读取配置文件
 	g_luavm = new LuaInterface();
+	luaopen_atablepointer(g_luavm->luaState());
+	g_luavm->SetGlobal("g_box_id",0);
 	g_luavm->Init();
+	
+	// TEST
+	LuaInterface *LI = new LuaInterface();
+	luaopen_atablepointer(LI->luaState());
+	LI->SetGlobal("g_box_id",1);
+	LI->Init();
+	
 	
 	
 	// 初始化GX上下文
