@@ -194,7 +194,12 @@ function o.init2()
 		sd = ap.restoretable(pointer_index)
 		assert(sd)
 		
-		print('slave OK')
+		print('slave OK',sd)
+		for k,v in pairs(sd) do
+			print(k,'==>',v)
+		end
+		
+		--os.exit(-3)
 	end
 end
 
@@ -254,5 +259,3 @@ function o.test3()
 end
 
 --o.test3()
-
-o2 = nil
