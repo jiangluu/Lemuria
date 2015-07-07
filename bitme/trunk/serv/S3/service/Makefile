@@ -4,7 +4,7 @@
 CPP      = g++
 CC       = g++
 WINDRES  = windres.exe
-OBJ      = main.o ../Common/alog.o ../Common/bson.o ../Common/kfifo.o ../Common/lfs.o ../Common/link.o ../Common/luaconf.o ../Common/omt.o ../Common/polarssl/padlock.o ../Common/polarssl/aes.o ../Common/polarssl/aesni.o ../Common/GXContext.o LuaInterface.o message_dispatch.o ../Common/GXCfunction.o ../Common/ae/ae.o ../Common/hiredis/async.o ../Common/hiredis/dict.o ../Common/hiredis/hiredis.o ../Common/hiredis/net.o ../Common/hiredis/sds.o CBox/CBox.o CBox/CBoxPool.o CBox/IOLine.o cfunction.o ../Common/polarssl/md5.o ../Common/pbc/alloc.o ../Common/pbc/array.o ../Common/pbc/bootstrap.o ../Common/pbc/context.o ../Common/pbc/decode.o ../Common/pbc/map.o ../Common/pbc/pattern.o ../Common/pbc/proto.o ../Common/pbc/register.o ../Common/pbc/rmessage.o ../Common/pbc/stringpool.o ../Common/pbc/varint.o ../Common/pbc/wmessage.o ../Common/pbc/pbc-lua.o
+OBJ      = main.o ../Common/alog.o ../Common/bson.o ../Common/kfifo.o ../Common/lfs.o ../Common/link.o  ../Common/omt.o ../Common/polarssl/padlock.o ../Common/polarssl/aes.o ../Common/polarssl/aesni.o ../Common/GXContext.o LuaInterface.o message_dispatch.o ../Common/GXCfunction.o ../Common/ae/ae.o ../Common/hiredis/async.o ../Common/hiredis/dict.o ../Common/hiredis/hiredis.o ../Common/hiredis/net.o ../Common/hiredis/sds.o CBox/CBox.o CBox/CBoxPool.o CBox/IOLine.o cfunction.o ../Common/polarssl/md5.o ../Common/pbc/alloc.o ../Common/pbc/array.o ../Common/pbc/bootstrap.o ../Common/pbc/context.o ../Common/pbc/decode.o ../Common/pbc/map.o ../Common/pbc/pattern.o ../Common/pbc/proto.o ../Common/pbc/register.o ../Common/pbc/rmessage.o ../Common/pbc/stringpool.o ../Common/pbc/varint.o ../Common/pbc/wmessage.o ../Common/pbc/pbc-lua.o ../Common/atablepointer.o
 LINKOBJ  = $(OBJ)
 LIBS     = -rdynamic -L../../lib/x64 -L../../lib -L/usr/local/lib  -lluajit  -lm -lpthread -ldl
 INCS     =  -I"../Common" -I../../include/tolua++ -I/usr/local/include
@@ -41,9 +41,6 @@ main.o: main.cpp
 
 ../Common/link.o: ../Common/link.cpp
 	$(CPP) -c ../Common/link.cpp -o ../Common/link.o $(CXXFLAGS)
-
-../Common/luaconf.o: ../Common/luaconf.c
-	$(CPP) -c ../Common/luaconf.c -o ../Common/luaconf.o $(CXXFLAGS)
 
 ../Common/omt.o: ../Common/omt.c
 	$(CPP) -c ../Common/omt.c -o ../Common/omt.o $(CXXFLAGS)
