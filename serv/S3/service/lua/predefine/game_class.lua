@@ -178,37 +178,27 @@ end
 
 o.init()
 
-function o.test2()
-	local lua_conf_pointer_index = 500
+function o.init2()
+	local pointer_index = 10
+	local ap = require('atabletopointer')
 	
 	if 0==g_box_id then
 		-- master
-		local conf = require("conf_lua")
+		sd = o2
 		
-		sd = nil
-		if o.c_obj then
-			conf.host.delete(o.c_obj)
-		end
+		assert(ap.topointer(pointer_index,sd))
 		
-		local p = conf.host.new(o2)
-		o.c_obj = p
-		-- sd means static data
-		sd = conf.box(p)
-		
-		local r = l_env_set_shared_lightud(lua_conf_pointer_index,p)
-		print('master OK',p,sd,r)
+		print('master OK')
 	elseif nil~=g_box_id then
 		-- slave
-		sd = nil	-- 显式的放一下
+		sd = ap.restoretable(pointer_index)
+		assert(sd)
 		
-		local conf = require("conf_lua")
-		local p = l_env_get_shared_lightud(lua_conf_pointer_index)
-		sd = conf.box(p)
-		print('slave OK',p,sd)
+		print('slave OK')
 	end
 end
 
-o.test2()
+o.init2()
 
 
 function o.test3()
