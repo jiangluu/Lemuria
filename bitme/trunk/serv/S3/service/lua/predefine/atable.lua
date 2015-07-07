@@ -13,24 +13,6 @@ if isServ() then
 		return {}
 	end
 	
-	-- 为了支持conf模块，又因为5.1没有__pairs metamethod，所以自定义一个pairs函数并替代原有的
-	local local_next = next
-	next_backup = next
-	
-	local conf_t = require("conf_lua")
-	local local_conf_next = conf_t.next
-	
-	pairs__backup = pairs
-	
-	pairs = function(t)
-		if nil~=rawget(t,'__parent') then
-			-- a conf userdata
-			return local_conf_next,t,nil
-		else
-			-- a NORMAL one
-			return local_next,t,nil
-		end
-	end
 	
 	-- 下面是企图修正5.1里table其实无视__len的行为
 	table.getn2 = table.getn
