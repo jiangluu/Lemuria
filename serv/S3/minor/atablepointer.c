@@ -29,7 +29,7 @@ struct Hack_lua_State {
 
 #define C_ENV_SHARED_LIGHTUD_LEN 512
 
-void** __make_sure_c_env_get_shared_lightud_exists()
+static void** __make_sure_ptr_pool()
 {
 	static void** aa = NULL;
 	if(NULL == aa){
@@ -47,7 +47,7 @@ static int ltopointer(lua_State *L) {
 	const void * t = lua_topointer(L, 2);
 	
 	if(index>0 && index<=C_ENV_SHARED_LIGHTUD_LEN){
-		void **a = __make_sure_c_env_get_shared_lightud_exists();
+		void **a = __make_sure_ptr_pool();
 		a[index-1] = t;
 		
 		lua_pushboolean(L,1);
@@ -64,7 +64,7 @@ static int lrestoretable(lua_State *L) {
 	lua_Integer index = lua_tointeger(L,1);
 	
 	if(index>0 && index<=C_ENV_SHARED_LIGHTUD_LEN){
-		void **a = __make_sure_c_env_get_shared_lightud_exists();
+		void **a = __make_sure_ptr_pool();
 		
 		struct Hack_lua_State *hl = (struct Hack_lua_State*)L;
 		
