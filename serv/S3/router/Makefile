@@ -4,7 +4,7 @@
 CPP      = g++
 CC       = g++
 WINDRES  = windres.exe
-OBJ      = main.o ../Common/alog.o ../Common/bson.o ../Common/kfifo.o ../Common/lfs.o ../Common/link.o ../Common/luaconf.o ../Common/omt.o ../Common/polarssl/padlock.o ../Common/polarssl/aes.o ../Common/polarssl/aesni.o ../Common/GXContext.o LuaInterface.o message_dispatch.o ../Common/GXCfunction.o
+OBJ      = main.o ../Common/alog.o ../Common/bson.o ../Common/kfifo.o ../Common/lfs.o ../Common/link.o ../Common/omt.o ../Common/polarssl/padlock.o ../Common/polarssl/aes.o ../Common/polarssl/aesni.o ../Common/GXContext.o LuaInterface.o message_dispatch.o ../Common/GXCfunction.o
 LINKOBJ  = $(OBJ)
 LIBS     = -rdynamic -L../../lib/x64 -L../../lib -L/usr/local/lib  -lluajit  -lm -lpthread -ldl
 INCS     =  -I"../Common" -I../../include/tolua++ -I/usr/local/include
@@ -41,9 +41,6 @@ main.o: main.cpp
 
 ../Common/link.o: ../Common/link.cpp
 	$(CPP) -c ../Common/link.cpp -o ../Common/link.o $(CXXFLAGS)
-
-../Common/luaconf.o: ../Common/luaconf.c
-	$(CPP) -c ../Common/luaconf.c -o ../Common/luaconf.o $(CXXFLAGS)
 
 ../Common/omt.o: ../Common/omt.c
 	$(CPP) -c ../Common/omt.c -o ../Common/omt.o $(CXXFLAGS)
