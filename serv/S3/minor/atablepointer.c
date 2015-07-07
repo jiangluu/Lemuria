@@ -1,8 +1,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <lua.h>
-#include <lauxlib.h>
+extern "C"{
+	#include <lua.h>
+	#include <lauxlib.h>
+}
 
 
 
