@@ -10,7 +10,7 @@ local lcf = ffi.C
 function g_reload_sd()
 	o2 = {}
 	o.init()
-	o.test2()
+	o.init2()
 end
 
 
@@ -184,7 +184,7 @@ function o.init2()
 	
 	if 0==g_box_id then
 		-- master
-		sd = o2
+		sd = table.deepclone(o2)
 		
 		assert(ap.topointer(pointer_index,sd))
 		
@@ -195,11 +195,9 @@ function o.init2()
 		assert(sd)
 		
 		print('slave OK',sd)
-		for k,v in pairs(sd) do
-			print(k,'==>',v)
-		end
-		
-		--os.exit(-3)
+		-- for k,v in pairs(sd) do
+			-- print(k,'==>',v)
+		-- end
 	end
 end
 
