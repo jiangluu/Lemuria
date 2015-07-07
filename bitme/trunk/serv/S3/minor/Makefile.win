@@ -124,4 +124,4 @@ cfunction.o: cfunction.c
 	$(CPP) -c cfunction.c -o cfunction.o $(CXXFLAGS)
 
 atablepointer.o: atablepointer.c
-	$(CC) -c atablepointer.c -o atablepointer.o $(CFLAGS)
+	$(CPP) -c atablepointer.c -o atablepointer.o $(CXXFLAGS)
