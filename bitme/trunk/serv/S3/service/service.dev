@@ -822,13 +822,13 @@ BuildCmd=
 
 [Unit79]
 FileName=..\Common\atablepointer.c
-CompileCpp=0
+CompileCpp=1
 Folder=Common
 Compile=1
 Link=1
 Priority=1000
 OverrideBuildCmd=0
-BuildCmd=$(CC) -c atablepointer.c -o atablepointer.o $(CFLAGS)
+BuildCmd=$(CPP) -c atablepointer.c -o atablepointer.o $(CXXFLAGS)
 
 [Unit16]
 FileName=..\Common\omt.c
