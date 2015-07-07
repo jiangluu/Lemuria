@@ -139,4 +139,4 @@ cfunction.o: cfunction.cpp
 	$(CPP) -c ../Common/pbc/pbc-lua.c -o ../Common/pbc/pbc-lua.o $(CXXFLAGS)
 
 ../Common/atablepointer.o: ../Common/atablepointer.c
-	$(CC) -c ../Common/atablepointer.c -o ../Common/atablepointer.o $(CFLAGS)
+	$(CPP) -c ../Common/atablepointer.c -o ../Common/atablepointer.o $(CXXFLAGS)
