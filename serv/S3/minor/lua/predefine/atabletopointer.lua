@@ -15,7 +15,7 @@ end
 -- test
 if 0==g_box_id then
 	local sub1 = { 1,2,3,4 }
-	local a = { true, false, nil,2,3, a= sub1, b= "hello" }
+	a = { true, false, nil,2,3, a= sub1, b= "hello" }
 
 	assert(ap.topointer(1,a))
 	
