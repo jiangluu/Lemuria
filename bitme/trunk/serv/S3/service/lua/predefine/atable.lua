@@ -22,11 +22,13 @@ if isServ() then
 		end
 		
 		local meta = getmetatable(o)
-		if meta and meta.__len then
-			return meta.__len(o)
-		else
-			return #o
+		-- if meta and meta.__len then
+			-- return meta.__len(o)
+		if meta then
+			local notuse = o[1]	-- 触发 __index
 		end
+		
+		return #o
 	end
 	
 else
