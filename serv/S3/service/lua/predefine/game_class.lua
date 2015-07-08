@@ -189,15 +189,54 @@ function o.init2()
 		assert(ap.topointer(pointer_index,sd))
 		
 		print('master OK')
+		
 	elseif nil~=g_box_id then
 		-- slave
-		sd = ap.restoretable(pointer_index)
-		assert(sd)
+		local t = ap.restoretable(pointer_index)
+		assert(t)
+		
+		-- ////////////////////////////////////////////////////////////////////////////////
+		-- make just one level, lazy
+		local function make_string_local_lazy(remote_t,local_t)
+			for k,v in pairs(remote_t) do
+				local k2 = k
+				if 'string'==type(k2) then
+					k2 = string.rep(k,1)
+				end
+				
+				if 'table'==type(v) then
+					local a = { _remote_table=v }
+					setmetatable(a,o.mt)
+					local_t[k2] = a
+				else
+					local_t[k2] = v
+				end
+			end
+		end
+		
+		o.mt = { __index=function(at,ak)
+			--print('HI~~~~~~~~~~~~~~~~~~~',ak)
+			make_string_local_lazy(at._remote_table,at)
+			
+			return rawget(at,ak)
+		end }
+		-- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+		
+		sd = {}
+		make_string_local_lazy(t,sd)
 		
 		print('slave OK',sd)
-		-- for k,v in pairs(sd) do
-			-- print(k,'==>',v)
-		-- end
+		
+		-- print('sd.buff',sd.buff)
+		-- print('sd.noop',sd.noop)
+		-- print('sd.scene',sd.scene)
+		-- print('sd.scene.to',sd.scene.to)
+		-- print('sd.scene.to.name',sd.scene.to.name)
+		-- print('sd.scene.to.noop',sd.scene.to.noop)
+		-- print('sd.scene.to.detail',sd.scene.to.detail)
+		-- print('sd.scene.to.detail[1]',sd.scene.to.detail[1])
+		-- print('sd.scene.to.detail[2].cost_count',sd.scene.to.detail[2].cost_count)
+		
 	end
 end
 
