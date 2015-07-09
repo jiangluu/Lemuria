@@ -184,7 +184,19 @@ function o.init2()
 	
 	if 0==g_box_id then
 		-- master
-		sd = table.deepclone(o2)
+		--sd = table.deepclone(o2)
+		sd = o2
+		
+		local function foo(t)
+			ap.makeungc(t)
+			for k,v in pairs(t) do
+				if 'table'==type(v) then
+					foo(v)
+				end
+			end
+		end
+		
+		foo(sd)
 		
 		assert(ap.topointer(pointer_index,sd))
 		
