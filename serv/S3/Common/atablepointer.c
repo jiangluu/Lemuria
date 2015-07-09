@@ -131,9 +131,26 @@ void _hack_copyvalue(lua_State *srcL,lua_State *destL) {
 	}
 }
 
+static int llen(lua_State *L) {
+	luaL_checktype(L, 1, LUA_TUSERDATA);
+	void * t = lua_touserdata(L, 1);
+	Atableptr *ud = (Atableptr*)(t);
+	
+	// just for safety
+	lua_checkstack(L,5);
+	lua_checkstack(ud->ownerL,5);
+	
+	_hacktotable(ud->ownerL,ud->o);
+	size_t n = lua_objlen(ud->ownerL,-1);
+	lua_pop(ud->ownerL,1);
+	
+	lua_pushinteger(L,n);
+	return 1;
+}
+
 static int lindex(lua_State *L) {
-	luaL_checktype(L, -2, LUA_TUSERDATA);
-	void * t = lua_touserdata(L, -2);
+	luaL_checktype(L, 1, LUA_TUSERDATA);
+	void * t = lua_touserdata(L, 1);
 	Atableptr *ud = (Atableptr*)(t);
 	
 	// we should ensure ownerL's stack unchanged
@@ -144,7 +161,7 @@ static int lindex(lua_State *L) {
 	lua_checkstack(ud->ownerL,5);
 	
 	//hack
-	if(lua_isnumber(L,-1)){
+	if(lua_isnumber(L,2)){
 		lua_Number n = lua_tonumber(L,-1);
 		
 		_hacktotable(ud->ownerL,ud->o);
@@ -154,7 +171,7 @@ static int lindex(lua_State *L) {
 		_hack_copyvalue(ud->ownerL,L);
 		lua_pop(ud->ownerL,1);
 	}
-	else if(lua_isstring(L,-1)){
+	else if(lua_isstring(L,2)){
 		size_t len = 0;
 		const char *str = lua_tolstring(L,-1,&len);
 		
@@ -186,6 +203,8 @@ void _new_atableptr(lua_State *L,Atableptr *u) {
 	if (luaL_newmetatable(L, "atablepointer")) {
 		lua_pushcfunction(L, lindex);
 		lua_setfield(L, -2, "__index");
+		lua_pushcfunction(L, llen);
+		lua_setfield(L, -2, "__len");
 	}
 	lua_setmetatable(L, -2);
 }
