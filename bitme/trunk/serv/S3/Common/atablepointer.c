@@ -27,9 +27,17 @@ struct Hack_lua_State {
   TValue *top;		/* First free slot in the stack. */
 };
 
+struct GCobj {
+  uint32_t nextgc; 
+  uint8_t marked; 
+  uint8_t gct;
+ };
 
 
 #define LJ_TTAB			(~11u)
+#define LJ_GC_WHITE0	0x01
+#define LJ_GC_BLACK	0x04
+#define LJ_GC_FIXED	0x20
 // END ================================
 
 #define C_ENV_SHARED_LIGHTUD_LEN 512
@@ -56,6 +64,11 @@ static int ltopointer(lua_State *L) {
 		a[index-1] = t;
 		
 		lua_pushboolean(L,1);
+		
+		// hack
+		struct GCobj *o = (struct GCobj*)t;
+		o->marked = LJ_GC_WHITE0;
+		o->marked |= LJ_GC_FIXED;	// prevent GC
 	}
 	else{
 		lua_pushboolean(L,0);
@@ -87,10 +100,26 @@ static int lrestoretable(lua_State *L) {
 	return 1;
 }
 
+static int lmakeUnGC(lua_State *L) {
+	luaL_checktype(L, 1, LUA_TTABLE);
+	const void * t = lua_topointer(L, 1);
+	
+	// hack
+	struct GCobj *o = (struct GCobj*)t;
+	o->marked = LJ_GC_WHITE0;
+	o->marked |= LJ_GC_FIXED;	// prevent GC
+	
+	lua_pushboolean(L,1);
+	
+	return 1;
+}
+
+
 int luaopen_atablepointer(lua_State *L) {
 	luaL_Reg l[] = {
 		{ "topointer", ltopointer },
 		{ "restoretable", lrestoretable },
+		{ "makeungc", lmakeUnGC },
 		{ NULL, NULL },
 	};
 	luaL_register(L,"atabletopointer",l);
