@@ -55,9 +55,9 @@ static void** __make_sure_ptr_pool()
 
 
 static int ltopointer(lua_State *L) {
-	luaL_checktype(L, 2, LUA_TTABLE);
-	lua_Integer index = lua_tointeger(L,1);
-	const void * t = lua_topointer(L, 2);
+	luaL_checktype(L, -1, LUA_TTABLE);
+	lua_Integer index = lua_tointeger(L,-2);
+	const void * t = lua_topointer(L, -1);
 	
 	if(index>0 && index<=C_ENV_SHARED_LIGHTUD_LEN){
 		void **a = __make_sure_ptr_pool();
@@ -79,7 +79,7 @@ static int ltopointer(lua_State *L) {
 
 
 static int lrestoretable(lua_State *L) {
-	lua_Integer index = lua_tointeger(L,1);
+	lua_Integer index = lua_tointeger(L,-1);
 	
 	if(index>0 && index<=C_ENV_SHARED_LIGHTUD_LEN){
 		void **a = __make_sure_ptr_pool();
@@ -101,8 +101,8 @@ static int lrestoretable(lua_State *L) {
 }
 
 static int lmakeUnGC(lua_State *L) {
-	luaL_checktype(L, 1, LUA_TTABLE);
-	const void * t = lua_topointer(L, 1);
+	luaL_checktype(L, -1, LUA_TTABLE);
+	const void * t = lua_topointer(L, -1);
 	
 	// hack
 	struct GCobj *o = (struct GCobj*)t;
