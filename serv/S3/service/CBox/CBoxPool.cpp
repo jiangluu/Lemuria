@@ -432,6 +432,7 @@ void CBoxPool::onUpdate(timetype now)
 			lua_State *L = bb->getLuaVM()->luaState();
 			if(L){
 				lua_gc(L,LUA_GCSTEP,5);
+				lua_gc(L,LUA_GCSTOP,0);
 			}
 		}
 	}
