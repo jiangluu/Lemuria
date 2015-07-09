@@ -132,6 +132,7 @@ void frame_time_driven(timetype now)
 	    
 		
 		lua_gc(L,LUA_GCSTEP,5);
+		lua_gc(L,LUA_GCSTOP,0);
 		
 	}
 }
