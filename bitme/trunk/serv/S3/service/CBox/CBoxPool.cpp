@@ -431,8 +431,7 @@ void CBoxPool::onUpdate(timetype now)
 			CBox *bb = a_box_+i;
 			lua_State *L = bb->getLuaVM()->luaState();
 			if(L){
-				lua_gc(L,LUA_GCSTEP,5);
-				lua_gc(L,LUA_GCSTOP,0);
+				lua_gc(L,LUA_GCSTEP,10);
 			}
 		}
 	}
