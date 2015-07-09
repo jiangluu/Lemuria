@@ -207,9 +207,9 @@ function o.init2()
 		print('sd.scene.to.name',sd.scene.to.name)
 		print('sd.scene.to.noop',sd.scene.to.noop)
 		print('sd.scene.to.detail',sd.scene.to.detail)
+		print('sd.scene.to.detail len',#sd.scene.to.detail)
 		print('sd.scene.to.detail[1]',sd.scene.to.detail[1])
 		print('sd.scene.to.detail[2].cost_count',sd.scene.to.detail[2].cost_count)
-		os.exit(-3)
 		
 	end
 end
