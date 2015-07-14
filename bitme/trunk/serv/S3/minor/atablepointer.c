@@ -103,14 +103,14 @@ void _hacktotable(lua_State *L,void *ptr) {
 // 栈顶到栈顶
 void _hack_copyvalue(lua_State *srcL,lua_State *destL) {
 	// 除了字符串，其他都“偷”
-	if(lua_isstring(srcL,-1)){
+	if(LUA_TSTRING == lua_type(srcL,-1)){
 		size_t len = 0;
 		const char *str = lua_tolstring(srcL,-1,&len);
 		
 		lua_pushlstring(destL,str,len);
 		lua_pop(srcL,1);
 	}
-	else if(lua_istable(srcL,-1)){
+	else if(LUA_TTABLE == lua_type(srcL,-1)){
 		const void * t = lua_topointer(srcL, -1);
 		
 		Atableptr bb;
@@ -161,7 +161,7 @@ static int lindex(lua_State *L) {
 	lua_checkstack(ud->ownerL,5);
 	
 	//hack
-	if(lua_isnumber(L,2)){
+	if(LUA_TNUMBER == lua_type(L,2)){
 		lua_Number n = lua_tonumber(L,-1);
 		
 		_hacktotable(ud->ownerL,ud->o);
@@ -171,7 +171,7 @@ static int lindex(lua_State *L) {
 		_hack_copyvalue(ud->ownerL,L);
 		lua_pop(ud->ownerL,1);
 	}
-	else if(lua_isstring(L,2)){
+	else if(LUA_TSTRING == lua_type(L,2)){
 		size_t len = 0;
 		const char *str = lua_tolstring(L,-1,&len);
 		
