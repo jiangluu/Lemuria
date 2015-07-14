@@ -195,6 +195,87 @@ static int lindex(lua_State *L) {
 	return 1;
 }
 
+// does NOT pop srcL
+int _copy_number_or_string(lua_State *srcL,int src_index,lua_State *destL)
+{
+	int r = 0;
+	int second_param = lua_type(srcL,src_index);
+	if(LUA_TNUMBER==second_param){
+		lua_Number n = lua_tonumber(srcL,src_index);
+		lua_pushnumber(destL,n);
+		r = 1;
+	}
+	else if(LUA_TSTRING==second_param){
+		size_t len = 0;
+		const char* s = lua_tolstring(srcL,src_index,&len);
+		lua_pushlstring(destL,s,len);
+		r = 1;
+	}
+	
+	return r;
+}
+
+static int Lnext(lua_State *L) {
+	luaL_checktype(L, 1, LUA_TUSERDATA);
+	struct Atableptr *p = (struct Atableptr*)lua_topointer(L, 1);
+	
+	int stack_before = lua_gettop(p->ownerL);
+	lua_checkstack(p->ownerL,5);
+	
+	_hacktotable(p->ownerL,p->o);
+	int second_param = lua_type(L,2);
+	// copy key. key just support number or string
+	if(LUA_TNUMBER==second_param || LUA_TSTRING==second_param){
+		_copy_number_or_string(L,2,p->ownerL);
+	}
+	else{
+		lua_pushnil(p->ownerL);
+	}
+	
+	// call next
+	int r = lua_next(p->ownerL,-2);
+	if(LUA_TNONE!=lua_type(L,2)){
+		lua_pop(L,1);
+	}
+	
+	if(0 == r){		// it's over
+		lua_pop(p->ownerL,1);
+		if(stack_before != lua_gettop(p->ownerL)){
+			lua_pushstring(L,"tabletopointer  ownerL stack changed");
+			lua_error(L);
+		}
+		return 0;
+	}
+	else{
+		int r2 = _copy_number_or_string(p->ownerL,2,L);
+		_hack_copyvalue(p->ownerL,L);
+		
+		lua_pop(p->ownerL,2);
+		
+		if(stack_before != lua_gettop(p->ownerL)){
+			lua_pushstring(L,"tabletopointer  ownerL stack changed");
+			lua_error(L);
+		}
+		if(0 == r2){
+			lua_pushstring(L,"tabletopointer  Lnext key must be number or string");
+			lua_error(L);
+		}
+		
+		return 2;
+	}
+}
+
+static int Lpairs(lua_State *L) {
+	luaL_checktype(L, 1, LUA_TUSERDATA);
+	lua_checkstack(L,5);
+	
+	lua_pushcfunction(L,Lnext);
+	lua_insert(L,-2);
+	lua_pushnil(L);
+	
+	return 3;
+}
+
 // stack +1
 void _new_atableptr(lua_State *L,Atableptr *u) {
 	void *ud = lua_newuserdata(L,sizeof(Atableptr));
@@ -231,6 +312,7 @@ int luaopen_atablepointer(lua_State *L) {
 	luaL_Reg l[] = {
 		{ "topointer", ltopointer },
 		{ "restoretable", lrestoretable },
+		{ "pairs", Lpairs },
 		{ NULL, NULL },
 	};
 	luaL_register(L,"atabletopointer",l);
