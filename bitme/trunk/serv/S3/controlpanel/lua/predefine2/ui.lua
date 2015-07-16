@@ -16,6 +16,7 @@ o.cmds = {{'PING',{2221,1}},
 	{'league end',{1101,'league end'} },
 	{'broadcast',{1101,'league end'} },
 	{'smail',{1101,'smail'} },
+	{'retty',{1101,'retty'} },
 }
 
 
@@ -23,6 +24,7 @@ function o.post_init()
 	o.text1 = iup.multiline{READONLY='yes',VISIBLELINES=40,VISIBLECOLUMNS=80}
 	
 	o.magic = ffi.new('char[?]',16)
+	--o.magic[0] = 1
 	
 	local function make_sure_target()
 		if nil==o.target_app then
@@ -79,6 +81,12 @@ function o.post_init()
 					l_gx_cur_writestream_put_slice(icon,0)
 					l_gx_cur_writestream_put_slice(title,0)
 					l_gx_cur_writestream_put_slice(text,0)
+				end
+			elseif 'retty'==cmd[2] then
+				local ok,tty = iup.GetParam('input tty',nil,'tty:%s\n','/dev/pts/0')
+				
+				if true==ok then
+					l_gx_cur_writestream_put_slice(tty)
 				end
 			end
 			
