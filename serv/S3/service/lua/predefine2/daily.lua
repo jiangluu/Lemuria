@@ -8,18 +8,21 @@ daily = o
 local lcf = ffi.C
 
 
+o.funcs = {}
+
 function o.post_init()
 	table.travel_sd(sd.daily,function(t,k)
 		local v = t[k]
 		if v.condition and v.value then
 			local ss = 1
 			if nil==string.match(v.condition,',') then
-				ss = string.format('return tonumber(util.%s(player_longlonglong))',v.condition)
+				ss = string.format('return tonumber(util.%s(player_9876))',v.condition)
 			else
-				ss = string.gsub(v.condition,',','(player_longlonglong,"')
+				ss = string.gsub(v.condition,',','(player_9876,"')
 				ss = string.format('return tonumber(util.%s"))',ss)
 			end
-			v.func = loadstring(ss)
+			--v.func = loadstring(ss)	-- v is userdata
+			o.funcs[k] = loadstring(ss)
 		end
 	end)
 end
@@ -145,16 +148,13 @@ function o.check_all(p)
 	if p.addition.daily.list then
 		for i=1,#p.addition.daily.list do
 			local dd = p.addition.daily.list[i]
-			local conf = sd.daily[dd.id]
+			local f = o.funcs[dd.id]
 			
 			if 0 == dd.stat then
-				player_longlonglong = p		-- 不得已用全局变量
-				local err,result = pcall(conf.func)
+				player_9876 = p		-- 不得已用全局变量
+				local err,result = pcall(f)
 				
-				if false==err then
-					-- print('daily condition error',dd.id,conf.condition)
-					-- print(result)
-				else
+				if true==err then
 					if result ~= dd.a then
 						jlpcall(o.on_daily_change,p,i,result)
 					end
