@@ -7,6 +7,9 @@ ach = o		-- ach means achievement
 
 local lcf = ffi.C
 
+
+o.funcs = {}
+
 function o.test()
 	local f = loadstring('return aa*2')
 	print(f)
@@ -23,12 +26,13 @@ function o.post_init()
 		local ss = 1
 		
 		if nil==string.match(v.condition,',') then
-			ss = string.format('return tonumber(util.%s(player_longlonglong))',v.condition)
+			ss = string.format('return tonumber(util.%s(player_9876))',v.condition)
 		else
-			ss = string.gsub(v.condition,',','(player_longlonglong,"')
+			ss = string.gsub(v.condition,',','(player_9876,"')
 			ss = string.format('return tonumber(util.%s"))',ss)
 		end
-		v.func = loadstring(ss)
+		--v.func = loadstring(ss)	-- v is userdata
+		o.funcs[k] = loadstring(ss)
 	end)
 end
 
@@ -39,24 +43,27 @@ function o.check_all(p)
 	table.travel_sd(sd.achieve,function(t,k)
 		local v = t[k]
 		
-		player_longlonglong = p		-- 不得已用全局变量
-		local err,result = pcall(v.func)
-		if false==err then
-			--print('achievement condition error',k,v.condition)
-			--print(result)
-		else
-			for ii,vv in pairs(v.info) do
-				if result ~= tonumber(vv.init) then
-					local ss = string.format('%s_%d',k,ii)
-					if nil==p.addition.achieve[ss] then
-						p.addition.achieve[ss] = {stat=0,a=vv.init,b=vv.value}
+		local f = o.funcs[k]
+		if f then
+			player_9876 = p		-- 不得已用全局变量
+			local err,result = pcall(f)
+			if false==err then
+				--print('achievement condition error',k,v.condition)
+				--print(result)
+			else
+				for ii,vv in pairs(v.info) do
+					if result ~= tonumber(vv.init) then
+						local ss = string.format('%s_%d',k,ii)
+						if nil==p.addition.achieve[ss] then
+							p.addition.achieve[ss] = {stat=0,a=vv.init,b=vv.value}
+						end
+						
+						if 0==p.addition.achieve[ss].stat and result~=p.addition.achieve[ss].a then
+							jlpcall(o.on_achievement_change,p,ss,result)
+							break
+						end
+					-- else  result == init的是初始值，根本不用处理，也没有这一条数据
 					end
-					
-					if 0==p.addition.achieve[ss].stat and result~=p.addition.achieve[ss].a then
-						jlpcall(o.on_achievement_change,p,ss,result)
-						break
-					end
-				-- else  result == init的是初始值，根本不用处理，也没有这一条数据
 				end
 			end
 		end
