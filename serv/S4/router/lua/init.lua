@@ -17,8 +17,14 @@ end
 
 
 g_lua_dir = "lua/"
+g_data_dir = "data/"
+
+package.path = package.path + ';lua/mod'
 
 
-jlpcall(dofile,g_lua_dir.."predefine/init.lua")
-
+if 1==g_tag then
+	jlpcall(dofile,g_lua_dir.."zero/init.lua")
+else
+	jlpcall(dofile,g_lua_dir.."predefine/init.lua")
+end
 
