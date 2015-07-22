@@ -47,7 +47,6 @@ __ENTER_FUNCTION
     if(luaVM)
     {
         lua_state_ = luaVM;
-        lua_settop(lua_state_, 0);
         return;
     }
 
@@ -60,7 +59,7 @@ __ENTER_FUNCTION
 	luaopen_protobuf_c(lua_state_);
     luaopen_atablepointer(lua_state_);
     
-    lua_settop(lua_state_, 0);
+    //lua_settop(lua_state_, 0);
 __LEAVE_FUNCTION
 }
  
