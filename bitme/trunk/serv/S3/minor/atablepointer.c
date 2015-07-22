@@ -247,7 +247,7 @@ static int Lnext(lua_State *L) {
 		return 0;
 	}
 	else{
-		int r2 = _copy_number_or_string(p->ownerL,2,L);
+		int r2 = _copy_number_or_string(p->ownerL,-2,L);
 		_hack_copyvalue(p->ownerL,L);
 		
 		lua_pop(p->ownerL,2);
