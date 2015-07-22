@@ -17,7 +17,6 @@
 #ifdef ENABLE_ENCRYPT
 char *g_e_key = NULL;
 #endif
-LuaInterface *g_luavm = 0;
 GameTime *g_time = 0;
 ARand *g_rand = 0;
 GXContext *g_gx1 = 0;
@@ -60,10 +59,6 @@ int main(int argc, char** argv) {
 	g_rand = new ARand((u32)g_time->getANSITime());
 	
 	
-	// 读取配置文件
-	g_luavm = new LuaInterface();
-	g_luavm->Init();
-	
 	
 	// 初始化GX上下文
 	g_gx1 = new GXContext();
@@ -83,7 +78,7 @@ int main(int argc, char** argv) {
 	}
 	
 	gx_set_context(g_gx1);
-	int init_r = g_luavm->callGlobalFunc<int>("PostInit");
+	int init_r = g_gx1->lua_vm2_->callGlobalFunc<int>("PostInit");
 	if(0 != init_r){
 		printf("Lua PostInit() failed.\n");
 		_exit(-2);
