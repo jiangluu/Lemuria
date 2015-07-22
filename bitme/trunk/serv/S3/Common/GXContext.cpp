@@ -304,8 +304,12 @@ bool GXContext::init(int type,const char* ID,int pool_size,int read_buf_len,int 
 		luaopen_base(lua_vm_);
 		luaopen_table(lua_vm_);
 		
+		char buf[32];
 		FOR(i,GX_LUA_INDICATOR_NUM){
+			sprintf(buf,"__indicator%d",i);
 			lua_newtable(lua_vm_);
+			lua_setfield(lua_vm_, LUA_GLOBALSINDEX, buf);		// prevent it to be GC
+			lua_getfield(lua_vm_, LUA_GLOBALSINDEX, buf);
 			lua_indicator_[i] = lua_gettop(lua_vm_);
 		}
 	}
