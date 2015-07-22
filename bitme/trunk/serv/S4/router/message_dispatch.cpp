@@ -9,8 +9,6 @@
 
 
 
-extern LuaInterface *g_luavm;
-
 AStream *ws = NULL;
 
 
@@ -20,10 +18,10 @@ int message_dispatch(GXContext *gx,Link* src_link,InternalHeader *hh,int body_le
 	
 	int msg_id = hh->message_id_;
 	if(msg_id>=8000 && msg_id<=8100){
-		int r = g_luavm->callGlobalFunc<int>("OnInternalMessage");
+		int r = gx->lua_vm2_->callGlobalFunc<int>("OnInternalMessage");
 	}
 	else{
-		int r = g_luavm->callGlobalFunc<int>("OnCustomMessage");
+		int r = gx->lua_vm2_->callGlobalFunc<int>("OnCustomMessage");
 	}
 	
 	return 0;
@@ -34,7 +32,7 @@ void on_client_cut(GXContext *gx,Link *ll,int reason,int gxcontext_type)
 {
 	gx_set_context(gx);
 	
-	int r = g_luavm->callGlobalFunc<int>("OnCut",ll->pool_index_,reason);
+	int r = gx->lua_vm2_->callGlobalFunc<int>("OnCut",ll->pool_index_,reason);
 	
 	if(0 != ll->link_id_[0]){
 		gx->unbind(ll->link_id_);
