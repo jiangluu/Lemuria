@@ -17,12 +17,7 @@ int message_dispatch(GXContext *gx,Link* src_link,InternalHeader *hh,int body_le
 	gx_set_context(gx);
 	
 	int msg_id = hh->message_id_;
-	if(msg_id>=8000 && msg_id<=8100){
-		int r = gx->lua_vm2_->callGlobalFunc<int>("OnInternalMessage");
-	}
-	else{
-		int r = gx->lua_vm2_->callGlobalFunc<int>("OnCustomMessage");
-	}
+	int r = gx->lua_vm2_->callGlobalFunc<int>("OnGXMessage");
 	
 	return 0;
 }
@@ -41,5 +36,6 @@ void on_client_cut(GXContext *gx,Link *ll,int reason,int gxcontext_type)
 
 void frame_time_driven(timetype now)
 {
+	g_gx1->lua_vm2_->callGlobalFunc<void>("OnFrame");
 }
 
