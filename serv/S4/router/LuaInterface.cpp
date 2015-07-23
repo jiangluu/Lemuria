@@ -137,3 +137,39 @@ __LEAVE_FUNCTION
 }
 
 
+int c_luaopen_lfs(lua_State *L)
+{
+	return luaopen_lfs(L);
+}
+
+int c_luaopen_bson(lua_State *L)
+{
+	return luaopen_bson(L);
+}
+
+int c_luaopen_atablepointer(lua_State *L)
+{
+	return luaopen_atablepointer(L);
+}
+
+int c_lua_ex_function(lua_State *L)
+{
+	lua_register(L,"l_env_get_shared_lightud",__c_env_get_shared_lightud);
+	lua_register(L,"l_env_set_shared_lightud",__c_env_set_shared_lightud);
+	
+	return 0;
+}
+
+lua_State* c_lua_new_vm()
+{
+	lua_State *L = luaL_newstate();
+    luaL_openlibs(L);
+    c_lua_ex_function(L);
+    
+    luaopen_lfs(L);
+    luaopen_bson(L);
+    luaopen_atablepointer(L);
+	
+	return L;
+}
+

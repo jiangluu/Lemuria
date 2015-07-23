@@ -29,7 +29,7 @@ IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=4
 CompilerSettings=0000000100000000001000000
-UnitCount=44
+UnitCount=46
 
 [VersionInfo]
 Major=1
@@ -484,6 +484,26 @@ BuildCmd=
 FileName=..\Common\hiredis\sds.h
 CompileCpp=1
 Folder=hiredis
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit45]
+FileName=cfunction.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit46]
+FileName=cfunction.h
+CompileCpp=1
+Folder=
 Compile=1
 Link=1
 Priority=1000

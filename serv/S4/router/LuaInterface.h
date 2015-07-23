@@ -911,4 +911,26 @@ void LuaInterface::_Call<void>(int);
 //#endif
 
 
+
+#ifdef WIN32
+#define CF_EXPORT  __declspec(dllexport)
+#else
+#define CF_EXPORT
+#endif
+
+extern "C"{
+
+CF_EXPORT int c_luaopen_lfs(lua_State *L);
+
+CF_EXPORT int c_luaopen_bson(lua_State *L);
+
+CF_EXPORT int c_luaopen_atablepointer(lua_State *L);
+
+CF_EXPORT int c_lua_ex_function(lua_State *L);
+
+CF_EXPORT lua_State* c_lua_new_vm();
+
+}
+
+
 #endif

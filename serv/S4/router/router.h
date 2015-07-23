@@ -21,6 +21,7 @@ extern GameTime *g_time;
 extern ARand *g_rand;
 
 extern ALog *g_log;
+extern ALog *g_yylog;
 
 extern GXContext *g_gx1;
 
