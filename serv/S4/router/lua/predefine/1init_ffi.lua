@@ -4,7 +4,7 @@ ffi = require("ffi")
 ffi.cdef[[
 
 // luaState functions
-struct lua_State;
+typedef struct lua_State lua_State;
 int c_luaopen_lfs(lua_State *L);
 
 int c_luaopen_bson(lua_State *L);
