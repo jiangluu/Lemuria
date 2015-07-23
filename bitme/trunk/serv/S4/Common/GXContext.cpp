@@ -322,10 +322,11 @@ bool GXContext::init(int type,const char* ID,int pool_size,int read_buf_len,int 
 bool GXContext::initWrap(int type,const char* ID)
 {
 	lua_vm2_ = new LuaInterface();
-	lua_vm2_->SetGlobal("g_tag",1);
+	lua_vm2_->SetGlobal("g_tag",0);
 	lua_vm2_->SetGlobal(LUA_GX_ID,ID);
+	lua_vm2_->SetGlobal("g_node_id",ID);
 	
-	lua_vm2_->Init();
+	lua_vm2_->doFile("./lua/init.lua");
 	
 	
 	// 初始化GX上下文
@@ -337,6 +338,10 @@ bool GXContext::initWrap(int type,const char* ID)
 	
 	bool r = init(type,ID,config_maxconn,config_readbuflen,config_writebuflen);
 	strncpy(this->ip_and_port_,my_port.c_str(),127);
+	
+	
+	lua_vm2_->SetGlobal("g_tag",1);
+	lua_vm2_->doFile("./lua/init.lua");
 	
 	return r;
 }
