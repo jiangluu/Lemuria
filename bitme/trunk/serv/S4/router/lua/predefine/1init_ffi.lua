@@ -3,6 +3,19 @@
 ffi = require("ffi")
 ffi.cdef[[
 
+// luaState functions
+struct lua_State;
+int c_luaopen_lfs(lua_State *L);
+
+int c_luaopen_bson(lua_State *L);
+
+int c_luaopen_atablepointer(lua_State *L);
+
+int c_lua_ex_function(lua_State *L);
+
+lua_State* c_lua_new_vm();
+
+
 // libz functions
 unsigned long compressBound(unsigned long sourceLen);
 int compress2(uint8_t *dest, unsigned long *destLen,
@@ -73,6 +86,67 @@ int gx_get_message_id();
 int gx_make_portal_sync(const char* ID,const char* port);
 
 int gx_bind_portal_id(int index,const char* id);
+
+// GX END
+
+
+struct Slice cur_stream_get_slice();
+
+bool cur_stream_is_end();
+
+int16_t cur_stream_get_int8();
+
+int16_t cur_stream_get_int16();
+
+int32_t cur_stream_get_int32();
+
+int64_t cur_stream_get_int64();
+
+float cur_stream_get_float32();
+
+double cur_stream_get_float64();
+
+int16_t cur_stream_peek_int16();
+
+bool cur_stream_push_int16(int16_t v);
+
+bool cur_stream_push_int32(int32_t v);
+
+bool cur_stream_push_int64(int64_t v);
+
+bool cur_stream_push_float32(float v);
+
+bool cur_stream_push_slice(struct Slice s);
+
+bool cur_stream_push_string(const char* v,int len);
+
+
+void cur_write_stream_cleanup();
+
+// 同步原路返回。messageid 是req的+1，内容是push到 stream里的内容。 
+void cur_stream_write_back();
+
+void cur_stream_write_back2(int message_id);
+
+void cur_stream_broadcast(int message_id);
+
+uint32_t cur_game_time();
+
+uint64_t cur_game_usec();
+
+bool log_write(int level,const char*,int len);
+
+bool log_write2(int index,const char*,int len);
+
+void log_force_flush();
+
+int string_hash(const char *str);
+
+int cur_message_loopback();
+
+int cur_stream_get_readbuf_len();
+
+const char* cur_stream_get_bin(int len);	// 获取bin块（事先知道len） 
 
 
 ]]
