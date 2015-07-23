@@ -18,6 +18,8 @@
 char *g_e_key = NULL;
 #endif
 GameTime *g_time = 0;
+ALog *g_log;
+ALog *g_yylog;
 ARand *g_rand = 0;
 GXContext *g_gx1 = 0;
 
@@ -58,6 +60,24 @@ int main(int argc, char** argv) {
 	
 	g_rand = new ARand((u32)g_time->getANSITime());
 	
+	
+	// init log
+	g_log = new ALog();
+	char buf1[64];
+	snprintf(buf1,60,"log%s",argv[1]);
+	if(!g_log->init(buf1)){
+		printf("Log init error\n");
+		_exit(-1);
+	}
+	g_log->setTimer(g_time);
+	
+	g_yylog = new ALog();
+	snprintf(buf1,60,"YY%s",argv[1]);
+	if(!g_yylog->init(buf1)){
+		printf("YYLog init error\n");
+		_exit(-1);
+	}
+	g_yylog->setTimer(g_time);
 	
 	
 	// 初始化GX上下文

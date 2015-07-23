@@ -4,8 +4,8 @@
 CPP      = g++.exe -D__DEBUG__
 CC       = gcc.exe -D__DEBUG__
 WINDRES  = windres.exe
-OBJ      = main.o ../Common/alog.o ../Common/bson.o ../Common/kfifo.o ../Common/lfs.o ../Common/link.o ../Common/omt.o ../Common/polarssl/padlock.o ../Common/polarssl/aes.o ../Common/GXContext.o LuaInterface.o message_dispatch.o ../Common/GXCfunction.o ../Common/atablepointer.o ../Common/ae/ae.o ../Common/hiredis/async.o ../Common/hiredis/dict.o ../Common/hiredis/hiredis.o ../Common/hiredis/net.o ../Common/hiredis/sds.o
-LINKOBJ  = main.o ../Common/alog.o ../Common/bson.o ../Common/kfifo.o ../Common/lfs.o ../Common/link.o ../Common/omt.o ../Common/polarssl/padlock.o ../Common/polarssl/aes.o ../Common/GXContext.o LuaInterface.o message_dispatch.o ../Common/GXCfunction.o ../Common/atablepointer.o ../Common/ae/ae.o ../Common/hiredis/async.o ../Common/hiredis/dict.o ../Common/hiredis/hiredis.o ../Common/hiredis/net.o ../Common/hiredis/sds.o
+OBJ      = main.o ../Common/alog.o ../Common/bson.o ../Common/kfifo.o ../Common/lfs.o ../Common/link.o ../Common/omt.o ../Common/polarssl/padlock.o ../Common/polarssl/aes.o ../Common/GXContext.o LuaInterface.o message_dispatch.o ../Common/GXCfunction.o ../Common/atablepointer.o ../Common/ae/ae.o ../Common/hiredis/async.o ../Common/hiredis/dict.o ../Common/hiredis/hiredis.o ../Common/hiredis/net.o ../Common/hiredis/sds.o cfunction.o
+LINKOBJ  = main.o ../Common/alog.o ../Common/bson.o ../Common/kfifo.o ../Common/lfs.o ../Common/link.o ../Common/omt.o ../Common/polarssl/padlock.o ../Common/polarssl/aes.o ../Common/GXContext.o LuaInterface.o message_dispatch.o ../Common/GXCfunction.o ../Common/atablepointer.o ../Common/ae/ae.o ../Common/hiredis/async.o ../Common/hiredis/dict.o ../Common/hiredis/hiredis.o ../Common/hiredis/net.o ../Common/hiredis/sds.o cfunction.o
 LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib32" -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib32" -static-libgcc -L"../../lib/win" -lws2_32 -llua51 -m32 -g3
 INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.8.1/include" -I"../Common" -I"../../include/tolua++" -I"."
 CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.8.1/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++" -I"../Common" -I"../../include/tolua++" -I"."
@@ -83,3 +83,6 @@ message_dispatch.o: message_dispatch.cpp
 
 ../Common/hiredis/sds.o: ../Common/hiredis/sds.c
 	$(CPP) -c ../Common/hiredis/sds.c -o ../Common/hiredis/sds.o $(CXXFLAGS)
+
+cfunction.o: cfunction.cpp
+	$(CPP) -c cfunction.cpp -o cfunction.o $(CXXFLAGS)
