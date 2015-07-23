@@ -11,10 +11,6 @@ function getWriteBufLen()
 	return 1024*1024
 end
 
-function getMyPort()
-	return '127.0.0.1:54333'
-end
-
 
 
 local o = {}
