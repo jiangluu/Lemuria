@@ -35,20 +35,4 @@ local function scan_sort_then_do(this_dir)
 end
 
 scan_sort_then_do('predefine/')
-scan_sort_then_do('predefine2/')
 
--- for file in lfs.dir(this_dir) do
-	-- if 'init.lua'~=file and string.match(file,'%.lua') then
-		-- print('loading ',file)
-		-- jlpcall(dofile,this_dir..file)
-	-- end
--- end
-
--- this_dir = g_lua_dir..'predefine2/'
-
--- for file in lfs.dir(this_dir) do
-	-- if 'init.lua'~=file and string.match(file,'%.lua') then
-		-- print('loading ',file)
-		-- jlpcall(dofile,this_dir..file)
-	-- end
--- end
