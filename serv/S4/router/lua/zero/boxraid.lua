@@ -25,6 +25,7 @@ local function init()
 		local box = o.a_box[i-1]
 		box.box_id = i-1
 		box.actor_per_box = o.actor_per_box
+		box.trans_per_box = o.trans_per_box
 		box.L = lcf.c_lua_new_vm()
 		box.transdata = ffi.new('TransData[?]',o.trans_per_box)
 		assert(box.transdata)
@@ -58,6 +59,10 @@ local function init()
 	o.ad = o.a_box[o.box_num]
 	
 	print('zero inited')
+end
+
+function o.getboxc(id)
+	return o.a_box[tonumber(id)-1]
 end
 
 init()
