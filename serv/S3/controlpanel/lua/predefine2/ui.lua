@@ -6,7 +6,7 @@ local o = {}
 ui = o
 
 o.cmds = {{'PING',{2221,1}},
-	{'BOX',{2227,89}},
+	{'BOX',{8019}},
 	{'reload handle',{8017,'handle'}},
 	{'reload data',{8017,'data'}},
 	{'reload all',{8017,'all'}},
