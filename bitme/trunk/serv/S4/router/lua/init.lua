@@ -1,9 +1,11 @@
 
 function jlpcall(func,...)
-	local err,msg = pcall(func,...)
-	if err == false then
-		print(err,msg)
+	local ok,msg = pcall(func,...)
+	if ok == false then
+		print(ok,msg)
+		return false
 	end
+	return msg
 end
 
 
