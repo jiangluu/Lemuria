@@ -2,19 +2,31 @@
 local lcf = ffi.C
 local ls = require('luastate')
 
+local yield_value = ls.C.LUA_YIELD
+
+local function remote_transaction_start(destL,func_name,mid)
+		local co = ls.newthread(destL)
+		ls.getglobal(co,func_name)
+		ls.pushnumber(co,mid)
+		local r = ls.C.lua_resume(co,1)
+		
+		if yield_value==r then		-- yield
+			return yield_value
+		elseif 0==r then				-- successful ends
+			return 0
+		else									-- there is error
+			print(ls.get(co,-1))
+			return r
+		end
+end
 
 function OnGXMessage()
 	local msg_id = lcf.gx_get_message_id()
-	print('OnGXMessage',msg_id)
 	
 	if msg_id>=8000 and msg_id<8100 then
 		-- internal msg
-		ls.getglobal(boxraid.ad.L,'on_message_1')
-		local ok,err = ls.pcall(boxraid.ad.L,msg_id)
-		if not ok then
-			print(err)
-		end
-		
+		local r = remote_transaction_start(boxraid.ad.L,'on_message_1',msg_id)
+		print('remote_transaction_start',r)
 	else
 		-- custom msg
 	end
