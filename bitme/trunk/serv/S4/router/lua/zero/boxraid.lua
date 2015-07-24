@@ -22,36 +22,38 @@ local function init()
 	assert(o.a_box)
 	
 	for i=1,o.box_num+1 do
-		local box = o.a_box[i-1]
-		box.box_id = i-1
-		box.actor_per_box = o.actor_per_box
-		box.trans_per_box = o.trans_per_box
-		box.L = lcf.c_lua_new_vm()
-		box.transdata = ffi.new('TransData[?]',o.trans_per_box)
-		assert(box.transdata)
+		local lbox = o.a_box[i-1]
+		lbox.box_id = i-1
+		lbox.actor_per_box = o.actor_per_box
+		lbox.trans_per_box = o.trans_per_box
+		lbox.L = lcf.c_lua_new_vm()
+		lbox.transdata = ffi.new('TransData[?]',o.trans_per_box)
+		assert(lbox.transdata)
 		for j=1,o.trans_per_box do
-			box.transdata[j-1].trans_id = j
+			lbox.transdata[j-1].trans_id = j
 		end
 		
 		-- ===============================
-		ls.pushnumber(box.L, 3)
-		ls.setglobal(box.L,'g_tag',-1)
+		ls.pushnumber(lbox.L, 3)
+		ls.setglobal(lbox.L,'g_tag',-1)
 		
-		ls.pushstring(box.L, g_node_id)
-		ls.setglobal(box.L,'g_node_id',-1)
+		ls.pushstring(lbox.L, g_node_id)
+		ls.setglobal(lbox.L,'g_node_id',-1)
 		
-		ls.pushnumber(box.L, i)
-		ls.setglobal(box.L,'g_box_id',-1)
+		ls.pushnumber(lbox.L, i)
+		ls.setglobal(lbox.L,'g_box_id',-1)
 		
-		ls.pushnumber(box.L, o.actor_per_box)
-		ls.setglobal(box.L,'g_actor_suggest_num',-1)
+		ls.pushnumber(lbox.L, o.actor_per_box)
+		ls.setglobal(lbox.L,'g_actor_suggest_num',-1)
 		
 		print(string.format('box [%d] init ...',i))
-		ls.loadfile(box.L,g_lua_dir..'init.lua')
-		local ok,err = ls.pcall(box.L)
+		ls.loadfile(lbox.L,g_lua_dir..'init.lua')
+		local ok,err = ls.pcall(lbox.L)
 		if not ok then
 			print(err)
 		end
+		
+		box.extra_init(lbox)
 		-- ===============================
 	end
 	

@@ -19,11 +19,16 @@ local function remote_transaction_start(dest_boxc,func_name,mid)
 			print('yield  trans_id:',td.trans_id,td.serial_no)
 			td.co = co
 			
+			-- save co the box_co, prevent GC
+			ls.rawseti(dest_boxc.L, dest_boxc.stack_at_box_co, td.trans_id)
+			
 			return yield_value
 		elseif 0==r then				-- successful ends
+			ls.pop(dest_boxc.L,1)
 			return 0
 		else									-- there is error
 			print(ls.get(co,-1))
+			ls.pop(dest_boxc.L,1)
 			return r
 		end
 end

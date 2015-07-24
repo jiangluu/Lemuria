@@ -28,13 +28,19 @@ typedef struct Box{
 	TransData *transdata;
 	uint32_t next_offset_transdata;
 	uint32_t next_serial_no;
+	uint32_t stack_at_box_co;
+	uint32_t stack_at_box_actors;
 } Box;
 ]]
 
 
+function o.get_transdata(boxc,id)
+	return boxc.transdata + id - 1
+end
+
 function o.new_transdata(boxc)
 	for i=1, boxc.trans_per_box do
-		local aa = boxc.transdata[boxc.next_offset_transdata]
+		local aa = boxc.transdata+boxc.next_offset_transdata
 		boxc.next_offset_transdata = (boxc.next_offset_transdata+1) % boxc.trans_per_box
 		
 		if 0==aa.is_active then
@@ -59,7 +65,15 @@ end
 function o.reset_transdata(td)
 	local bak = td.trans_id
 	
-	ffi.fill(td,ffi.sizeof(td))
+	ffi.fill(td,ffi.sizeof('TransData'))
 	td.trans_id = bak
+end
+
+function o.extra_init(boxc)
+	ls.newtable(boxc.L)
+	boxc.stack_at_box_co = ls.gettop(boxc.L)
+	
+	ls.newtable(boxc.L)
+	boxc.stack_at_box_actors = ls.gettop(boxc.L)
 end
 
