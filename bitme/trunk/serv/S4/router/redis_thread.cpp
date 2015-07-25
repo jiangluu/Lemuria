@@ -9,6 +9,9 @@
 #include "router.h"
 
 
+// 注：文件名里有 thread，但是这个 thread是概念上的，非OS thread 
+
+
 #define IP_LEN 32
 #define MAX_REDIS_SERVER 32
 struct RedisThreadData{
@@ -44,54 +47,7 @@ RedisThreadData* getRTD()
 	return rtd;
 }
 
-
-void* work_thread_func(void *userdata);
-
-
-int init_readis_thread()
-{
-		void *ud = getRTD();
-		
-		aeEventLoop *ae_loop = aeCreateEventLoop(MAX_REDIS_SERVER*4);
-		
-		if(NULL == ae_loop){
-			printf("error: ae_loop create failed. exit.\n");
-	        fprintf(stderr,"error: ae_loop create failed. exit.\n");
-	        _exit(-3);
-			return -3;
-		}
-		
-		pthread_t id;
-	    pthread_attr_t attr;
-	    pthread_attr_init(&attr);
-	    //pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-		pthread_attr_setstacksize(&attr,1024*1024);		// 栈大小设为1024K
-	
-	    if(pthread_create( &id, &attr , work_thread_func , ae_loop )){
-	    	printf("error: could NOT create thread!! exit.\n");
-	        fprintf(stderr,"error: could NOT create thread!! exit.\n");
-	        _exit(-3);
-			return -3;
-	    }
-	    
-	return 0;
-}
-
-int add_redis_server(const char* ip,int port)
-{
-	RedisThreadData* rtd = getRTD();
-	FOR(i,MAX_REDIS_SERVER){
-		if(one_server_stat_empty == rtd->a_server[i].stat){
-			strncpy(rtd->a_server[i].IP,ip,IP_LEN-1);
-			rtd->a_server[i].port = port;
-			
-			rtd->a_server[i].stat = one_server_stat_just_add;
-			return i;
-		}
-	}
-	
-	return -1;
-}
+static aeEventLoop *ae_loop = NULL;
 
 int time_cb(struct aeEventLoop *l,long long id,void *data)
 {
@@ -100,13 +56,6 @@ int time_cb(struct aeEventLoop *l,long long id,void *data)
 
 void fin_cb(struct aeEventLoop *l,void *data)
 {
-}
-
-void getCallback(redisAsyncContext *c, void *r, void *privdata) {
-    redisReply *reply = r;
-    if (reply == NULL) return;
-    
-    
 }
 
 void connectCallback(const redisAsyncContext *c, int status) {
@@ -127,22 +76,34 @@ void disconnectCallback(const redisAsyncContext *c, int status) {
     printf("Disconnected...\n");
 }
 
-
-void* work_thread_func(void *userdata)
+int init_redis_thread()
 {
-	aeEventLoop *ae_loop = (aeEventLoop*)userdata;
+		void *ud = getRTD();
+		
+		ae_loop = aeCreateEventLoop(MAX_REDIS_SERVER*4);
+		
+		if(NULL == ae_loop){
+			printf("error: ae_loop create failed. exit.\n");
+	        fprintf(stderr,"error: ae_loop create failed. exit.\n");
+	        _exit(-3);
+			return -3;
+		}
+		
+		long long r1 = aeCreateTimeEvent(ae_loop,5*1000,time_cb,NULL,fin_cb);
+	    
+	return 0;
+}
+
+int add_redis_server(const char* ip,int port)
+{
 	RedisThreadData* rtd = getRTD();
-	
-	// add this just to make sure aeloop not quit
-	long long r1 = aeCreateTimeEvent(ae_loop,5*1000,time_cb,NULL,fin_cb);
-	
-	while(0 == rtd->to_end){
-		// first check if new add server
-		FOR(i,MAX_REDIS_SERVER){
-			if(one_server_stat_just_add == rtd->a_server[i].stat){
-				rtd->a_server[i].stat = one_server_stat_opening;
-				
-				redisAsyncContext* c = redisAsyncConnect(rtd->a_server[i].IP,rtd->a_server[i].port);
+	FOR(i,MAX_REDIS_SERVER){
+		if(one_server_stat_empty == rtd->a_server[i].stat){
+			strncpy(rtd->a_server[i].IP,ip,IP_LEN-1);
+			rtd->a_server[i].port = port;
+			rtd->a_server[i].stat = one_server_stat_just_add;
+			
+			redisAsyncContext* c = redisAsyncConnect(ip,port);
 				if (c->err) {
 	    			printf("redisAsyncConnect Error: %s  [%s:%d]\n", c->errstr,
 					rtd->a_server[i].IP,rtd->a_server[i].port);
@@ -153,7 +114,7 @@ void* work_thread_func(void *userdata)
 	    			
 	    			int r1 = redisAeAttach(ae_loop,c);
 	    			if(REDIS_OK != r1){
-	    				printf("aeCreateFileEvent failed  [%s:%d]\n",
+	    				printf("redisAeAttach failed  [%s:%d]\n",
 						rtd->a_server[i].IP,rtd->a_server[i].port);
 						rtd->a_server[i].stat = one_server_stat_has_error;
 	    			}
@@ -162,19 +123,50 @@ void* work_thread_func(void *userdata)
 	    				
 	    				redisAsyncSetConnectCallback(c,connectCallback);
 	    				redisAsyncSetDisconnectCallback(c,disconnectCallback);
+	    				
+	    				return i;
 					}
 				}
-			}
-			else if(one_server_stat_to_close == rtd->a_server[i].stat){
-				// @TODO
-			}
+				
 			
-			
+			return -1;
 		}
-		
-		aeProcessEvents(ae_loop,AE_ALL_EVENTS | AE_DONT_WAIT);
-		
 	}
+	
+	return -1;
+}
+
+
+
+
+void getCallback(redisAsyncContext *c, void *r, void *privdata) {
+    redisReply *reply = r;
+    if (reply == NULL) return;
+    
+    
+}
+
+
+int c_redisAsyncCommand(uint32_t redis_i, void *privdata, const char *format, ...)
+{
+	if(redis_i >= MAX_REDIS_SERVER) return -1;
+	
+	RedisThreadData* rtd = getRTD();
+	int r = -1;
+	if(one_server_stat_running == rtd->a_server[redis_i].stat){
+		va_list ap;
+		va_start(ap, format);
+		
+		r = redisvAsyncCommand((redisAsyncContext*)rtd->a_server[redis_i].redis_handle, getCallback, privdata, format, ap);
+		va_end(ap);
+	}
+	
+	return r;
+}
+
+int redis_thread_frame()
+{
+	return aeProcessEvents(ae_loop,AE_ALL_EVENTS | AE_DONT_WAIT);
 }
 
 

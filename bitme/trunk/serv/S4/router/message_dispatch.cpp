@@ -34,8 +34,11 @@ void on_client_cut(GXContext *gx,Link *ll,int reason,int gxcontext_type)
 	}
 }
 
+extern int redis_thread_frame();
+
 void frame_time_driven(timetype now)
 {
+	redis_thread_frame();
 	g_gx1->lua_vm2_->callGlobalFunc<void>("OnFrame");
 }
 
