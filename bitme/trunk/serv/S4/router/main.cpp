@@ -33,6 +33,7 @@ int message_dispatch(GXContext*,Link* src_link,InternalHeader *hh,int body_len,c
 void on_client_cut(GXContext*,Link *ll,int reason,int gxcontext_type);
 
 void frame_time_driven(timetype now);
+int init_readis_thread();
 
 
 
@@ -78,6 +79,9 @@ int main(int argc, char** argv) {
 		_exit(-1);
 	}
 	g_yylog->setTimer(g_time);
+	
+	
+	init_readis_thread();
 	
 	
 	// 初始化GX上下文

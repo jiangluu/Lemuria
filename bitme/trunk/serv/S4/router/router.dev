@@ -29,7 +29,7 @@ IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=4
 CompilerSettings=0000000100000000001000000
-UnitCount=46
+UnitCount=47
 
 [VersionInfo]
 Major=1
@@ -502,6 +502,16 @@ BuildCmd=
 
 [Unit46]
 FileName=cfunction.h
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit47]
+FileName=redis_thread.cpp
 CompileCpp=1
 Folder=
 Compile=1
