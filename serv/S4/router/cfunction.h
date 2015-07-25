@@ -80,6 +80,9 @@ CF_EXPORT int cur_stream_get_readbuf_len();
 CF_EXPORT const char* cur_stream_get_bin(int len);	// 获取bin块（事先知道len） 
 
 
+CF_EXPORT int add_redis_server(const char* ip,int port);
+CF_EXPORT int c_redisAsyncCommand(uint32_t redis_i, void *privdata, const char *format, ...);
+
 }
 
 

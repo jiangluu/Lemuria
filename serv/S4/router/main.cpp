@@ -28,12 +28,12 @@ int g_stop_loop = 0;
 
 // 前置声明 
 void __installHandler();
+int init_redis_thread();
 
 int message_dispatch(GXContext*,Link* src_link,InternalHeader *hh,int body_len,char *body);
 void on_client_cut(GXContext*,Link *ll,int reason,int gxcontext_type);
 
 void frame_time_driven(timetype now);
-int init_readis_thread();
 
 
 
@@ -81,13 +81,7 @@ int main(int argc, char** argv) {
 	g_yylog->setTimer(g_time);
 	
 	
-	init_readis_thread();
-	// 主线程稍等一会儿 
-	#ifdef WIN32
-		Sleep(100);
-	#else
-		usleep(1000*100);
-	#endif
+	init_redis_thread();
 	
 	
 	// 初始化GX上下文
