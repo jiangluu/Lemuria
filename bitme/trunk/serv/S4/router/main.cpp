@@ -82,6 +82,12 @@ int main(int argc, char** argv) {
 	
 	
 	init_readis_thread();
+	// 主线程稍等一会儿 
+	#ifdef WIN32
+		Sleep(100);
+	#else
+		usleep(1000*100);
+	#endif
 	
 	
 	// 初始化GX上下文
