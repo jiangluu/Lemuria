@@ -24,10 +24,14 @@ struct Slice{
 };
 
 CF_EXPORT void gx_set_context(struct GXContext*);
+
+CF_EXPORT struct GXContext* gx_get_context();
 	
 CF_EXPORT void* gx_env_get_shared_ptr(int index);
 
 CF_EXPORT bool gx_env_set_shared_ptr(int index,void *p);
+
+CF_EXPORT void gx_cur_stream_cleanup();
 
 CF_EXPORT bool gx_cur_stream_is_end();
 
@@ -84,6 +88,10 @@ CF_EXPORT int gx_make_portal_sync(const char* ID,const char* port);
 CF_EXPORT int gx_bind_portal_id(int index,const char* id);
 
 CF_EXPORT int gx_cur_writestream_route_to(const char* destID,int message_id);
+
+CF_EXPORT int gx_get_input_context_size();
+
+CF_EXPORT void* gx_get_input_context();
 
 }
 
