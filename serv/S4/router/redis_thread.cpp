@@ -97,8 +97,7 @@ int init_redis_thread()
 {
 		void *ud = getRTD();
 		
-		//ae_loop = aeCreateEventLoop(MAX_REDIS_SERVER*4);
-		ae_loop = aeCreateEventLoop(20000);
+		ae_loop = aeCreateEventLoop(MAX_REDIS_SERVER*32);
 		
 		if(NULL == ae_loop){
 			printf("error: ae_loop create failed. exit.\n");

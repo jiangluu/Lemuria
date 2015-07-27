@@ -56,6 +56,15 @@ void gx_set_context(struct GXContext *aa)
 	s_gx = aa;
 }
 
+struct GXContext* gx_get_context()
+{
+	return s_gx;
+}
+
+void gx_cur_stream_cleanup()
+{
+	if(s_gx) s_gx->rs_->cleanup();
+}
 
 bool gx_cur_stream_is_end()
 {
@@ -313,6 +322,19 @@ int gx_cur_writestream_route_to(const char* destID,int message_id)
 	}
 	
 	return -1;
+}
+
+int gx_get_input_context_size()
+{
+	return sizeof(GXContext::InputContext);
+}
+
+void* gx_get_input_context()
+{
+	if(s_gx){
+		return &s_gx->input_context_;
+	}
+	return NULL;
 }
 
 
