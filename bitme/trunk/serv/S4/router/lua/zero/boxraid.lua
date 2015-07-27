@@ -30,6 +30,7 @@ local function init()
 		lbox.transdata = ffi.new('TransData[?]',o.trans_per_box)
 		assert(lbox.transdata)
 		for j=1,o.trans_per_box do
+			lbox.transdata[j-1].box_id = i-1
 			lbox.transdata[j-1].trans_id = j
 		end
 		
@@ -64,7 +65,7 @@ local function init()
 end
 
 function o.getboxc(id)
-	return o.a_box[tonumber(id)-1]
+	return o.a_box + tonumber(id) - 1
 end
 
 init()
