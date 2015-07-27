@@ -13,6 +13,12 @@ local function __foo(privdata, reply)
 	ls.pushlightuserdata(td.co, td)
 	ls.setglobal(td.co, '__g_cur_context')
 	
+	-- restore context
+	local dest = lcf.gx_get_input_context()
+	ffi.copy(dest, td.input_context, box.input_context_size)
+	lcf.gx_cur_stream_cleanup()
+	lcf.gx_cur_writestream_cleanup()
+	
 	ls.pushlightuserdata(td.co, reply)
 	local r = ls.C.lua_resume(td.co, 1)
 	if yield_value~=r then
@@ -21,6 +27,7 @@ local function __foo(privdata, reply)
 		ls.rawseti(boxcdata.L, boxcdata.stack_at_box_co, td.trans_id)
 		
 		box.release_transdata(boxcdata,td)
+		print('box.release_transdata', td.trans_id)
 	end
 	
 end

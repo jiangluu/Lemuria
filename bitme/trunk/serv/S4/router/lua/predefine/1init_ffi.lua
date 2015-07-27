@@ -36,6 +36,8 @@ void* gx_env_get_shared_ptr(int index);
 
 bool gx_env_set_shared_ptr(int index,void *p);
 
+void gx_cur_stream_cleanup();
+
 bool gx_cur_stream_is_end();
 
 int16_t gx_cur_stream_get_int8();
@@ -86,6 +88,10 @@ int gx_get_message_id();
 int gx_make_portal_sync(const char* ID,const char* port);
 
 int gx_bind_portal_id(int index,const char* id);
+
+int gx_get_input_context_size();
+
+void* gx_get_input_context();
 
 // GX END
 
