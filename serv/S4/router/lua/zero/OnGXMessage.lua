@@ -11,6 +11,7 @@ local function remote_transaction_start(dest_boxc,func_name,mid)
 		local co = ls.newthread(dest_boxc.L)		-- @TODO: coroutine pool
 		ls.getglobal(co,func_name)
 		ls.pushnumber(co,mid)
+		
 		local r = ls.C.lua_resume(co,1)
 		
 		if yield_value==r then		-- yield
@@ -19,7 +20,6 @@ local function remote_transaction_start(dest_boxc,func_name,mid)
 				error('transdata pool was full')
 			end
 			
-			print('yield  trans_id:',td.trans_id,td.serial_no)
 			td.co = co
 			
 			-- save co to box_co, prevent GC
