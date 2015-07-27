@@ -25,6 +25,10 @@ local function remote_transaction_start(dest_boxc,func_name,mid)
 			-- save co to box_co, prevent GC
 			ls.rawseti(dest_boxc.L, dest_boxc.stack_at_box_co, td.trans_id)
 			
+			-- save context
+			local src = lcf.gx_get_input_context()
+			ffi.copy(td.input_context, src, box.input_context_size)
+			
 			ls.pushlightuserdata(co,td)
 			return ls.C.lua_resume(co,1)
 			
@@ -44,7 +48,6 @@ function OnGXMessage()
 	if msg_id>=8000 and msg_id<8100 then
 		-- internal msg
 		local r = jlpcall(remote_transaction_start,boxraid.ad,'on_message_1',msg_id)
-		print('remote_transaction_start',r)
 	else
 		-- custom msg
 	end

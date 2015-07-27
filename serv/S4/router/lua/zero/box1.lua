@@ -16,6 +16,8 @@ typedef __attribute__((aligned(4))) struct TransData{
 	uint16_t is_active;
 	uint32_t trans_id;
 	uint32_t serial_no;
+	char input_context[128];
+	char app_context[16];
 	lua_State *co;
 } TransData;
 
@@ -33,6 +35,8 @@ typedef __attribute__((aligned(4))) struct Box{
 } Box;
 ]]
 
+o.input_context_size = lcf.gx_get_input_context_size()
+o.app_context_size = 16
 
 function o.get_transdata(boxc,id)
 	return boxc.transdata + id - 1

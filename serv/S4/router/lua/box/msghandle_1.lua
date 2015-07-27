@@ -4,7 +4,6 @@ local lcf = ffi.C
 local hd1 = {}
 
 function on_message_1(mid)
-	print('on_message_1',mid,'g_box_id',g_box_id)
 		local hd = hd1[mid]
 		if hd then
 			local ok,ret = pcall(hd)
