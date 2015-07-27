@@ -4,9 +4,9 @@
 #include "hiredis/hiredis.h"
 #include "hiredis/async.h"
 #include "ae/ae.h"
-#include "hiredis/adapter_ae.h"
 #include <pthread.h>
 #include "router.h"
+#include "cfunction.h"
 
 
 // 注：文件名里有 thread，但是这个 thread是概念上的，非OS thread 
@@ -21,6 +21,7 @@ struct RedisThreadData{
 		uint16_t stat;
 		uint16_t padding;
 		void* redis_handle;
+		void* reply;
 	};
 	struct one_server_info a_server[MAX_REDIS_SERVER];
 	
@@ -76,11 +77,28 @@ void disconnectCallback(const redisAsyncContext *c, int status) {
     printf("Disconnected...\n");
 }
 
+void aeFileCallback(struct aeEventLoop *eventLoop, int fd, void *clientData, int mask)
+{
+	redisAsyncContext *redis = (redisAsyncContext*)clientData;
+	if(NULL == redis) return;
+	
+	if((AE_READABLE & mask)!=0){
+		redisAsyncHandleRead(redis);
+	}
+	
+	if((AE_WRITABLE & mask)!=0){
+		//printf("write  %d  %d\n",fd,mask);
+		redisAsyncHandleWrite(redis);
+	}
+}
+
+
 int init_redis_thread()
 {
 		void *ud = getRTD();
 		
-		ae_loop = aeCreateEventLoop(MAX_REDIS_SERVER*4);
+		//ae_loop = aeCreateEventLoop(MAX_REDIS_SERVER*4);
+		ae_loop = aeCreateEventLoop(20000);
 		
 		if(NULL == ae_loop){
 			printf("error: ae_loop create failed. exit.\n");
@@ -112,9 +130,9 @@ int add_redis_server(const char* ip,int port)
 	    		else{
 	    			rtd->a_server[i].redis_handle = c;
 	    			
-	    			int r1 = redisAeAttach(ae_loop,c);
+	    			int r1 = aeCreateFileEvent(ae_loop,c->c.fd,AE_READABLE | AE_WRITABLE,aeFileCallback,c);
 	    			if(REDIS_OK != r1){
-	    				printf("redisAeAttach failed  [%s:%d]\n",
+	    				printf("aeCreateFileEvent failed  [%s:%d]\n",
 						rtd->a_server[i].IP,rtd->a_server[i].port);
 						rtd->a_server[i].stat = one_server_stat_has_error;
 	    			}
@@ -138,12 +156,25 @@ int add_redis_server(const char* ip,int port)
 
 
 
-
 void getCallback(redisAsyncContext *c, void *r, void *privdata) {
     redisReply *reply = r;
     if (reply == NULL) return;
     
+    RedisThreadData* rtd = getRTD();
+    FOR(i,MAX_REDIS_SERVER){
+    	if(c == rtd->a_server[i].redis_handle){
+    		rtd->a_server[i].reply = reply;
+    		break;
+		}
+    }
     
+    lua_State *L = g_gx1->lua_vm2_->luaState();
+    lua_getglobal(L,"OnRedisReply");
+    lua_pushlightuserdata(L,privdata);
+    lua_pushlightuserdata(L,reply);
+    
+    int r2 = lua_pcall(L,2,1,0);
+    lua_pop(L,1);
 }
 
 
