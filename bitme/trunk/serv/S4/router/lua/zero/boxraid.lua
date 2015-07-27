@@ -59,7 +59,7 @@ local function init()
 	end
 	
 	-- the last one box is preserved by sys
-	o.ad = o.a_box[o.box_num]
+	o.ad = o.a_box + o.box_num
 	
 	print('zero inited')
 end

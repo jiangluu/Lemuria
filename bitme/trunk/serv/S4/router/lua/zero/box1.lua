@@ -9,7 +9,7 @@ local lcf = ffi.C
 local ls = require('luastate')
 
 ffi.cdef[[
-typedef struct TransData{
+typedef __attribute__((aligned(4))) struct TransData{
 	// @TODO
 	uint32_t padding;
 	uint16_t box_id;
@@ -19,7 +19,7 @@ typedef struct TransData{
 	lua_State *co;
 } TransData;
 
-typedef struct Box{
+typedef __attribute__((aligned(4))) struct Box{
 	uint32_t padding;
 	uint32_t box_id;
 	uint32_t actor_per_box;
@@ -41,11 +41,14 @@ end
 function o.new_transdata(boxc)
 	for i=1, boxc.trans_per_box do
 		local aa = boxc.transdata+boxc.next_offset_transdata
+		local index_bak = boxc.next_offset_transdata
 		boxc.next_offset_transdata = (boxc.next_offset_transdata+1) % boxc.trans_per_box
 		
 		if 0==aa.is_active then
 			o.reset_transdata(aa)
 			aa.is_active = 1
+			aa.box_id = boxc.box_id
+			aa.trans_id = index_bak + 1
 			aa.serial_no = boxc.next_serial_no
 			
 			boxc.next_serial_no = boxc.next_serial_no+1
@@ -63,10 +66,7 @@ function o.release_transdata(boxc,td)
 end
 
 function o.reset_transdata(td)
-	local bak = td.trans_id
-	
 	ffi.fill(td,ffi.sizeof('TransData'))
-	td.trans_id = bak
 end
 
 function o.extra_init(boxc)
