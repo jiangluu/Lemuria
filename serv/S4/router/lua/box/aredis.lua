@@ -6,15 +6,6 @@ local o = {}
 redis = o
 
 
-function o.init()
-	for i=1,#redis_port do
-		local ip,port = string.match(redis_port[i],'([^:]+):(%d+)')
-		if ip and port then
-			assert(lcf.add_redis_server(ip,port) >= 0)
-		end
-	end
-end
-
 local function parse_reply(c_reply)
 	if 1==c_reply.type or 5==c_reply.type then
 		return ffi.string(c_reply.str,c_reply.len)
@@ -97,6 +88,7 @@ function o.command_and_wait(redis_index,formatt,...)
 		return nil
 	end
 	
+	reply = ffi.cast('redisReply*',reply)
 	local ret = parse_reply(reply)
 	if 'table'~=type(ret) then
 		return ret
@@ -106,5 +98,3 @@ function o.command_and_wait(redis_index,formatt,...)
 	
 end
 
-
-o.init()
