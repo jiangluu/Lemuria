@@ -4,3 +4,6 @@ function getMyPort()
 end
 
 
+redis_port = {
+	'192.168.1.200:6379',
+}

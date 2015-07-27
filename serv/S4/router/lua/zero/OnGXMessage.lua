@@ -5,7 +5,10 @@ local ls = require('luastate')
 local yield_value = ls.C.LUA_YIELD
 
 local function remote_transaction_start(dest_boxc,func_name,mid)
-		local co = ls.newthread(dest_boxc.L)
+		ls.pushnil(dest_boxc.L)
+		ls.setglobal(dest_boxc.L, '__g_cur_context')
+		
+		local co = ls.newthread(dest_boxc.L)		-- @TODO: coroutine pool
 		ls.getglobal(co,func_name)
 		ls.pushnumber(co,mid)
 		local r = ls.C.lua_resume(co,1)
@@ -19,16 +22,18 @@ local function remote_transaction_start(dest_boxc,func_name,mid)
 			print('yield  trans_id:',td.trans_id,td.serial_no)
 			td.co = co
 			
-			-- save co the box_co, prevent GC
+			-- save co to box_co, prevent GC
 			ls.rawseti(dest_boxc.L, dest_boxc.stack_at_box_co, td.trans_id)
 			
-			return yield_value
+			ls.pushlightuserdata(co,td)
+			return ls.C.lua_resume(co,1)
+			
 		elseif 0==r then				-- successful ends
 			ls.pop(dest_boxc.L,1)
 			return 0
 		else									-- there is error
 			print(ls.get(co,-1))
-			ls.pop(dest_boxc.L,1)
+			ls.pop(dest_boxc.L,2)
 			return r
 		end
 end

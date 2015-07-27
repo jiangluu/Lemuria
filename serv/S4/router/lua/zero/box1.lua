@@ -12,7 +12,7 @@ ffi.cdef[[
 typedef struct TransData{
 	// @TODO
 	uint32_t padding;
-	uint16_t padding2;
+	uint16_t box_id;
 	uint16_t is_active;
 	uint32_t trans_id;
 	uint32_t serial_no;
