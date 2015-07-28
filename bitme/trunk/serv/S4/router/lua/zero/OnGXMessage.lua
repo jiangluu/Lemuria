@@ -50,6 +50,14 @@ function OnGXMessage()
 		local r = jlpcall(remote_transaction_start,boxraid.ad,'on_message_1',msg_id)
 	else
 		-- custom msg
+		local ptr = lcf.cur_stream_get_bin(box.app_context_size)
+		ptr = ffi.cast('uint16_t[4]',ptr)
+		local con_index = tonumber(ptr[2])
+		local box_id = ctb_strategy.get(con_index)
+		local boxc = boxraid.getboxc(box_id)
+		
+		local r = jlpcall(remote_transaction_start,boxc,'on_message_2',msg_id)
+		
 	end
 	
 	return 0

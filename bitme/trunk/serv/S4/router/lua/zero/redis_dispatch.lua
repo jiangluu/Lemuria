@@ -28,6 +28,9 @@ local function __foo(privdata, reply)
 		
 		box.release_transdata(boxcdata,td)
 		print('box.release_transdata', td.trans_id)
+		
+		local msg_id = lcf.gx_get_message_id()
+		ctb_strategy.check_detach(1,msg_id)
 	end
 	
 end
