@@ -31,7 +31,6 @@ typedef __attribute__((aligned(4))) struct Box{
 	uint32_t next_offset_transdata;
 	uint32_t next_serial_no;
 	uint32_t stack_at_box_co;
-	uint32_t stack_at_box_actors;
 } Box;
 ]]
 
@@ -76,8 +75,5 @@ end
 function o.extra_init(boxc)
 	ls.newtable(boxc.L)
 	boxc.stack_at_box_co = ls.gettop(boxc.L)
-	
-	ls.newtable(boxc.L)
-	boxc.stack_at_box_actors = ls.gettop(boxc.L)
 end
 
