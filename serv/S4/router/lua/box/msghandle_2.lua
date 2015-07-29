@@ -3,10 +3,15 @@ local lcf = ffi.C
 
 local hd1 = {}
 
-function on_message_2(mid)
+function on_message_2(con_index, mid)
 		local hd = hd1[mid]
 		if hd then
-			local ok,ret = pcall(hd)
+			local actor = ma.get(con_index)
+			if nil==actor then
+				actor = ma.new(con_index)
+			end
+			
+			local ok,ret = pcall(hd,actor)
 			if ok then
 				return ret
 			else
