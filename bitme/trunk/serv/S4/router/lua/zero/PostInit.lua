@@ -10,6 +10,8 @@ function PostInit()
 		if not ok then
 			print(err)
 		end
+		
+		ls.pop(box.L,1)
 	end
 	
 	-- ===================================

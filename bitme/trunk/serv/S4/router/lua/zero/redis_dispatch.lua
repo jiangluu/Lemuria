@@ -32,7 +32,6 @@ local function __foo(privdata, reply)
 		ls.rawseti(boxcdata.L, boxcdata.stack_at_box_co, td.trans_id)
 		
 		box.release_transdata(boxcdata,td)
-		print('box.release_transdata', td.trans_id)
 		
 		
 		local ptr = ffi.cast('uint16_t*',td.app_context)

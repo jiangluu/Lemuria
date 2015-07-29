@@ -17,9 +17,10 @@ local function remote_transaction_start(dest_boxc,func_name,mid,app_context,con_
 		end
 		ls.pushnumber(co,mid)
 		
-		local r = ls.C.lua_resume(co,arg_num)
 		
+		local r = ls.C.lua_resume(co,arg_num)
 		if yield_value==r then		-- yield
+			
 			local td = box.new_transdata(dest_boxc)
 			if nil==td then
 				error('transdata pool was full')
