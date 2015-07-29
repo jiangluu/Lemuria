@@ -59,7 +59,7 @@ function OnGXMessage()
 	else
 		-- custom msg
 		local ptr = lcf.cur_stream_get_bin(box.app_context_size)
-		ptr = ffi.cast('uint16_t[4]',ptr)
+		ptr = ffi.cast('uint16_t*',ptr)
 		local con_index = tonumber(ptr[2])
 		local box_id = ctb_strategy.get(con_index)
 		local boxc = boxraid.getboxc(box_id)
