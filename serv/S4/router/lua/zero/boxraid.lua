@@ -8,6 +8,17 @@ local lcf = ffi.C
 
 local ls = require('luastate')
 
+local function L_gc(L)
+	print('!!!!!!!!!!!!!!!!!!!!!!!! L gc!  we DO NOT want it')
+	ffi.gc(L, nil)
+	ls.C.lua_close(L)
+end
+
+local function __gc_notify(ud)
+	print('!!!!!!!!!!!  UD gc!  we DO NOT want it')
+end
+
+o.keep_ref = {}
 
 local function init()
 	-- init data vm here(if there is)
@@ -26,9 +37,18 @@ local function init()
 		lbox.box_id = i-1
 		lbox.actor_per_box = o.actor_per_box
 		lbox.trans_per_box = o.trans_per_box
-		lbox.L = lcf.c_lua_new_vm()
-		lbox.transdata = ffi.new('TransData[?]',o.trans_per_box)
-		assert(lbox.transdata)
+		local c_vm = lcf.c_lua_new_vm()
+		assert(nil ~= c_vm)
+		table.insert(o.keep_ref,c_vm)
+		lbox.L = c_vm
+		ffi.gc(c_vm,L_gc)
+		
+		local c_transdata = ffi.new('TransData[?]',o.trans_per_box)
+		assert(nil ~= c_transdata)
+		table.insert(o.keep_ref,c_transdata)
+		lbox.transdata = c_transdata
+		ffi.gc(c_transdata, __gc_notify)
+		
 		for j=1,o.trans_per_box do
 			lbox.transdata[j-1].box_id = i-1
 			lbox.transdata[j-1].trans_id = j
@@ -62,6 +82,7 @@ local function init()
 	o.ad = o.a_box + o.box_num
 	
 	print('zero inited')
+	
 end
 
 function o.getboxc(id)
