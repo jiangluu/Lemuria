@@ -16,7 +16,7 @@ function o.get(i)
 end
 
 function o.new(i)
-	local r = {}
+	local r = { __id=i }
 	rawset(o.actors,tonumber(i),r)
 	return r
 end
