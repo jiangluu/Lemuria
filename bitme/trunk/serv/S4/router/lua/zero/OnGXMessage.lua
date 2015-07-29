@@ -4,15 +4,20 @@ local ls = require('luastate')
 
 local yield_value = ls.C.LUA_YIELD
 
-local function remote_transaction_start(dest_boxc,func_name,mid)
+local function remote_transaction_start(dest_boxc,func_name,mid,app_context,con_index)
 		ls.pushnil(dest_boxc.L)
 		ls.setglobal(dest_boxc.L, '__g_cur_context')
 		
 		local co = ls.newthread(dest_boxc.L)		-- @TODO: coroutine pool
 		ls.getglobal(co,func_name)
+		local arg_num = 1
+		if nil~=app_context then
+			ls.pushnumber(co,con_index)
+			arg_num = 2
+		end
 		ls.pushnumber(co,mid)
 		
-		local r = ls.C.lua_resume(co,1)
+		local r = ls.C.lua_resume(co,arg_num)
 		
 		if yield_value==r then		-- yield
 			local td = box.new_transdata(dest_boxc)
@@ -28,6 +33,9 @@ local function remote_transaction_start(dest_boxc,func_name,mid)
 			-- save context
 			local src = lcf.gx_get_input_context()
 			ffi.copy(td.input_context, src, box.input_context_size)
+			if nil~=app_context then
+				ffi.copy(td.app_context, app_context, box.app_context_size)
+			end
 			
 			ls.pushlightuserdata(co,td)
 			return ls.C.lua_resume(co,1)
@@ -56,7 +64,7 @@ function OnGXMessage()
 		local box_id = ctb_strategy.get(con_index)
 		local boxc = boxraid.getboxc(box_id)
 		
-		local r = jlpcall(remote_transaction_start,boxc,'on_message_2',msg_id)
+		local r = jlpcall(remote_transaction_start,boxc,'on_message_2',msg_id,ptr,con_index)
 		
 	end
 	

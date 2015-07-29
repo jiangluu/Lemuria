@@ -30,7 +30,9 @@ local function __foo(privdata, reply)
 		print('box.release_transdata', td.trans_id)
 		
 		local msg_id = lcf.gx_get_message_id()
-		ctb_strategy.check_detach(1,msg_id)
+		local ptr = ffi.cast('uint16_t[4]',td.app_context)
+		local con_index = tonumber(ptr[2])
+		ctb_strategy.check_detach(con_index,msg_id)
 	end
 	
 end
