@@ -19,6 +19,11 @@ local function __foo(privdata, reply)
 	lcf.gx_cur_stream_cleanup()
 	lcf.gx_cur_writestream_cleanup()
 	
+	local msg_id = lcf.gx_get_message_id()
+	if not (msg_id>=8000 and msg_id<8100) then
+		lcf.gx_cur_stream_push_bin(td.app_context, box.app_context_size)
+	end
+	
 	ls.pushlightuserdata(td.co, reply)
 	local r = ls.C.lua_resume(td.co, 1)
 	if yield_value~=r then
@@ -29,7 +34,7 @@ local function __foo(privdata, reply)
 		box.release_transdata(boxcdata,td)
 		print('box.release_transdata', td.trans_id)
 		
-		local msg_id = lcf.gx_get_message_id()
+		
 		local ptr = ffi.cast('uint16_t[4]',td.app_context)
 		local con_index = tonumber(ptr[2])
 		ctb_strategy.check_detach(con_index,msg_id)
