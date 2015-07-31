@@ -64,6 +64,7 @@ function OnGXMessage()
 		local con_index = tonumber(ptr[2])
 		local box_id = ctb_strategy.get(con_index)
 		local boxc = boxraid.getboxc(box_id)
+		lcf.gx_cur_stream_push_bin(ffi.cast('const char*',ptr), box.app_context_size)
 		
 		local r = jlpcall(remote_transaction_start,boxc,'on_message_2',msg_id,ptr,con_index)
 		
