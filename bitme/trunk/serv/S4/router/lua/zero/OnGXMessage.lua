@@ -46,7 +46,7 @@ local function remote_transaction_start(dest_boxc,func_name,mid,app_context,con_
 			return 0
 		else									-- there is error
 			print(ls.get(co,-1))
-			ls.pop(dest_boxc.L,2)
+			ls.pop(dest_boxc.L,1)
 			return r
 		end
 end
