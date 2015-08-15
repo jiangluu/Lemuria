@@ -77,7 +77,7 @@ static int ltopointer(lua_State *L) {
 		
 		// hack
 		struct GCobj *o = (struct GCobj*)t;
-		o->marked = LJ_GC_WHITE0;
+		//o->marked = LJ_GC_WHITE0;
 		o->marked |= LJ_GC_FIXED;	// prevent GC
 	}
 	else{
