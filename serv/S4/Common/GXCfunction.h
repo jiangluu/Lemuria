@@ -72,7 +72,7 @@ CF_EXPORT const char* gx_cur_stream_get_bin(int len);	// »ñÈ¡bin¿é£¨ÊÂÏÈÖªµÀlen£
 
 CF_EXPORT void gx_cur_writestream_cleanup();
 
-CF_EXPORT void gx_cur_stream_protect(int n);	// ±£»¤ÊäÈëbufµÄÇ°n¸ö×Ö½Ú²»±»Çå³ı 
+CF_EXPORT void gx_cur_writestream_protect(int n);	// ±£»¤ÊäÈëbufµÄÇ°n¸ö×Ö½Ú²»±»Çå³ı 
 
 // Í¬²½Ô­Â··µ»Ø¡£messageid ÊÇreqµÄ+1£¬ÄÚÈİÊÇpushµ½ streamÀïµÄÄÚÈİ¡£ 
 CF_EXPORT int gx_cur_writestream_syncback();
