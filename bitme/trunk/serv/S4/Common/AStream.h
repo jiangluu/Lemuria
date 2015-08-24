@@ -7,13 +7,24 @@
 //template<typename U>
 class AStream{	// means ArtmeStream
 public:
-	AStream(s32 len,char *data):data_(data),data_len_(len),offset_read_(0),offset_write_(0){}
+	AStream(s32 len,char *data):data_(data),data_len_(len),offset_read_(0),offset_write_(0),
+	offset_write_protect_(0){}
 	
 	
 	// 注意：这个函数并不释放资源，仅仅是使此对象能被复用而已。 
 	void cleanup(){
 		offset_read_ = 0;
-		offset_write_ = 0;
+		//offset_write_ = 0;
+		offset_write_ = offset_write_protect_;
+	}
+	
+	void protect_n(int n){
+		if(n > 0){
+			offset_write_protect_ = n;
+		}
+		else{
+			offset_write_protect_ = 0;
+		}
 	}
 	
 	void reset(s32 len,char *data){
@@ -21,6 +32,7 @@ public:
 		data_len_ = len;
 		offset_read_ = 0;
 		offset_write_ = 0;
+		offset_write_protect_ = 0;
 	}
 	
 	bool is_end(){
@@ -131,6 +143,7 @@ private:
 	s32 data_len_;
 	s32 offset_read_;
 	s32 offset_write_;
+	s32 offset_write_protect_;
 };
 
 

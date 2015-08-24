@@ -216,6 +216,10 @@ void gx_cur_writestream_cleanup()
 	if(s_gx) s_gx->ws_->cleanup();
 }
 
+void gx_cur_stream_protect(int n)
+{
+	if(s_gx) s_gx->ws_->protect_n(n);
+}
 
 // 同步原路返回。messageid 是req的+1，内容是push到 stream里的内容。 
 int gx_cur_writestream_syncback()
