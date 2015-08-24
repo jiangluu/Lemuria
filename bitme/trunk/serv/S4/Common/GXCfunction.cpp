@@ -216,7 +216,7 @@ void gx_cur_writestream_cleanup()
 	if(s_gx) s_gx->ws_->cleanup();
 }
 
-void gx_cur_stream_protect(int n)
+void gx_cur_writestream_protect(int n)
 {
 	if(s_gx) s_gx->ws_->protect_n(n);
 }
