@@ -1,14 +1,11 @@
 bson = require("BSon")
 
 local o = {}
-local o2 = {}
-
 
 local lcf = ffi.C
 
 
 function g_reload_sd()
-	o2 = {}
 	o.init()
 	o.init2()
 end
@@ -99,14 +96,29 @@ end
 
 
 function o.read_and_set(key_level_1,filename)
-	local tt = o.read_from_file(filename)
-	--tt = o.make_table_readonly(tt)
-	if nil~=tt then
-		io.write(string.format('travel  file %s\n\n\n',filename))
-		o.travel_table(tt)
-		o2[key_level_1] = tt
-		return true
+	-- test if the file changed first
+	local fh2 = io.open(filename)
+	if nil==fh2 then
+		return false
 	end
+	local bin = fh2:read('*a')
+	lcf.MD5(bin,#bin,o.buf_md5)
+	fh2:close()
+	local md5_lua_string = ffi.string(o.buf_md5,16)
+	
+	if md5_lua_string~=o.t_md5[filename] then
+		local tt = o.read_from_file(filename)
+		if nil~=tt then
+			--io.write(string.format('travel  file %s\n\n\n',filename))
+			--o.travel_table(tt)
+			sd[key_level_1] = tt
+			
+			o.t_md5[filename] = md5_lua_string
+			
+			return true
+		end
+	end
+	
 	return false
 end
 
@@ -120,27 +132,20 @@ function o.finddata(key_level_1,key_level_2)
 	return nil
 end
 
--- 注：下面这个函数使一个table变得只读。但是注意：一、他不是修改t而是返回新值；二、有一个副作用，使表变得不可遍历。
-function o.make_table_readonly(t)
-	if type(t)~='table' then
-		return
-	end
-	
-	for k,v in pairs(t) do
-		if type(v)=='table' then
-			t[k] = o.make_table_readonly(v)
-		end
-	end
-	
-	local proxy = {}
-	local meta = {__index = function(tab,k) return rawget(t,k) end,
-	__newindex=function() error('can NOT set a readonly table') end,
-	}
-	return setmetatable(proxy,meta)
-end
 
 function o.init()
 	if 0==g_box_id then
+	
+	if nil==sd then
+		sd = {}
+	end
+	
+	if nil==o.buf_md5 then
+		o.buf_md5 = ffi.new('unsigned char[32]')
+	end
+	if nil==o.t_md5 then
+		o.t_md5 = {}
+	end
 	
 	io.output('../aaa.txt')
 	o.read_and_set('scene',g_data_dir..'scene.bytes')
@@ -171,6 +176,10 @@ function o.init()
 	o.read_and_set('quality',g_data_dir..'quality.bytes')
 	o.read_and_set('item',g_data_dir..'item.bytes')
 	o.read_and_set('craft',g_data_dir..'craft.bytes')
+	o.read_and_set('loot',g_data_dir..'loot.bytes')
+	o.read_and_set('randomname',g_data_dir..'randomname.bytes')
+	o.read_and_set('ksztemplate',g_data_dir..'robot.bytes')
+	o.read_and_set('starreward',g_data_dir..'starreward.bytes')
 	io.close()
 	
 	end
@@ -184,19 +193,21 @@ function o.init2()
 	
 	if 0==g_box_id then
 		-- master
-		--sd = table.deepclone(o2)
-		sd = o2
 		
-		assert(ap.topointer(pointer_index,sd))
+		if nil==o.topointer_called then
+			assert(ap.topointer(pointer_index,sd))
+			o.topointer_called = true
+		end
 		
 		print('master OK')
 		
 	elseif nil~=g_box_id then
 		-- slave
-		local t = ap.restoretable(pointer_index)
-		assert(t)
+		if nil==sd then
+			sd = ap.restoretable(pointer_index)
+			assert(sd)
+		end
 		
-		sd = t
 		
 		print('slave OK',sd)
 		
