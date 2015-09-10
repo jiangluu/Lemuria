@@ -62,6 +62,26 @@ int message_dispatch_2(GXContext*,Link* src_link,ClientHeader *hh,int body_len,c
 {
 	int message_id = hh->message_id_;
 	
+#ifdef ENABLE_ENCRYPT
+	if(body_len<1){
+		// 认为不合法，踢掉此玩家 
+		return -1;
+	}
+	
+	if(! src_link->enc_is_first_){
+		++ src_link->enc_inc_;
+		if((*body) != src_link->enc_inc_) return -1;
+	}
+	else{
+		src_link->enc_inc_ = *body;
+		src_link->enc_is_first_ = false;
+	}
+	
+	++body;
+	--body_len;
+	//printf("OK  %d  %d  %d\n",(int)src_link->enc_inc_,body_len,message_id);
+#endif
+	
 	
 	// 短连接相关
 #define DUAN_LIANJIE_OPEN_ID 9001
