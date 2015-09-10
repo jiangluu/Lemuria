@@ -79,6 +79,7 @@ int message_dispatch_2(GXContext*,Link* src_link,ClientHeader *hh,int body_len,c
 	
 	++body;
 	--body_len;
+	-- hh->len_;
 	//printf("OK  %d  %d  %d\n",(int)src_link->enc_inc_,body_len,message_id);
 #endif
 	
