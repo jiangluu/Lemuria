@@ -62,6 +62,8 @@ struct Link{
 
 #ifdef ENABLE_ENCRYPT
 	aes_context aes_c_dec_;
+	bool enc_is_first_;
+	char enc_inc_;
 #endif
 
 
@@ -107,6 +109,8 @@ struct Link{
 		#define ENCRYPT_KEY_LEN 128
 		aes_init(&aes_c_dec_);
 		aes_setkey_dec(&aes_c_dec_,g_e_key,ENCRYPT_KEY_LEN);
+		enc_is_first_ = true;
+		enc_inc_ = 0;
 	#endif
 		link_stat_ = 0;
 		enable_encrypt_ = false;
