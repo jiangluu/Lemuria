@@ -50,8 +50,9 @@ int main(int argc, char** argv) {
 #ifdef ENABLE_ENCRYPT
 	// …Ë÷√√ÿ‘ø 
 	g_e_key = (char*)malloc(256);
-	FOR(i,256){
-		g_e_key[i] = 'a'+(i%50);
+	memset(g_e_key,0,256);
+	FOR(i,4){
+		memcpy(g_e_key+i*32,"VlzjIc1hIgc5Yc6Hxb10Z8Rp5hU3Dc2w",32);
 	}
 #endif	
 	
