@@ -2,8 +2,8 @@
 Order=24,27,29,0
 Focused=27
 [Editor_0]
-CursorCol=1
-CursorRow=50
+CursorCol=62
+CursorRow=55
 TopLine=35
 LeftChar=1
 [Editor_25]
@@ -62,7 +62,7 @@ CursorRow=124
 TopLine=105
 LeftChar=1
 [Editor_27]
-CursorCol=4
+CursorCol=14
 CursorRow=82
-TopLine=52
+TopLine=48
 LeftChar=1
