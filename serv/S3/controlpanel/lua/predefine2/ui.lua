@@ -10,11 +10,12 @@ o.cmds = {{'PING',{2221,1}},
 	{'reload handle',{8017,'handle'}},
 	{'reload data',{8017,'data'}},
 	{'reload all',{8017,'all'}},
+	{'make ksztemplate',{8017,'makeksztemplate'}},
 	{'global_phb_fill',{2225}},
 	
 	{'league start',{1101,'league start'} },
 	{'league end',{1101,'league end'} },
-	{'broadcast',{1101,'league end'} },
+	{'broadcast',{1101,'broadcast'} },
 	{'smail',{1101,'smail'} },
 	{'retty',{1101,'retty'} },
 }
@@ -87,6 +88,12 @@ function o.post_init()
 				
 				if true==ok then
 					l_gx_cur_writestream_put_slice(tty)
+				end
+			elseif 'broadcast'==cmd[2] then
+				iup.SetGlobal('UTF8MODE','yes')
+				local ok,aa = iup.GetParam('input msg',nil,'msg:%s\n','')
+				if true==ok then
+					l_gx_cur_writestream_put_slice(aa)
 				end
 			end
 			
