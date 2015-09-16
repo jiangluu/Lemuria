@@ -22,3 +22,6 @@ function l_gx_simple_ack()
 	return lcf.gx_cur_writestream_syncback()
 end
 
+function l_cur_stream_get_slice()
+	return l_gx_cur_stream_get_slice()
+end
