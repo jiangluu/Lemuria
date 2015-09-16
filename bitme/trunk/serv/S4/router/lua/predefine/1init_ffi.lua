@@ -74,6 +74,8 @@ const char* gx_cur_stream_get_bin(int len);
 
 void gx_cur_writestream_cleanup();
 
+void gx_cur_writestream_protect(int);
+
 // 同步原路返回。messageid 是req的+1，内容是push到 stream里的内容。 
 int gx_cur_writestream_syncback();
 

@@ -11,9 +11,11 @@ local ls = require('luastate')
 ffi.cdef[[
 typedef __attribute__((aligned(4))) struct TransData{
 	// @TODO
-	uint32_t padding;
+	uint16_t padding1;
+	uint16_t padding2;
 	uint16_t box_id;
-	uint16_t is_active;
+	uint8_t is_active;
+	uint8_t optype;		// 0-GX msg  1-GX msg with app_context  9-redis push msg
 	uint32_t trans_id;
 	uint32_t serial_no;
 	char input_context[128];

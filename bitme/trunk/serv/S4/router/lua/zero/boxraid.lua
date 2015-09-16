@@ -61,6 +61,9 @@ local function init()
 		ls.pushstring(lbox.L, g_node_id)
 		ls.setglobal(lbox.L,'g_node_id',-1)
 		
+		ls.pushstring(lbox.L, g_node_id)
+		ls.setglobal(lbox.L,'g_app_id',-1)		-- g_node_id的别名
+		
 		ls.pushnumber(lbox.L, i)
 		ls.setglobal(lbox.L,'g_box_id',-1)
 		
@@ -86,6 +89,10 @@ local function init()
 end
 
 function o.getboxc(id)
+	if id<1 or id>o.box_num+1 then
+		return nil
+	end
+	
 	return o.a_box + tonumber(id) - 1
 end
 

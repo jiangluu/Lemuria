@@ -24,3 +24,13 @@ end
 function o.release(i)
 	rawset(o.actors,tonumber(i),nil)
 end
+
+function o.find_actor_by_usersn(sn)
+	for __, u in pairs(o.actors) do
+		if nil~=u.basic and sn == u.basic.usersn then
+			return u
+		end
+	end
+	
+	return nil
+end

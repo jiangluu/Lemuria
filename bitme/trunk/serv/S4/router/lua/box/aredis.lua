@@ -77,7 +77,7 @@ function o.command_and_wait(redis_index,formatt,...)
 		context = coroutine.yield()
 	end
 	
-	local r = lcf.c_redisAsyncCommand(redis_index-1,context,formatt,...)
+	local r = lcf.c_redisAsyncCommand(redis_index,context,formatt,...)
 	if 0~=r then
 		error('redis command error')
 	end
@@ -96,5 +96,17 @@ function o.command_and_wait(redis_index,formatt,...)
 		return unpack(ret)
 	end
 	
+end
+
+
+function o.get(redis_index,key)
+	key = tostring(key)
+	return o.command_and_wait(redis_index,'GET %s',key)
+end
+
+function o.set(redis_index,key,value)
+	key = tostring(key)
+	value = tostring(value)
+	return o.command_and_wait(redis_index,'SET %s %b',key,value,ffi.cast('size_t',#value))
 end
 
