@@ -170,6 +170,7 @@ lua_State* c_lua_new_vm()
     
     luaopen_lfs(L);
     luaopen_bson(L);
+    luaopen_protobuf_c(L);
     luaopen_atablepointer(L);
 	
 	return L;
