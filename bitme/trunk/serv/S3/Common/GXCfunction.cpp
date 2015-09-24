@@ -305,11 +305,20 @@ int gx_bind_portal_id(int index,const char* id)
 	return -1;
 }
 
-int gx_cur_writestream_route_to(const char* destID,int message_id)
+int gx_cur_writestream_route_to(const char* destID,int message_id,int flag)
 {
 	if(s_gx && destID){
 		AStream *aa = s_gx->ws_;
-		return s_gx->packetRouteToNode(destID,message_id,aa->getwritebuflen(),aa->getbuf());
+		u16 bak = s_gx->input_context_.header_.flag_;
+		if(0 != flag)
+		{
+			s_gx->input_context_.header_.flag_ |= flag;
+		}
+		int r = s_gx->packetRouteToNode(destID,message_id,aa->getwritebuflen(),aa->getbuf());
+		
+		s_gx->input_context_.header_.flag_ = bak;
+		
+		return r;
 	}
 	
 	return -1;
