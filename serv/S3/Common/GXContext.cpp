@@ -543,7 +543,7 @@ int GXContext::packetRouteToNode(const char* destID,int msgid,int datalen,void *
 		return -1;
 	}
 	
-	u16 flag_bak = input_context_.flag_;
+	u16 flag_bak = input_context_.header_.flag_;
 	flag_bak &= (~HEADER_FLAG_ROUTE);
 	
 	int r = findPortal(0,destID);
