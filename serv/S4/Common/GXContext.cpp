@@ -572,6 +572,9 @@ int GXContext::packetRouteToNode(const char* destID,int msgid,int datalen,void *
 		return -1;
 	}
 	
+	u16 flag_bak = input_context_.header_.flag_;
+	flag_bak &= (~HEADER_FLAG_ROUTE);
+	
 	int r = findPortal(0,destID);
 	if(r >= 0){
 		// 在本上下文中直接定位到了，不必route了（PS，认为这种情况不常见） 
@@ -584,7 +587,7 @@ int GXContext::packetRouteToNode(const char* destID,int msgid,int datalen,void *
 				memcpy(&h,&input_context_.header_,sizeof(h));
 				h.message_id_ = msgid;
 				h.len_ = CLIENT_HEADER_LEN + datalen;
-				h.flag_ = 0;
+				h.flag_ = flag_bak;
 				
 				__kfifo_put(ff,(unsigned char*)&h,INTERNAL_HEADER_LEN);
 			}
@@ -631,7 +634,7 @@ int GXContext::packetRouteToNode(const char* destID,int msgid,int datalen,void *
 				memcpy(&h,&input_context_.header_,sizeof(h));
 				h.message_id_ = msgid;
 				h.len_ = CLIENT_HEADER_LEN + datalen;
-				h.flag_ = 0;
+				h.flag_ = flag_bak;
 				h.flag_ |= HEADER_FLAG_ROUTE;
 				h.jumpnum_ = 1;
 				
