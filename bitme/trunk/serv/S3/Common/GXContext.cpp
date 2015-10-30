@@ -1438,7 +1438,7 @@ void GXContext::frame_poll(timetype now,int block_time)
 //命令：cat /proc/sys/net/core/rmem_max
 // cat /proc/sys/net/core/wmem_max
 // 故把这个值定为163840
-#define MAX_BYTES_PER_FRAME 163840
+#define MAX_BYTES_PER_FRAME 2048
 
 int GXContext::frame_flush(timetype now)
 {
