@@ -313,6 +313,7 @@ pbc_register(struct pbc_env * p, struct pbc_slice *slice) {
 	struct pbc_rmessage ** files = (struct pbc_rmessage **)alloca(n * sizeof(struct pbc_rmessage *));
 	int i;
 	int r = n;
+	
 	if (n == 0) {
 		p->lasterror = "register empty";
 		goto _error;
