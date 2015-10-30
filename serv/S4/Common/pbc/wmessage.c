@@ -61,17 +61,6 @@ pbc_wmessage_delete(struct pbc_wmessage *m) {
 	}
 }
 
-// jianglu add for reuse a wmessage
-void
-pbc_wmessage_reset(struct pbc_wmessage *m) {
-	if (m) {
-		m->ptr = m->buffer;
-		// 看代码貌似 m->packed字段只有在类型为PACKED时才会用到，我们应该不用这种类型。那就不考虑它的释放问题 
-		// m->packed = NULL;
-		memset(m->buffer,0,m->endptr-m->buffer);	// 为了有问题能够及早发现，把内存全部清零 
-	}
-}
-
 static void
 _expand_message(struct pbc_wmessage *m, int sz) {
 	if (m->ptr + sz > m->endptr) {
