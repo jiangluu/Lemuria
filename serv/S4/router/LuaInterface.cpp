@@ -10,7 +10,7 @@
 #include "LuaInterface.h"
 
 extern int luaopen_bson(lua_State *L);
-extern int luaopen_protobuf_c(lua_State *L);
+extern "C" int luaopen_protobuf_c(lua_State *L);
 extern int luaopen_atablepointer(lua_State *L);
 
 
