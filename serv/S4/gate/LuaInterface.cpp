@@ -141,15 +141,15 @@ int c_luaopen_lfs(lua_State *L)
 	return luaopen_lfs(L);
 }
 
-int c_luaopen_bson(lua_State *L)
-{
-	return luaopen_bson(L);
-}
+// int c_luaopen_bson(lua_State *L)
+// {
+	// return luaopen_bson(L);
+// }
 
-int c_luaopen_atablepointer(lua_State *L)
-{
-	return luaopen_atablepointer(L);
-}
+// int c_luaopen_atablepointer(lua_State *L)
+// {
+	// return luaopen_atablepointer(L);
+// }
 
 int c_lua_ex_function(lua_State *L)
 {
