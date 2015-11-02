@@ -55,9 +55,6 @@ __ENTER_FUNCTION
     ex_function(lua_state_);
     
     luaopen_lfs(lua_state_);
-    luaopen_bson(lua_state_);
-    luaopen_protobuf_c(lua_state_);
-    luaopen_atablepointer(lua_state_);
     
     //lua_settop(lua_state_, 0);
 __LEAVE_FUNCTION
@@ -169,9 +166,6 @@ lua_State* c_lua_new_vm()
     c_lua_ex_function(L);
     
     luaopen_lfs(L);
-    luaopen_bson(L);
-    luaopen_protobuf_c(L);
-    luaopen_atablepointer(L);
 	
 	return L;
 }
