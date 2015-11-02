@@ -10,6 +10,8 @@
 #include "LuaInterface.h"
 
 extern int luaopen_bson(lua_State *L);
+extern "C" int luaopen_protobuf_c(lua_State *L);
+extern int luaopen_atablepointer(lua_State *L);
 
 
 //#define NOPREFIXCALL 
@@ -45,7 +47,6 @@ __ENTER_FUNCTION
     if(luaVM)
     {
         lua_state_ = luaVM;
-        lua_settop(lua_state_, 0);
         return;
     }
 
@@ -55,8 +56,10 @@ __ENTER_FUNCTION
     
     luaopen_lfs(lua_state_);
     luaopen_bson(lua_state_);
+    luaopen_protobuf_c(lua_state_);
+    luaopen_atablepointer(lua_state_);
     
-    lua_settop(lua_state_, 0);
+    //lua_settop(lua_state_, 0);
 __LEAVE_FUNCTION
 }
  
@@ -135,4 +138,41 @@ __ENTER_FUNCTION
 __LEAVE_FUNCTION
 }
 
+
+int c_luaopen_lfs(lua_State *L)
+{
+	return luaopen_lfs(L);
+}
+
+int c_luaopen_bson(lua_State *L)
+{
+	return luaopen_bson(L);
+}
+
+int c_luaopen_atablepointer(lua_State *L)
+{
+	return luaopen_atablepointer(L);
+}
+
+int c_lua_ex_function(lua_State *L)
+{
+	lua_register(L,"l_env_get_shared_lightud",__c_env_get_shared_lightud);
+	lua_register(L,"l_env_set_shared_lightud",__c_env_set_shared_lightud);
+	
+	return 0;
+}
+
+lua_State* c_lua_new_vm()
+{
+	lua_State *L = luaL_newstate();
+    luaL_openlibs(L);
+    c_lua_ex_function(L);
+    
+    luaopen_lfs(L);
+    luaopen_bson(L);
+    luaopen_protobuf_c(L);
+    luaopen_atablepointer(L);
+	
+	return L;
+}
 

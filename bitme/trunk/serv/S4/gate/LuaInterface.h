@@ -66,6 +66,7 @@ public:
     *    取得内部解释器实例的句柄。
     */
     lua_State* luaState(){ return lua_state_; }
+    lua_State* L(){ return lua_state_; }
     /**
     *    获得在解释器堆栈中的参数个数。
     */
@@ -908,6 +909,28 @@ protected:
 template<>
 void LuaInterface::_Call<void>(int);
 //#endif
+
+
+
+#ifdef WIN32
+#define CF_EXPORT  __declspec(dllexport)
+#else
+#define CF_EXPORT
+#endif
+
+extern "C"{
+
+CF_EXPORT int c_luaopen_lfs(lua_State *L);
+
+CF_EXPORT int c_luaopen_bson(lua_State *L);
+
+CF_EXPORT int c_luaopen_atablepointer(lua_State *L);
+
+CF_EXPORT int c_lua_ex_function(lua_State *L);
+
+CF_EXPORT lua_State* c_lua_new_vm();
+
+}
 
 
 #endif
