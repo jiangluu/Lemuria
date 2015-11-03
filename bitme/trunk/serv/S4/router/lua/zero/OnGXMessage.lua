@@ -85,6 +85,8 @@ function OnGXMessage()
 		
 		local r = jlpcall(remote_transaction_start,boxc,'on_message_2',msg_id,ptr,con_index)
 		
+		lcf.gx_cur_writestream_protect(0)
+		
 	end
 	
 	return 0
