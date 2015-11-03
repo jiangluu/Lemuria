@@ -42,6 +42,8 @@ local function __foo(privdata, reply)
 		ctb_strategy.check_detach(con_index,msg_id)
 	end
 	
+	lcf.gx_cur_writestream_protect(0)
+	
 end
 
 local function parse_reply(c_reply)
