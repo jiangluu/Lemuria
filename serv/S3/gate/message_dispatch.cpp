@@ -61,7 +61,7 @@ DuanLianJie_Imprint* help_omt_get_imprint(omt_tree* tr,const char* key)
 	u32 index = -1;
 	
 	int r = omt_find_order(tr,&s1,&index);
-	if(-1 == r){
+	if(-1 == r && -1!=index){
 		return (DuanLianJie_Imprint*)tr->nodes[index].value->v_;
 	}
 	
@@ -164,10 +164,12 @@ int message_dispatch_2(GXContext*,Link* src_link,ClientHeader *hh,int body_len,c
 				}
 				memset(buf,0,32);
 				
-				FOR(i,LINK_ID_LEN){
-					buf[i] = 'A' + (g_rand->rand32()%26);
-				}
+//				FOR(i,LINK_ID_LEN){
+//					buf[i] = 'A' + (g_rand->rand32()%26);
+//				}
 				
+				
+				strncpy(buf,session_id.c_str(),LINK_ID_LEN);
 				strncpy(src_link->link_id_,buf,LINK_ID_LEN);
 				
 				// alloc a free imprint
