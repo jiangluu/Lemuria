@@ -14,7 +14,7 @@
 
 #define OFFLINE_TIMEOUT 60000	// 60秒没有任何消息算下线 
 
-#define DUANLIANJIE_TIMEOUT 120000	// 120秒之内短连接不算失效 
+#define DUANLIANJIE_TIMEOUT 200000	// 120秒之内短连接不算失效 
 
 
 
@@ -183,6 +183,22 @@ int message_dispatch_2(GXContext*,Link* src_link,ClientHeader *hh,int body_len,c
 				}
 			}
 			
+		}
+	}
+	
+#define HEARTBEAT 11
+	if(g_duanlianjie>=1 && table1 && HEARTBEAT == message_id){
+		static char* buf = (char*)malloc(LINK_ID_LEN*2);
+		memset(buf,0,LINK_ID_LEN*2);
+		memcpy(buf,src_link->link_id_,LINK_ID_LEN);
+		
+		DuanLianJie_Imprint *p = help_omt_get_imprint(table1,buf);
+		if(NULL != p && ((u16)-1)!=src_link->app_box_id_){
+				p->last_pool_id_ = src_link->pool_index_;
+				p->last_time_ = g_time->getANSITime();
+				p->session_link_index_ = src_link->session_link_index_;
+				p->app_box_id_ = src_link->app_box_id_;
+				p->app_actor_id_ = src_link->app_actor_id_;
 		}
 	}
 	
@@ -363,11 +379,11 @@ void on_client_cut_2(GXContext*,Link *ll,int reason,int gxcontext_type)
 			strcpy(buf,ll->link_id_);
 			DuanLianJie_Imprint *p = help_omt_get_imprint(table1,buf);
 			if(NULL != p){
-				p->last_pool_id_ = ll->pool_index_;
-				p->last_time_ = g_time->getANSITime();
-				p->session_link_index_ = ll->session_link_index_;
-				p->app_box_id_ = ll->app_box_id_;
-				p->app_actor_id_ = ll->app_actor_id_;
+//				p->last_pool_id_ = ll->pool_index_;
+//				p->last_time_ = g_time->getANSITime();
+//				p->session_link_index_ = ll->session_link_index_;
+//				p->app_box_id_ = ll->app_box_id_;
+//				p->app_actor_id_ = ll->app_actor_id_;
 				
 				send_nodify = false;
 			}
@@ -501,7 +517,7 @@ int check_client_links(timetype now)
 						Link *ta_service = g_gx2->getLink(p->session_link_index_);
 						if(ta_service){
 							InternalHeader tt;
-							tt.message_id_ = 1000;
+							tt.message_id_ = 1001;
 							tt.len_ = CLIENT_HEADER_LEN+sizeof(BoxProtocolTier);
 							tt.flag_ = 0;
 							tt.jumpnum_ = 0;
