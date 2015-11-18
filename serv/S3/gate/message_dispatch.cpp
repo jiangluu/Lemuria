@@ -29,6 +29,18 @@ struct DuanLianJie_Imprint{
 	s32		session_link_index_; 	// 此session在哪个link 
 	u16		app_box_id_;
 	u16		app_actor_id_;
+	
+	void reset(){
+		last_pool_id_ = -1;
+		last_time_ = 0;
+		session_link_index_ = -2;
+		app_box_id_ = -1;
+		app_actor_id_ = -1;
+	}
+	
+	DuanLianJie_Imprint(){
+		reset();
+	}
 };
 
 #define IMPRINT_POOL_NUM 60000
@@ -132,6 +144,7 @@ int message_dispatch_2(GXContext*,Link* src_link,ClientHeader *hh,int body_len,c
 				if(now <= p->last_time_+DUANLIANJIE_TIMEOUT){
 					need_new_session = false;
 					
+					// 这里继承状态，重要！如果状态错误也从这里继承了下去 
 					p->last_time_ = now;
 					p->last_pool_id_ = src_link->pool_index_;
 					
@@ -169,6 +182,8 @@ int message_dispatch_2(GXContext*,Link* src_link,ClientHeader *hh,int body_len,c
 				}
 				
 				if(im){
+					im->reset();
+					
 					im->last_pool_id_ = src_link->pool_index_;
 					im->last_time_ = g_time->getANSITime();
 					
