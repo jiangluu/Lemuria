@@ -70,7 +70,7 @@ struct Link{
 	s16		pool_stat_;
 	s16		link_stat_;
 	bool	enable_encrypt_;
-	char	link_id_[LINK_ID_LEN];
+	char	link_id_[LINK_ID_LEN+4];
 	int		pool_index_;	// 在池中的下标 
 	int		sock_;
 	int		read_buf_len_;
