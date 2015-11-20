@@ -188,6 +188,29 @@ int message_dispatch_2(GXContext*,Link* src_link,ClientHeader *hh,int body_len,c
 	return 0;
 }
 
+void __help_sendmsg(Link *ll,int msgid)
+{
+			Link *ta_service = g_gx1->getLink(ll->session_link_index_);
+			if(ta_service){
+				InternalHeader tt;
+				tt.message_id_ = msgid;
+				tt.len_ = CLIENT_HEADER_LEN+sizeof(BoxProtocolTier);
+				tt.flag_ = 0;
+				tt.jumpnum_ = 0;
+				
+				BoxProtocolTier bt;
+				bt.reset();
+				bt.box_id_ = ll->app_box_id_;
+				bt.actor_id_ = ll->app_actor_id_;
+				bt.gate_pool_index_ = ll->pool_index_;
+				bt.padding_ = 0;
+				bt.usersn_ = ll->usersn_;
+				
+				__kfifo_put(&ta_service->write_fifo_,(unsigned char*)&tt,INTERNAL_HEADER_LEN);
+				__kfifo_put(&ta_service->write_fifo_,(unsigned char*)&bt,sizeof(BoxProtocolTier));
+			}
+}
+
 void on_client_cut_2(GXContext*,Link *ll,int reason,int gxcontext_type)
 {
 	printf("on_client_cut  link_index [%d]  reason [%d]  gxcontext_type[%d]\n",ll->pool_index_,reason,gxcontext_type);
@@ -219,25 +242,7 @@ void on_client_cut_2(GXContext*,Link *ll,int reason,int gxcontext_type)
 		bool send_nodify = true;		
 		if(send_nodify){
 			// 是客户端断线，发消息 
-			Link *ta_service = g_gx1->getLink(ll->session_link_index_);
-			if(ta_service){
-				InternalHeader tt;
-				tt.message_id_ = 1001;
-				tt.len_ = CLIENT_HEADER_LEN+sizeof(BoxProtocolTier);
-				tt.flag_ = 0;
-				tt.jumpnum_ = 0;
-				
-				BoxProtocolTier bt;
-				bt.reset();
-				bt.box_id_ = ll->app_box_id_;
-				bt.actor_id_ = ll->app_actor_id_;
-				bt.gate_pool_index_ = ll->pool_index_;
-				bt.padding_ = 0;
-				bt.usersn_ = ll->usersn_;
-				
-				__kfifo_put(&ta_service->write_fifo_,(unsigned char*)&tt,INTERNAL_HEADER_LEN);
-				__kfifo_put(&ta_service->write_fifo_,(unsigned char*)&bt,sizeof(BoxProtocolTier));
-			}
+			__help_sendmsg(ll,1001);
 		}
 	}
 }
@@ -320,10 +325,14 @@ int check_client_links(timetype now)
 		return 0;
 	}
 	
+	static int untouch_timeout = -1;
 	static int offline_timeout = -1;
 	if(-1 == offline_timeout){
 		offline_timeout = g_luavm->GetGlobal<int>("conf_offline_timeout");
+		untouch_timeout = g_luavm->GetGlobal<int>("conf_untouch_timeout");
+		
 		offline_timeout = 0==offline_timeout?60:offline_timeout;
+		untouch_timeout = 0==untouch_timeout?10:untouch_timeout;
 	}
 	
 	if(now >= pre_point_1+3000){
@@ -335,9 +344,14 @@ int check_client_links(timetype now)
 				ll->lk_times_ = 0;
 				ll->lk_traffic_ = 0;
 			}
-			if(ll && 0!=ll->last_active_time_ && ll->last_active_time_+offline_timeout*1000 <now){
-				// 认为断线，踢掉之 
-				server_kick_client(ll,3);
+			if(ll && 0!=ll->last_active_time_){
+				if(ll->last_active_time_+offline_timeout*1000 <=now){
+					// 认为断线，踢掉之 
+					server_kick_client(ll,3);
+				}
+				else if(ll->last_active_time_+untouch_timeout*1000 <=now){
+					__help_sendmsg(ll,1003);
+				}
 			}
 		}
 				
