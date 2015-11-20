@@ -27,7 +27,6 @@ extern GXContext *g_gx1;
 
 extern GXContext *g_gx2;
 
-extern int g_duanlianjie;
 
 
 #define ARAND32 (g_rand->rand32())

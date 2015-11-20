@@ -12,61 +12,15 @@
 
 
 
-#define OFFLINE_TIMEOUT 60000	// 60秒没有任何消息算下线 
-
-#define DUANLIANJIE_TIMEOUT 200000	// 120秒之内短连接不算失效 
-
+//#define OFFLINE_TIMEOUT 60000	// 60秒没有任何消息算下线 
 
 
 extern LuaInterface *g_luavm;
 
 
-static struct omt_tree *table1 = NULL;
-
-struct DuanLianJie_Imprint{
-	int last_pool_id_;
-	timetype last_time_;
-	s32		session_link_index_; 	// 此session在哪个link 
-	u16		app_box_id_;
-	u16		app_actor_id_;
-	
-	void reset(){
-		last_pool_id_ = -1;
-		last_time_ = 0;
-		session_link_index_ = -2;
-		app_box_id_ = -1;
-		app_actor_id_ = -1;
-	}
-	
-	DuanLianJie_Imprint(){
-		reset();
-	}
-};
-
-#define IMPRINT_POOL_NUM 60000
-static struct DuanLianJie_Imprint *a_imprint = NULL;
-static int imprint_free_offset = 0;
-
 
 int server_kick_client(Link *ll,int reason);
 
-
-DuanLianJie_Imprint* help_omt_get_imprint(omt_tree* tr,const char* key)
-{
-	struct slice s1;
-	s1.size = strlen(key);
-	s1.data = key;
-	s1.v_ = 0;
-	
-	u32 index = -1;
-	
-	int r = omt_find_order(tr,&s1,&index);
-	if(-1 == r && -1!=index){
-		return (DuanLianJie_Imprint*)tr->nodes[index].value->v_;
-	}
-	
-	return NULL;
-}
 
 
 // 客户端来的消息，包头是ClientHeader 
@@ -95,129 +49,6 @@ int message_dispatch_2(GXContext*,Link* src_link,ClientHeader *hh,int body_len,c
 	//printf("OK  %d  %d  %d\n",(int)src_link->enc_inc_,body_len,message_id);
 #endif
 	
-	
-	// 短连接相关
-#define DUAN_LIANJIE_OPEN_ID 9001
-	if(g_duanlianjie>=1 &&  DUAN_LIANJIE_OPEN_ID == message_id){
-		AStream rs(body_len,body);	// rs means read stream
-		std::string session_id = rs.getStr();
-		
-		if(NULL == table1){
-			table1 = omt_new();
-			assert(table1);
-			
-			a_imprint = new struct DuanLianJie_Imprint[IMPRINT_POOL_NUM];
-			assert(a_imprint);
-		}
-		
-		// 防止 table1 无限增长 
-		if(table1->free_idx > 50000){
-			printf("re-generate table1...\n");
-			struct omt_tree *new_tree = omt_new();
-			assert(new_tree);
-			
-			timetype now = g_time->getANSITime();
-			
-			FOR(i,table1->free_idx){
-				struct omt_node &node = table1->nodes[i];
-				if(0 != node.value->v_){
-					DuanLianJie_Imprint *p = (DuanLianJie_Imprint*)node.value->v_;
-					if(now <= p->last_time_+DUANLIANJIE_TIMEOUT){
-						omt_insert(new_tree,node.value);
-					}
-				}
-			}
-			
-			omt_free(table1);
-			table1 = new_tree;
-			printf("re-generate table1 over. new tree has [%d] leaf\n",table1->free_idx);
-		}
-		// ================
-		
-		if(0 == src_link->link_id_[0]){
-			
-			struct slice *v = NULL;
-			DuanLianJie_Imprint *p = help_omt_get_imprint(table1,session_id.c_str());
-			bool need_new_session = true;
-			if(NULL != p){	// found
-				timetype now = g_time->getANSITime();
-				if(now <= p->last_time_+DUANLIANJIE_TIMEOUT){
-					need_new_session = false;
-					
-					// 这里继承状态，重要！如果状态错误也从这里继承了下去 
-					p->last_time_ = now;
-					p->last_pool_id_ = src_link->pool_index_;
-					
-					src_link->session_link_index_ = p->session_link_index_;
-					src_link->app_box_id_ = p->app_box_id_;
-					src_link->app_actor_id_ = p->app_actor_id_;
-					
-					strncpy(src_link->link_id_,session_id.c_str(),LINK_ID_LEN);
-				}
-			}
-			
-			if(need_new_session){
-				// gen a random string
-				static char *buf = NULL;
-				if(NULL == buf){
-					buf = (char*)malloc(32);
-				}
-				memset(buf,0,32);
-				
-//				FOR(i,LINK_ID_LEN){
-//					buf[i] = 'A' + (g_rand->rand32()%26);
-//				}
-				
-				
-				strncpy(buf,session_id.c_str(),LINK_ID_LEN);
-				strncpy(src_link->link_id_,buf,LINK_ID_LEN);
-				
-				// alloc a free imprint
-				struct DuanLianJie_Imprint *im = NULL;
-				FOR(i,IMPRINT_POOL_NUM){
-					int idx = imprint_free_offset + i;
-					idx = idx<IMPRINT_POOL_NUM?idx:(idx-IMPRINT_POOL_NUM);
-					if(-2 == a_imprint[idx].session_link_index_){
-						im = a_imprint+idx;
-						break;
-					}
-				}
-				
-				if(im){
-					im->reset();
-					
-					im->last_pool_id_ = src_link->pool_index_;
-					im->last_time_ = g_time->getANSITime();
-					
-					struct slice sl;
-					sl.data = buf;
-					sl.size = LINK_ID_LEN;
-					sl.v_ = im;
-					
-					omt_insert(table1,&sl);
-					++ imprint_free_offset;
-					imprint_free_offset = imprint_free_offset<IMPRINT_POOL_NUM?imprint_free_offset:(imprint_free_offset-IMPRINT_POOL_NUM);
-				}
-			}
-			
-		}
-	}
-	
-#define HEARTBEAT 11
-	if(g_duanlianjie>=1 && table1 && HEARTBEAT == message_id){
-		static char* buf = (char*)malloc(LINK_ID_LEN*2);
-		memset(buf,0,LINK_ID_LEN*2);
-		memcpy(buf,src_link->link_id_,LINK_ID_LEN);
-		
-		DuanLianJie_Imprint *p = help_omt_get_imprint(table1,buf);
-		if(NULL != p && ((u16)-1)!=src_link->app_box_id_){
-				p->last_pool_id_ = src_link->pool_index_;
-				p->last_time_ = g_time->getANSITime();
-				p->session_link_index_ = src_link->session_link_index_;
-				p->app_box_id_ = src_link->app_box_id_;
-				p->app_actor_id_ = src_link->app_actor_id_;
-		}
-	}
 	
 	// 流控、安全性等加在这里 
 #define LK_LIMIT_TIMES 200
@@ -252,21 +83,6 @@ int message_dispatch_2(GXContext*,Link* src_link,ClientHeader *hh,int body_len,c
 		// 认为不合法，踢掉此玩家 
 		server_kick_client(src_link,2);
 		return -1;
-	}
-	
-	if(g_duanlianjie>=1 &&  DUAN_LIANJIE_OPEN_ID == message_id){
-		kfifo *ff = &src_link->write_fifo_;
-		ClientHeader bb;
-		bb.message_id_ = DUAN_LIANJIE_OPEN_ID+1;
-		
-		u16 len = LINK_ID_LEN;
-		bb.len_ = CLIENT_HEADER_LEN+len+2;
-		
-		__kfifo_put(ff,(unsigned char*)&bb,CLIENT_HEADER_LEN);
-		__kfifo_put(ff,(unsigned char*)&len,2);
-		__kfifo_put(ff,(unsigned char*)src_link->link_id_,len);
-		
-		return 0;	// gate拦截此消息 
 	}
 	
 	
@@ -390,22 +206,7 @@ void on_client_cut_2(GXContext*,Link *ll,int reason,int gxcontext_type)
 	}
 	
 	{
-		bool send_nodify = true;
-		if(g_duanlianjie >= 1 && table1){
-			char buf[32];
-			strcpy(buf,ll->link_id_);
-			DuanLianJie_Imprint *p = help_omt_get_imprint(table1,buf);
-			if(NULL != p){
-//				p->last_pool_id_ = ll->pool_index_;
-//				p->last_time_ = g_time->getANSITime();
-//				p->session_link_index_ = ll->session_link_index_;
-//				p->app_box_id_ = ll->app_box_id_;
-//				p->app_actor_id_ = ll->app_actor_id_;
-				
-				send_nodify = false;
-			}
-		}
-		
+		bool send_nodify = true;		
 		if(send_nodify){
 			// 是客户端断线，发消息 
 			Link *ta_service = g_gx1->getLink(ll->session_link_index_);
@@ -509,7 +310,13 @@ int check_client_links(timetype now)
 		return 0;
 	}
 	
-	if(now >= pre_point_1+5000){
+	static int offline_timeout = -1;
+	if(-1 == offline_timeout){
+		offline_timeout = g_luavm->GetGlobal<int>("conf_offline_timeout");
+		offline_timeout = 0==offline_timeout?60:offline_timeout;
+	}
+	
+	if(now >= pre_point_1+3000){
 		pre_point_1 = now;
 		
 		FOR(i,g_gx2->link_pool_size_){
@@ -518,50 +325,12 @@ int check_client_links(timetype now)
 				ll->lk_times_ = 0;
 				ll->lk_traffic_ = 0;
 			}
-			if(ll && 0!=ll->last_active_time_ && ll->last_active_time_+OFFLINE_TIMEOUT<now){
+			if(ll && 0!=ll->last_active_time_ && ll->last_active_time_+offline_timeout*1000 <now){
 				// 认为断线，踢掉之 
 				server_kick_client(ll,3);
 			}
 		}
-		
-		if(g_duanlianjie >= 1 && table1){
-			FOR(i,table1->free_idx){
-				struct omt_node &node = table1->nodes[i];
-				if(0 != node.value->v_){
-					DuanLianJie_Imprint *p = (DuanLianJie_Imprint*)node.value->v_;
-					if(now > p->last_time_+DUANLIANJIE_TIMEOUT){
-						// send notify 
-						Link *ta_service = g_gx2->getLink(p->session_link_index_);
-						if(ta_service){
-							InternalHeader tt;
-							tt.message_id_ = 1001;
-							tt.len_ = CLIENT_HEADER_LEN+sizeof(BoxProtocolTier);
-							tt.flag_ = 0;
-							tt.jumpnum_ = 0;
-							
-							BoxProtocolTier bt;
-							bt.reset();
-							bt.box_id_ = p->app_box_id_;
-							bt.actor_id_ = p->app_actor_id_;
-							bt.gate_pool_index_ = p->last_pool_id_;
-							bt.padding_ = 0;
-							bt.usersn_ = 0;
-							
-							__kfifo_put(&ta_service->write_fifo_,(unsigned char*)&tt,INTERNAL_HEADER_LEN);
-							__kfifo_put(&ta_service->write_fifo_,(unsigned char*)&bt,sizeof(BoxProtocolTier));
-						}
-					}
-					
-					// cleanup  node.value->val
-					// free(node.value->v_);	need NO free
-					struct DuanLianJie_Imprint *im = (struct DuanLianJie_Imprint*)node.value->v_;
-					im->session_link_index_ = -2;	// mark as free
-					node.value->v_ = 0;
-					
-				}
-			}
-		}
-		
+				
 	}
 	
 	
