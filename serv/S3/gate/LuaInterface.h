@@ -66,6 +66,7 @@ public:
     *    取得内部解释器实例的句柄。
     */
     lua_State* luaState(){ return lua_state_; }
+    lua_State* L(){ return lua_state_; }
     /**
     *    获得在解释器堆栈中的参数个数。
     */

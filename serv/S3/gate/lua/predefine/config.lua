@@ -11,4 +11,4 @@ function getWriteBufLen()
 	return 1024*8
 end
 
-
+conf_offline_timeout = 60

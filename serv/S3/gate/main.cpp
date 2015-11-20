@@ -23,7 +23,6 @@ ALog *g_log = 0;
 GXContext *g_gx1 = 0;
 GXContext *g_gx2 = 0;
 
-int g_duanlianjie = 0;
 int g_stop_loop = 0;
 
 
@@ -56,12 +55,6 @@ int main(int argc, char** argv) {
 	}
 #endif	
 	
-	FOR(i,argc){
-		if(0 == strcmp(argv[i],"--duan")){
-			g_duanlianjie = 1;
-			printf("use duanlianjie mode\n");
-		}
-	}
 	
 	__installHandler();
 	
