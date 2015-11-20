@@ -51,9 +51,19 @@ int message_dispatch_2(GXContext*,Link* src_link,ClientHeader *hh,int body_len,c
 	
 	
 	// 流控、安全性等加在这里 
-#define LK_LIMIT_TIMES 200
-#define LK_LIMIT_TRAFFIC	1024*100
-	if(src_link->lk_times_+1<=LK_LIMIT_TIMES && (s64)(src_link->lk_traffic_)+body_len+CLIENT_HEADER_LEN<=LK_LIMIT_TRAFFIC){
+//#define LK_LIMIT_TIMES 100
+//#define LK_LIMIT_TRAFFIC	1024*100
+	static int lk_limit_times = -1;
+	static int lk_limit_traffic = -1;
+	if(-1 == lk_limit_times){
+		lk_limit_times = g_luavm->GetGlobal<int>("conf_lk_limit_times");
+		lk_limit_traffic = g_luavm->GetGlobal<int>("conf_lk_limit_traffic");
+		
+		lk_limit_times = 0==lk_limit_times?100:lk_limit_times;
+		lk_limit_traffic = 0==lk_limit_traffic?(1024*100):lk_limit_traffic;
+	}
+	
+	if(src_link->lk_times_+1<=lk_limit_times && (s64)(src_link->lk_traffic_)+body_len+CLIENT_HEADER_LEN<=lk_limit_traffic){
 		++ src_link->lk_times_;
 		src_link->lk_traffic_ += body_len+CLIENT_HEADER_LEN;
 		
@@ -71,7 +81,7 @@ int message_dispatch_2(GXContext*,Link* src_link,ClientHeader *hh,int body_len,c
 			buf = (char*)malloc(256);
 		}
 		memset(buf,0,256);
-		if(src_link->lk_times_+1 > LK_LIMIT_TIMES){
+		if(src_link->lk_times_+1 > lk_limit_times){
 			sprintf(buf,"too many packets in short time. actor_id[%d]",src_link->app_actor_id_);
 		}
 		else{
