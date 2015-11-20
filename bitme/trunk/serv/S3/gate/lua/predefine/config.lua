@@ -12,3 +12,5 @@ function getWriteBufLen()
 end
 
 conf_offline_timeout = 60
+conf_lk_limit_times = 100
+conf_lk_limit_traffic = 1024*100
