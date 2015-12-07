@@ -869,7 +869,7 @@ int GXContext::connect2_no_care_id(char *ip_and_port)
 	return ll->pool_index_;
 }
 
-#define CLIENT_MSG_MAX_LEN (1024*15)
+#define CLIENT_MSG_MAX_LEN (1024*7)
 
 int GXContext::try_deal_one_msg_s(Link *ioable,int &begin)
 {
