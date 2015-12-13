@@ -32,9 +32,11 @@ local nnp = {
 function o.update_all_file(remote_addr)
 	-- local ip = string.match(remote_addr,'([^:]+)')
 	-- print(ip)
-	local nbegin = 4
+	local nbegin = 1
 	
-	for i=2,#nnp do
+	local fh = io.open('ppp.bat','w')
+	
+	for i=1,#nnp do
 		local ip = nnp[i]
 		
 		-- local cmd = 'cd aaa;svn update;cd ssdb;chmod 755 ssdb-server;./ssdb-server -d '
@@ -45,11 +47,14 @@ function o.update_all_file(remote_addr)
 		--local cmd = string.format('killall -9 gate;killall -9 service;cd aaa;svn update;cd b;chmod 755 service;nohup ./service S%d',i)
 		local cmd = string.format('killall -9 gate;cd aaa;svn update;cd c;chmod 755 gate;nohup ./gate G%d',i)
 		
-		local aa = string.format('plink.exe jl@%s -pw Nana9151 %s',ip,cmd)
-		os.execute(aa)
-		
-		break
+		local aa = string.format('start plink.exe jl@%s -pw Nana9151 %s',ip,cmd)
+		--os.execute(aa)
+		fh:write(aa)
+		fh:write("\n")
 		
 	end
+	
+	fh:write('pause\n')
+	fh:close()
 	
 end
