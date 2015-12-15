@@ -39,6 +39,60 @@ void frame_time_driven(timetype now);
 
 
 
+#ifndef WIN32
+int daemonize(const char *dir)
+{
+	printf("daemonize ...\n");
+	switch(fork()){
+		case -1:
+			printf("fork() return -1\n");
+			exit(-1);
+		case 0:
+			break;
+		default:
+			printf("parent exit() normally\n");
+			exit(0);
+	}
+	if(setsid() == -1){
+		exit(0);
+	}
+	if(dir != NULL){
+		if(chdir(dir) == -1){
+			exit(0);
+		}
+	}
+	
+
+
+	if(close(STDIN_FILENO) == -1){
+		exit(0);
+	}
+	if(close(STDOUT_FILENO) == -1){
+		exit(0);
+	}
+	if(close(STDERR_FILENO) == -1){
+		exit(0);
+	}
+
+	int fd = open("/dev/null", O_RDWR, 0);
+	if(fd == -1){
+		exit(0);
+	}
+	if(dup2(fd, STDIN_FILENO) == -1){
+		exit(0);
+	}
+	if(dup2(fd, STDOUT_FILENO) == -1){
+		exit(0);
+	}
+	if(dup2(fd, STDERR_FILENO) == -1){
+		exit(0);
+	}
+
+
+	return 0;
+}
+#endif
+
 int main(int argc, char** argv) {
 	if(argc < 2){
 		printf("argv error.\n");
@@ -87,6 +141,12 @@ int main(int argc, char** argv) {
 	
 	g_luavm->SetGlobal(LUA_GX_ID,(const char*)argv[1]);
 	std::string my_port = g_luavm->callGlobalFunc<std::string>("getMyPort");
+	
+#ifndef WIN32
+	if(argc>=3 && strcmp("-d",argv[2])==0){
+		daemonize(NULL);
+	}
+#endif
 	
 	g_gx1 = new GXContext();
 	g_gx1->init(GXContext::typeFullFunction,argv[1],8,1024*1024*8,1024*1024*8);
