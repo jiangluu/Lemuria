@@ -40,12 +40,15 @@ extern void frame_time_driven(timetype now);
 #ifndef WIN32
 int daemonize(const char *dir)
 {
+	printf("daemonize ...\n");
 	switch(fork()){
 		case -1:
-			return -1;
+			printf("fork() return -1\n");
+			exit(-1);
 		case 0:
 			break;
 		default:
+			printf("parent exit() normally\n");
 			exit(0);
 	}
 	if(setsid() == -1){
