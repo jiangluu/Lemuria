@@ -60,20 +60,8 @@ int daemonize(const char *dir)
 		}
 	}
 	
-	
-	if(close(STDIN_FILENO) == -1){
-		exit(0);
-	}
-	
-	int fd = open("/dev/null", O_RDWR, 0);
-	if(fd == -1){
-		exit(0);
-	}
-	if(dup2(fd, STDIN_FILENO) == -1){
-		exit(0);
-	}
 
-/*
+
 	if(close(STDIN_FILENO) == -1){
 		exit(0);
 	}
@@ -97,7 +85,7 @@ int daemonize(const char *dir)
 	if(dup2(fd, STDERR_FILENO) == -1){
 		exit(0);
 	}
-*/
+
 
 	return 0;
 }
