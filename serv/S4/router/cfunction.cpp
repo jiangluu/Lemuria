@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <string>
-#include "polarssl/md5.h"
 #include "router.h"
 #include "LuaInterface.h"
 #include "cfunction.h"
