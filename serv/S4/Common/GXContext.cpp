@@ -1,7 +1,7 @@
 #include "GXContext.h"
 #include "ARand.h"
 #include "CAS.h"
-
+#include "picohttpparser/picohttpparser.h"
 
 
 extern ARand *g_rand;
@@ -1177,6 +1177,39 @@ int GXContext::try_deal_one_msg_s(Link *ioable,int &begin)
 	return -1;
 }
 
+int GXContext::deal_one_http(Link *ioable,int end){
+	printf("HTTP:  %s\n", ioable->read_buf_);
+	printf("len:  %d\n", end);
+	if(0==ioable) return -1;
+
+	if(callback_http_){
+					// 准备好上下文
+					input_context_.reset();
+					
+					input_context_.gxc_ = this;
+					input_context_.src_link_pool_index_ = ioable->pool_index_;
+					input_context_.header_type_ = 80;
+					
+					rs_ = rs_bak_;
+					ws_ = ws_bak_;
+					ws_->cleanup();
+					rs_->reset(end,ioable->read_buf_);
+
+					int r = 0;
+					
+					//r = ((GXContextMessageDispatch2)callback_http_)(this,ioable);
+
+					return r;
+				}
+
+	return -1;
+}
+
+// only GET and POST supported
+inline bool _is_http_header(const char* buf){
+	return 0==strncmp("GET",buf,3) || 0==strncmp("POST",buf,4) || 0==strncmp("HTTP",buf,4);
+}
+
 
 /*
  使用IOCP需要注意的一些问题
@@ -1409,8 +1442,8 @@ void GXContext::frame_poll(timetype now,int block_time)
 				}
 				bool need_kick = false;
 				
-				if(likely(0==err)){
-					if(true){
+				if(likely(0==err && ioable->read_buf_offset_>=CLIENT_HEADER_LEN)){
+					if(likely(false==_is_http_header(ioable->read_buf_))){
 						// 是服务端内部包，绝大多数情况下应该是 InternalHeader 包头 
 						int byte_begin = 0;
 						FOR(limiter,9999){
@@ -1434,9 +1467,26 @@ void GXContext::frame_poll(timetype now,int block_time)
 							ioable->read_buf_offset_ = 0;
 						}
 					}
+					else{	// a http header
+						char *method, *path;
+						int pret, minor_version;
+						struct phr_header headers[8];
+						size_t buflen = 0, prevbuflen = 0, method_len, path_len, num_headers = 8;
+						pret = phr_parse_request(ioable->read_buf_, ioable->read_buf_offset_, &method, &method_len, &path, &path_len,
+                             &minor_version, headers, &num_headers, 0);
+						if(pret>0){
+							//successfully parsed the request
+							deal_one_http(ioable, pret);
+						}
+						else if(-1 == pret){
+							// parse Error
+							need_kick = true;
+						}
+						// else incomplete, do nothing
+					}
 					
 				}
-				else{
+				else if(0!=err){
 					need_kick = true;
 				}
 				
@@ -1464,10 +1514,11 @@ void GXContext::frame_poll(timetype now,int block_time)
 
 //对客户端连接，应该限制每帧写出去的字节
 //但是这个值应该大于系统缓存比较好，查了在我们的ubuntu系统上，系统的socket读、写缓存的上限都是163840 byte
+//It's 212992 at aliyun
 //命令：cat /proc/sys/net/core/rmem_max
 // cat /proc/sys/net/core/wmem_max
 // 故把这个值定为163840
-#define MAX_BYTES_PER_FRAME 163840
+#define MAX_BYTES_PER_FRAME 212992
 
 int GXContext::frame_flush(timetype now)
 {

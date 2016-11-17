@@ -61,6 +61,7 @@ struct GXContext{
 	
 	int listening_socket_;
 	void *callback_;
+	void *callback_http_;
 	LinkCut link_cut_callback_;
 	
 	int	link_pool_size_;
@@ -103,7 +104,7 @@ struct GXContext{
 	
 	GXContext():type_(0),layer_(0),header_type_(0),stat_(0),enable_encrypt_(false),link_pool_size_conf_(0),
 	link_pool_size_(0),read_buf_len_(0),write_fifo_len_(0),listening_socket_(-1),
-	callback_(0),link_cut_callback_(0),link_pool_(NULL),lua_vm_(NULL),lua_vm2_(NULL),rs_(0),ws_(0),rs_bak_(0),ws_bak_(0),
+	callback_(0),callback_http_(0),link_cut_callback_(0),link_pool_(NULL),lua_vm_(NULL),lua_vm2_(NULL),rs_(0),ws_(0),rs_bak_(0),ws_bak_(0),
 	#ifdef __USING_WINDOWS_IOCP
 		iocp_handle_(0)
 	#else
@@ -168,6 +169,7 @@ struct GXContext{
 	
 private:
 	int try_deal_one_msg_s(Link *ioable,int &begin);
+	int deal_one_http(Link *ioable,int end);
 	
 };
 
