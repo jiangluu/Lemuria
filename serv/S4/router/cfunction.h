@@ -13,7 +13,7 @@
 #endif
 
 
-// ÎªÁËÈÃLuaÄÜ¹»Ê¹ÓÃ¶øĞ´µÄCº¯Êı
+// ä¸ºäº†è®©Luaèƒ½å¤Ÿä½¿ç”¨è€Œå†™çš„Cå‡½æ•°
 extern "C"{
 
 CF_EXPORT bool cur_stream_is_end();
@@ -49,7 +49,7 @@ CF_EXPORT bool cur_stream_push_string(const char* v,int len=0);
 
 CF_EXPORT void cur_write_stream_cleanup();
 
-// Í¬²½Ô­Â··µ»Ø¡£messageid ÊÇreqµÄ+1£¬ÄÚÈİÊÇpushµ½ streamÀïµÄÄÚÈİ¡£ 
+// åŒæ­¥åŸè·¯è¿”å›ã€‚messageid æ˜¯reqçš„+1ï¼Œå†…å®¹æ˜¯pushåˆ° streamé‡Œçš„å†…å®¹ã€‚ 
 CF_EXPORT void cur_stream_write_back();
 
 CF_EXPORT void cur_stream_write_back2(int message_id);
@@ -63,7 +63,7 @@ CF_EXPORT u64 cur_game_usec();
 
 
 
-// ÒòÎª´«ÈëÁË³¤¶Èlen£¬Õâ¸ö½Ó¿ÚÖ§³Ö¶ş½øÖÆÊı¾İ 
+// å› ä¸ºä¼ å…¥äº†é•¿åº¦lenï¼Œè¿™ä¸ªæ¥å£æ”¯æŒäºŒè¿›åˆ¶æ•°æ® 
 CF_EXPORT bool log_write(int level,const char*,int len);
 
 CF_EXPORT bool log_write2(int index,const char *ss,int len);
@@ -77,7 +77,7 @@ CF_EXPORT int cur_message_loopback();
 
 CF_EXPORT int cur_stream_get_readbuf_len();
 
-CF_EXPORT const char* cur_stream_get_bin(int len);	// »ñÈ¡bin¿é£¨ÊÂÏÈÖªµÀlen£© 
+CF_EXPORT const char* cur_stream_get_bin(int len);	// è·å–binå—ï¼ˆäº‹å…ˆçŸ¥é“lenï¼‰ 
 
 
 CF_EXPORT int add_redis_server(const char* ip,int port);

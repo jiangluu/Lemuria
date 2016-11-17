@@ -22,7 +22,7 @@ int message_dispatch(GXContext *gx,Link* src_link,InternalHeader *hh,int body_le
 	return 0;
 }
 
-// 物理连接断掉时的回调 
+// 鐗╃悊杩炴帴鏂帀鏃剁殑鍥炶皟 
 void on_client_cut(GXContext *gx,Link *ll,int reason,int gxcontext_type)
 {
 	gx_set_context(gx);

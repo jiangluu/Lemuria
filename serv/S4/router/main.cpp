@@ -26,7 +26,7 @@ GXContext *g_gx1 = 0;
 int g_stop_loop = 0;
 
 
-// Ç°ÖÃÉùÃ÷ 
+// å‰ç½®å£°æ˜Ž 
 void __installHandler();
 int init_redis_thread();
 
@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
 	
 
 #ifdef ENABLE_ENCRYPT
-	// ÉèÖÃÃØÔ¿ 
+	// è®¾ç½®ç§˜é’¥ 
 	g_e_key = (char*)malloc(256);
 	FOR(i,256){
 		g_e_key[i] = 'a'+(i%50);
@@ -55,7 +55,7 @@ int main(int argc, char** argv) {
 	__installHandler();
 	
 	
-	// ³õÊ¼»¯Ê±¼ä 
+	// åˆå§‹åŒ–æ—¶é—´ 
 	g_time = new GameTime();
 	g_time->init();
 	
@@ -84,7 +84,7 @@ int main(int argc, char** argv) {
 	init_redis_thread();
 	
 	
-	// ³õÊ¼»¯GXÉÏÏÂÎÄ
+	// åˆå§‹åŒ–GXä¸Šä¸‹æ–‡
 	g_gx1 = new GXContext();
 	g_gx1->initWrap(GXContext::typeFullFunction,argv[1]);
 	
@@ -108,8 +108,8 @@ int main(int argc, char** argv) {
 		_exit(-2);
 	}
 	
-	// ½øÈëÖ÷Ñ­»· 
-	static int frame_time_max = 10;		// Ã¿Ö¡×î¶àÈÃCPUµÈ´ý10¸öÇ§·ÖÖ®Ò»Ãë 
+	// è¿›å…¥ä¸»å¾ªçŽ¯ 
+	static int frame_time_max = 10;		// æ¯å¸§æœ€å¤šè®©CPUç­‰å¾…10ä¸ªåƒåˆ†ä¹‹ä¸€ç§’ 
 	
 	printf("server inited. start running...\n");
 	
@@ -121,7 +121,7 @@ int main(int argc, char** argv) {
 		
 		g_gx1->frame_poll(now,frame_time_max);
 		
-		// ÄÚ²¿Ê±¼äÇý¶¯
+		// å†…éƒ¨æ—¶é—´é©±åŠ¨
 		frame_time_driven(now);
 		
 		

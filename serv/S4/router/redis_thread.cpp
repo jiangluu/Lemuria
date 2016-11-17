@@ -9,7 +9,7 @@
 #include "cfunction.h"
 
 
-// ×¢£ºÎÄ¼şÃûÀïÓĞ thread£¬µ«ÊÇÕâ¸ö threadÊÇ¸ÅÄîÉÏµÄ£¬·ÇOS thread 
+// æ³¨ï¼šæ–‡ä»¶åé‡Œæœ‰ threadï¼Œä½†æ˜¯è¿™ä¸ª threadæ˜¯æ¦‚å¿µä¸Šçš„ï¼ŒéOS thread 
 
 
 #define IP_LEN 32

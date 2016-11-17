@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
-// ÎÄ¼şÃû : LuaInterface.h
-// Ä£¿é    :    Script
-// ¹¦ÄÜ     :    ½Å±¾ÏµÍ³Ìá¹©¸øÍâ½çÊ¹ÓÃµÄLuaµÄ½Ó¿Ú
-// ĞŞ¸ÄÀúÊ·:
+// æ–‡ä»¶å : LuaInterface.h
+// æ¨¡å—    :    Script
+// åŠŸèƒ½     :    è„šæœ¬ç³»ç»Ÿæä¾›ç»™å¤–ç•Œä½¿ç”¨çš„Luaçš„æ¥å£
+// ä¿®æ”¹å†å²:
 //-----------------------------------------------------------------------------
 #ifndef __LUAINTERFACE_H_
 #define __LUAINTERFACE_H_
@@ -37,22 +37,22 @@ typedef lua_State Lua_State;
 
 
 /**
-*    ½Å±¾½âÊÍÆ÷·â×°Àà¡£
+*    è„šæœ¬è§£é‡Šå™¨å°è£…ç±»ã€‚
 */
 class LuaInterface
 {
 public:
     /**
-    *    ¹¹Ôìº¯Êı¡£
-    *    Èç¹û´«ÈëÒ»¸öÒÑÓĞµÄ½âÊÍÆ÷ÊµÀı£¬ÔòÊ¹ÓÃ´ËÊµÀı¡£
-    *    ·ñÔòÉú³ÉÒ»¸öĞÂÊµÀı¡£
+    *    æ„é€ å‡½æ•°ã€‚
+    *    å¦‚æœä¼ å…¥ä¸€ä¸ªå·²æœ‰çš„è§£é‡Šå™¨å®ä¾‹ï¼Œåˆ™ä½¿ç”¨æ­¤å®ä¾‹ã€‚
+    *    å¦åˆ™ç”Ÿæˆä¸€ä¸ªæ–°å®ä¾‹ã€‚
     *    @see ~LuaWrapper()
     */
     LuaInterface(lua_State* luaVM=0);
     
     /**
-    *    Îö¹¹º¯Êı¡£
-    *    »áÊÍ·Å½âÊÍÆ÷µÄÊµÀı¡£
+    *    ææ„å‡½æ•°ã€‚
+    *    ä¼šé‡Šæ”¾è§£é‡Šå™¨çš„å®ä¾‹ã€‚
     *    @see LuaWrapper()
     */
     ~LuaInterface()
@@ -63,21 +63,21 @@ public:
     void Init();
     
     /**
-    *    È¡µÃÄÚ²¿½âÊÍÆ÷ÊµÀıµÄ¾ä±ú¡£
+    *    å–å¾—å†…éƒ¨è§£é‡Šå™¨å®ä¾‹çš„å¥æŸ„ã€‚
     */
     lua_State* luaState(){ return lua_state_; }
     lua_State* L(){ return lua_state_; }
     /**
-    *    »ñµÃÔÚ½âÊÍÆ÷¶ÑÕ»ÖĞµÄ²ÎÊı¸öÊı¡£
+    *    è·å¾—åœ¨è§£é‡Šå™¨å †æ ˆä¸­çš„å‚æ•°ä¸ªæ•°ã€‚
     */
     int GetParamCount()
     {
         return lua_gettop(lua_state_);
     }
     /**
-    *    È¡µÃ½Å±¾ÖĞÄ³¸öÈ«¾Ö±äÁ¿µÄÖµ¡£
-    *    @param name È«¾Ö±äÁ¿ÔÚ½Å±¾ÖĞµÄÃû×Ö
-    *    @return È«¾Ö±äÁ¿µÄÖµ
+    *    å–å¾—è„šæœ¬ä¸­æŸä¸ªå…¨å±€å˜é‡çš„å€¼ã€‚
+    *    @param name å…¨å±€å˜é‡åœ¨è„šæœ¬ä¸­çš„åå­—
+    *    @return å…¨å±€å˜é‡çš„å€¼
     *    @see SetGlobal()
     */
     template<typename R>
@@ -87,9 +87,9 @@ public:
         return getValue<R>();
     }
     /**
-    *    ÉèÖÃ½Å±¾ÖĞÄ³¸öÈ«¾Ö±äÁ¿µÄÖµ¡£
-    *    @param name È«¾Ö±äÁ¿ÔÚ½Å±¾ÖĞµÄÃû×Ö
-    *    @param value ÓûÉèÖÃµÄÖµ
+    *    è®¾ç½®è„šæœ¬ä¸­æŸä¸ªå…¨å±€å˜é‡çš„å€¼ã€‚
+    *    @param name å…¨å±€å˜é‡åœ¨è„šæœ¬ä¸­çš„åå­—
+    *    @param value æ¬²è®¾ç½®çš„å€¼
     *    @see GetGlobal()
     */
     template<typename T>
@@ -99,10 +99,10 @@ public:
         lua_setglobal(lua_state_, name);
     }
     /**
-    *    »ñÈ¡½Å±¾ÖĞÄ³¸öÈ«¾Ö±äÁ¿µÄÒ»¸ö³ÉÔ±µÄÖµ¡£
-    *    @param var_name È«¾Ö±äÁ¿ÔÚ½Å±¾ÖĞµÄÃû×Ö
-    *    @param field_name ³ÉÔ±µÄÃû×Ö
-    *    @return ³ÉÔ±µÄÖµ
+    *    è·å–è„šæœ¬ä¸­æŸä¸ªå…¨å±€å˜é‡çš„ä¸€ä¸ªæˆå‘˜çš„å€¼ã€‚
+    *    @param var_name å…¨å±€å˜é‡åœ¨è„šæœ¬ä¸­çš„åå­—
+    *    @param field_name æˆå‘˜çš„åå­—
+    *    @return æˆå‘˜çš„å€¼
     *    @see setGlobalVarField()
     */
     template<typename R>
@@ -114,10 +114,10 @@ public:
         return getValue<R>();
     }
     /**
-    *    ÉèÖÃ½Å±¾ÖĞÄ³¸öÈ«¾Ö±äÁ¿µÄÒ»¸ö³ÉÔ±µÄÖµ¡£
-    *    @param var_name È«¾Ö±äÁ¿ÔÚ½Å±¾ÖĞµÄÃû×Ö
-    *    @param field_name ³ÉÔ±µÄÃû×Ö
-    *    @param value ÓûÉèÖÃµÄÖµ
+    *    è®¾ç½®è„šæœ¬ä¸­æŸä¸ªå…¨å±€å˜é‡çš„ä¸€ä¸ªæˆå‘˜çš„å€¼ã€‚
+    *    @param var_name å…¨å±€å˜é‡åœ¨è„šæœ¬ä¸­çš„åå­—
+    *    @param field_name æˆå‘˜çš„åå­—
+    *    @param value æ¬²è®¾ç½®çš„å€¼
     *    @see getGlobalVarField()
     */
     template<typename T>
@@ -149,10 +149,10 @@ public:
 #endif
 
     /**
-    *    µ÷ÓÃÄ³¸ö¶ÔÏóÔÚ½Å±¾ÖĞ¶¨ÒåµÄ³ÉÔ±º¯Êı(Ã»ÓĞ²ÎÊı°æ±¾)¡£
-    *    @param obj ¶ÔÏóÖ¸Õë¡£±ØĞëÊÇÖ¸Õë£¬¶ø²»ÊÇÖµ»òÕßÒıÓÃ
-    *    @param func ³ÉÔ±º¯ÊıµÄÃû×Ö
-    *    @return º¯Êı·µ»ØÖµ(Èç¹ûÓĞ·µ»ØÖµ)
+    *    è°ƒç”¨æŸä¸ªå¯¹è±¡åœ¨è„šæœ¬ä¸­å®šä¹‰çš„æˆå‘˜å‡½æ•°(æ²¡æœ‰å‚æ•°ç‰ˆæœ¬)ã€‚
+    *    @param obj å¯¹è±¡æŒ‡é’ˆã€‚å¿…é¡»æ˜¯æŒ‡é’ˆï¼Œè€Œä¸æ˜¯å€¼æˆ–è€…å¼•ç”¨
+    *    @param func æˆå‘˜å‡½æ•°çš„åå­—
+    *    @return å‡½æ•°è¿”å›å€¼(å¦‚æœæœ‰è¿”å›å€¼)
     *    @see callObjFunc(OBJTYPE obj,const char* func,P1 p1)
     */
     template<typename R,typename OBJTYPE>
@@ -168,19 +168,19 @@ public:
         return _Call<R>(1);
     }
     /**
-    *    µ÷ÓÃÄ³¸ö¶ÔÏóÔÚ½Å±¾ÖĞ¶¨ÒåµÄ³ÉÔ±º¯Êı(Ò»¸ö²ÎÊı°æ±¾)¡£
-    *    @param obj ¶ÔÏóÖ¸Õë¡£±ØĞëÊÇÖ¸Õë£¬¶ø²»ÊÇÖµ»òÕßÒıÓÃ
-    *    @param func ³ÉÔ±º¯ÊıµÄÃû×Ö
-    *    @param p1 ²ÎÊı1
-    *    @return º¯Êı·µ»ØÖµ(Èç¹ûÓĞ·µ»ØÖµ)
-    *    @note ·µ»ØÖµÀàĞÍ±ØĞëÎªÒÔÏÂ¼¸ÖÖÖ®Ò»£¬»òÕß¿ÉÒÔ×Ô¶¯×ª»¯ÎªÕâĞ©ÀàĞÍ:
-    *    int,double,bool,char*,void*¡£
-    *    Èç¹ûº¯ÊıĞèÒª·µ»ØÒ»¸ö×Ô¶¨Òå¶ÔÏó£¬ÄÇÃ´±ØĞë·µ»ØËüµÄÖ¸Õë£¬²¢Ö¸¶¨·µ»ØÖµÀàĞÍÎªvoid*£¬È»ºóÔÙÇ¿ÖÆ×ª»»Îª×Ô¶¨ÒåÀàĞÍ¡£Èç:
+    *    è°ƒç”¨æŸä¸ªå¯¹è±¡åœ¨è„šæœ¬ä¸­å®šä¹‰çš„æˆå‘˜å‡½æ•°(ä¸€ä¸ªå‚æ•°ç‰ˆæœ¬)ã€‚
+    *    @param obj å¯¹è±¡æŒ‡é’ˆã€‚å¿…é¡»æ˜¯æŒ‡é’ˆï¼Œè€Œä¸æ˜¯å€¼æˆ–è€…å¼•ç”¨
+    *    @param func æˆå‘˜å‡½æ•°çš„åå­—
+    *    @param p1 å‚æ•°1
+    *    @return å‡½æ•°è¿”å›å€¼(å¦‚æœæœ‰è¿”å›å€¼)
+    *    @note è¿”å›å€¼ç±»å‹å¿…é¡»ä¸ºä»¥ä¸‹å‡ ç§ä¹‹ä¸€ï¼Œæˆ–è€…å¯ä»¥è‡ªåŠ¨è½¬åŒ–ä¸ºè¿™äº›ç±»å‹:
+    *    int,double,bool,char*,void*ã€‚
+    *    å¦‚æœå‡½æ•°éœ€è¦è¿”å›ä¸€ä¸ªè‡ªå®šä¹‰å¯¹è±¡ï¼Œé‚£ä¹ˆå¿…é¡»è¿”å›å®ƒçš„æŒ‡é’ˆï¼Œå¹¶æŒ‡å®šè¿”å›å€¼ç±»å‹ä¸ºvoid*ï¼Œç„¶åå†å¼ºåˆ¶è½¬æ¢ä¸ºè‡ªå®šä¹‰ç±»å‹ã€‚å¦‚:
     *    @code Npc* npc0 = (Npc*)script.callObjFunc<void*>(npc_mng,"createNPC"); @endcode
-    *    Èç¹û´Ëº¯ÊıÃ»ÓĞ·µ»ØÖµ£¬·µ»ØÖµÀàĞÍ±ØĞëÉèÎª void¡£
-    *    Ä¿Ç°Ö»Ö§³Ö×î¶àÒ»¸ö·µ»ØÖµ¡£
-    *    Èç¹ûĞèÒª´«Èë×Ô¶¨Òå¶ÔÏó×÷Îª²ÎÊı£¬ÄÇÃ´±ØĞë´«Èë¶ÔÏóÖ¸Õë£¬¶ø²»ÊÇÖµ»òÕßÒıÓÃ¡£
-    *    ×÷Îª²ÎÊı´«ÈëµÄ¶ÔÏó±ØĞë¾­¹ıº¯Êı addWrapperToCObj() ´¦Àí¡£
+    *    å¦‚æœæ­¤å‡½æ•°æ²¡æœ‰è¿”å›å€¼ï¼Œè¿”å›å€¼ç±»å‹å¿…é¡»è®¾ä¸º voidã€‚
+    *    ç›®å‰åªæ”¯æŒæœ€å¤šä¸€ä¸ªè¿”å›å€¼ã€‚
+    *    å¦‚æœéœ€è¦ä¼ å…¥è‡ªå®šä¹‰å¯¹è±¡ä½œä¸ºå‚æ•°ï¼Œé‚£ä¹ˆå¿…é¡»ä¼ å…¥å¯¹è±¡æŒ‡é’ˆï¼Œè€Œä¸æ˜¯å€¼æˆ–è€…å¼•ç”¨ã€‚
+    *    ä½œä¸ºå‚æ•°ä¼ å…¥çš„å¯¹è±¡å¿…é¡»ç»è¿‡å‡½æ•° addWrapperToCObj() å¤„ç†ã€‚
     *    @see addWrapperToCObj(T cobj)
     */
     template<typename R,typename OBJTYPE,typename P1>
@@ -197,12 +197,12 @@ public:
         return _Call<R>(2);
     }
     /**
-    *    µ÷ÓÃÄ³¸ö¶ÔÏóÔÚ½Å±¾ÖĞ¶¨ÒåµÄ³ÉÔ±º¯Êı(¶ş¸ö²ÎÊı°æ±¾)¡£
-    *    @param obj ¶ÔÏóÖ¸Õë¡£±ØĞëÊÇÖ¸Õë£¬¶ø²»ÊÇÖµ»òÕßÒıÓÃ
-    *    @param func ³ÉÔ±º¯ÊıµÄÃû×Ö
-    *    @param p1 ²ÎÊı1
-    *    @param p2 ²ÎÊı2
-    *    @return º¯Êı·µ»ØÖµ(Èç¹ûÓĞ·µ»ØÖµ)
+    *    è°ƒç”¨æŸä¸ªå¯¹è±¡åœ¨è„šæœ¬ä¸­å®šä¹‰çš„æˆå‘˜å‡½æ•°(äºŒä¸ªå‚æ•°ç‰ˆæœ¬)ã€‚
+    *    @param obj å¯¹è±¡æŒ‡é’ˆã€‚å¿…é¡»æ˜¯æŒ‡é’ˆï¼Œè€Œä¸æ˜¯å€¼æˆ–è€…å¼•ç”¨
+    *    @param func æˆå‘˜å‡½æ•°çš„åå­—
+    *    @param p1 å‚æ•°1
+    *    @param p2 å‚æ•°2
+    *    @return å‡½æ•°è¿”å›å€¼(å¦‚æœæœ‰è¿”å›å€¼)
     *    @see callObjFunc(OBJTYPE obj,const char* func,P1 p1)
     */
     template<typename R,typename OBJTYPE,typename P1,typename P2>
@@ -220,13 +220,13 @@ public:
         return _Call<R>(3);
     }
     /**
-    *    µ÷ÓÃÄ³¸ö¶ÔÏóÔÚ½Å±¾ÖĞ¶¨ÒåµÄ³ÉÔ±º¯Êı(Èı¸ö²ÎÊı°æ±¾)¡£
-    *    @param obj ¶ÔÏóÖ¸Õë¡£±ØĞëÊÇÖ¸Õë£¬¶ø²»ÊÇÖµ»òÕßÒıÓÃ
-    *    @param func ³ÉÔ±º¯ÊıµÄÃû×Ö
-    *    @param p1 ²ÎÊı1
-    *    @param p2 ²ÎÊı2
-    *    @param p3 ²ÎÊı3
-    *    @return º¯Êı·µ»ØÖµ(Èç¹ûÓĞ·µ»ØÖµ)
+    *    è°ƒç”¨æŸä¸ªå¯¹è±¡åœ¨è„šæœ¬ä¸­å®šä¹‰çš„æˆå‘˜å‡½æ•°(ä¸‰ä¸ªå‚æ•°ç‰ˆæœ¬)ã€‚
+    *    @param obj å¯¹è±¡æŒ‡é’ˆã€‚å¿…é¡»æ˜¯æŒ‡é’ˆï¼Œè€Œä¸æ˜¯å€¼æˆ–è€…å¼•ç”¨
+    *    @param func æˆå‘˜å‡½æ•°çš„åå­—
+    *    @param p1 å‚æ•°1
+    *    @param p2 å‚æ•°2
+    *    @param p3 å‚æ•°3
+    *    @return å‡½æ•°è¿”å›å€¼(å¦‚æœæœ‰è¿”å›å€¼)
     *    @see callObjFunc(OBJTYPE obj,const char* func,P1 p1)
     */
     template<typename R,typename OBJTYPE,typename P1,typename P2,typename P3>
@@ -245,14 +245,14 @@ public:
         return _Call<R>(4);
     }
     /**
-    *    µ÷ÓÃÄ³¸ö¶ÔÏóÔÚ½Å±¾ÖĞ¶¨ÒåµÄ³ÉÔ±º¯Êı(ËÄ¸ö²ÎÊı°æ±¾)¡£
-    *    @param obj ¶ÔÏóÖ¸Õë¡£±ØĞëÊÇÖ¸Õë£¬¶ø²»ÊÇÖµ»òÕßÒıÓÃ
-    *    @param func ³ÉÔ±º¯ÊıµÄÃû×Ö
-    *    @param p1 ²ÎÊı1
-    *    @param p2 ²ÎÊı2
-    *    @param p3 ²ÎÊı3
-    *    @param p4 ²ÎÊı4
-    *    @return º¯Êı·µ»ØÖµ(Èç¹ûÓĞ·µ»ØÖµ)
+    *    è°ƒç”¨æŸä¸ªå¯¹è±¡åœ¨è„šæœ¬ä¸­å®šä¹‰çš„æˆå‘˜å‡½æ•°(å››ä¸ªå‚æ•°ç‰ˆæœ¬)ã€‚
+    *    @param obj å¯¹è±¡æŒ‡é’ˆã€‚å¿…é¡»æ˜¯æŒ‡é’ˆï¼Œè€Œä¸æ˜¯å€¼æˆ–è€…å¼•ç”¨
+    *    @param func æˆå‘˜å‡½æ•°çš„åå­—
+    *    @param p1 å‚æ•°1
+    *    @param p2 å‚æ•°2
+    *    @param p3 å‚æ•°3
+    *    @param p4 å‚æ•°4
+    *    @return å‡½æ•°è¿”å›å€¼(å¦‚æœæœ‰è¿”å›å€¼)
     *    @see callObjFunc(OBJTYPE obj,const char* func,P1 p1)
     */
     template<typename R,typename OBJTYPE,typename P1,typename P2,typename P3,typename P4>
@@ -272,15 +272,15 @@ public:
         return _Call<R>(5);
     }
     /**
-    *    µ÷ÓÃÄ³¸ö¶ÔÏóÔÚ½Å±¾ÖĞ¶¨ÒåµÄ³ÉÔ±º¯Êı(Îå¸ö²ÎÊı°æ±¾)¡£
-    *    @param obj ¶ÔÏóÖ¸Õë¡£±ØĞëÊÇÖ¸Õë£¬¶ø²»ÊÇÖµ»òÕßÒıÓÃ
-    *    @param func ³ÉÔ±º¯ÊıµÄÃû×Ö
-    *    @param p1 ²ÎÊı1
-    *    @param p2 ²ÎÊı2
-    *    @param p3 ²ÎÊı3
-    *    @param p4 ²ÎÊı4
-    *    @param p5 ²ÎÊı5
-    *    @return º¯Êı·µ»ØÖµ(Èç¹ûÓĞ·µ»ØÖµ)
+    *    è°ƒç”¨æŸä¸ªå¯¹è±¡åœ¨è„šæœ¬ä¸­å®šä¹‰çš„æˆå‘˜å‡½æ•°(äº”ä¸ªå‚æ•°ç‰ˆæœ¬)ã€‚
+    *    @param obj å¯¹è±¡æŒ‡é’ˆã€‚å¿…é¡»æ˜¯æŒ‡é’ˆï¼Œè€Œä¸æ˜¯å€¼æˆ–è€…å¼•ç”¨
+    *    @param func æˆå‘˜å‡½æ•°çš„åå­—
+    *    @param p1 å‚æ•°1
+    *    @param p2 å‚æ•°2
+    *    @param p3 å‚æ•°3
+    *    @param p4 å‚æ•°4
+    *    @param p5 å‚æ•°5
+    *    @return å‡½æ•°è¿”å›å€¼(å¦‚æœæœ‰è¿”å›å€¼)
     *    @see callObjFunc(OBJTYPE obj,const char* func,P1 p1)
     */
     template<typename R,typename OBJTYPE,typename P1,typename P2,typename P3,typename P4,typename P5>
@@ -301,16 +301,16 @@ public:
         return _Call<R>(6);
     }
     /**
-    *    µ÷ÓÃÄ³¸ö¶ÔÏóÔÚ½Å±¾ÖĞ¶¨ÒåµÄ³ÉÔ±º¯Êı(Áù¸ö²ÎÊı°æ±¾)¡£
-    *    @param obj ¶ÔÏóÖ¸Õë¡£±ØĞëÊÇÖ¸Õë£¬¶ø²»ÊÇÖµ»òÕßÒıÓÃ
-    *    @param func ³ÉÔ±º¯ÊıµÄÃû×Ö
-    *    @param p1 ²ÎÊı1
-    *    @param p2 ²ÎÊı2
-    *    @param p3 ²ÎÊı3
-    *    @param p4 ²ÎÊı4
-    *    @param p5 ²ÎÊı5
-    *    @param p6 ²ÎÊı6
-    *    @return º¯Êı·µ»ØÖµ(Èç¹ûÓĞ·µ»ØÖµ)
+    *    è°ƒç”¨æŸä¸ªå¯¹è±¡åœ¨è„šæœ¬ä¸­å®šä¹‰çš„æˆå‘˜å‡½æ•°(å…­ä¸ªå‚æ•°ç‰ˆæœ¬)ã€‚
+    *    @param obj å¯¹è±¡æŒ‡é’ˆã€‚å¿…é¡»æ˜¯æŒ‡é’ˆï¼Œè€Œä¸æ˜¯å€¼æˆ–è€…å¼•ç”¨
+    *    @param func æˆå‘˜å‡½æ•°çš„åå­—
+    *    @param p1 å‚æ•°1
+    *    @param p2 å‚æ•°2
+    *    @param p3 å‚æ•°3
+    *    @param p4 å‚æ•°4
+    *    @param p5 å‚æ•°5
+    *    @param p6 å‚æ•°6
+    *    @return å‡½æ•°è¿”å›å€¼(å¦‚æœæœ‰è¿”å›å€¼)
     *    @see callObjFunc(OBJTYPE obj,const char* func,P1 p1)
     */
     template<typename R,typename OBJTYPE,typename P1,typename P2,typename P3,typename P4,typename P5,typename P6>
@@ -332,9 +332,9 @@ public:
         return _Call<R>(7);
     }
     /**
-    *    µ÷ÓÃ½Å±¾ÖĞ¶¨ÒåµÄÈ«¾Öº¯Êı(Ã»ÓĞ²ÎÊı°æ±¾)¡£
-    *    @param func ³ÉÔ±º¯ÊıµÄÃû×Ö
-    *    @return º¯Êı·µ»ØÖµ(Èç¹ûÓĞ·µ»ØÖµ)
+    *    è°ƒç”¨è„šæœ¬ä¸­å®šä¹‰çš„å…¨å±€å‡½æ•°(æ²¡æœ‰å‚æ•°ç‰ˆæœ¬)ã€‚
+    *    @param func æˆå‘˜å‡½æ•°çš„åå­—
+    *    @return å‡½æ•°è¿”å›å€¼(å¦‚æœæœ‰è¿”å›å€¼)
     *    @see callGlobalFunc(const char* func,P1 p1)
     */
     template<typename R>
@@ -354,18 +354,18 @@ public:
 		return R();
     }
     /**
-    *    µ÷ÓÃ½Å±¾ÖĞ¶¨ÒåµÄÈ«¾Öº¯Êı(Ò»¸ö²ÎÊı°æ±¾)¡£
-    *    @param func ³ÉÔ±º¯ÊıµÄÃû×Ö
-    *    @param p1 ²ÎÊı1
-    *    @return º¯Êı·µ»ØÖµ(Èç¹ûÓĞ·µ»ØÖµ)
-    *    @note ·µ»ØÖµÀàĞÍ±ØĞëÎªÒÔÏÂ¼¸ÖÖÖ®Ò»£¬»òÕß¿ÉÒÔ×Ô¶¯×ª»¯ÎªÕâĞ©ÀàĞÍ:
-    *    int,double,bool,char*,void*¡£
-    *    Èç¹ûº¯ÊıĞèÒª·µ»ØÒ»¸ö×Ô¶¨Òå¶ÔÏó£¬ÄÇÃ´±ØĞë·µ»ØËüµÄÖ¸Õë£¬²¢Ö¸¶¨·µ»ØÖµÀàĞÍÎªvoid*£¬È»ºóÔÙÇ¿ÖÆ×ª»»Îª×Ô¶¨ÒåÀàĞÍ¡£Èç:
+    *    è°ƒç”¨è„šæœ¬ä¸­å®šä¹‰çš„å…¨å±€å‡½æ•°(ä¸€ä¸ªå‚æ•°ç‰ˆæœ¬)ã€‚
+    *    @param func æˆå‘˜å‡½æ•°çš„åå­—
+    *    @param p1 å‚æ•°1
+    *    @return å‡½æ•°è¿”å›å€¼(å¦‚æœæœ‰è¿”å›å€¼)
+    *    @note è¿”å›å€¼ç±»å‹å¿…é¡»ä¸ºä»¥ä¸‹å‡ ç§ä¹‹ä¸€ï¼Œæˆ–è€…å¯ä»¥è‡ªåŠ¨è½¬åŒ–ä¸ºè¿™äº›ç±»å‹:
+    *    int,double,bool,char*,void*ã€‚
+    *    å¦‚æœå‡½æ•°éœ€è¦è¿”å›ä¸€ä¸ªè‡ªå®šä¹‰å¯¹è±¡ï¼Œé‚£ä¹ˆå¿…é¡»è¿”å›å®ƒçš„æŒ‡é’ˆï¼Œå¹¶æŒ‡å®šè¿”å›å€¼ç±»å‹ä¸ºvoid*ï¼Œç„¶åå†å¼ºåˆ¶è½¬æ¢ä¸ºè‡ªå®šä¹‰ç±»å‹ã€‚å¦‚:
     *    @code Npc* npc0 = (Npc*)script.callGlobalFunc<void*>("createNPC"); @endcode
-    *    Èç¹û´Ëº¯ÊıÃ»ÓĞ·µ»ØÖµ£¬·µ»ØÖµÀàĞÍ±ØĞëÉèÎª void¡£
-    *    Ä¿Ç°Ö»Ö§³Ö×î¶àÒ»¸ö·µ»ØÖµ¡£
-    *    Èç¹ûĞèÒª´«Èë×Ô¶¨Òå¶ÔÏó×÷Îª²ÎÊı£¬ÄÇÃ´±ØĞë´«Èë¶ÔÏóÖ¸Õë£¬¶ø²»ÊÇÖµ»òÕßÒıÓÃ¡£
-    *    ×÷Îª²ÎÊı´«ÈëµÄ¶ÔÏó±ØĞë¾­¹ıº¯Êı addWrapperToCObj() ´¦Àí¡£
+    *    å¦‚æœæ­¤å‡½æ•°æ²¡æœ‰è¿”å›å€¼ï¼Œè¿”å›å€¼ç±»å‹å¿…é¡»è®¾ä¸º voidã€‚
+    *    ç›®å‰åªæ”¯æŒæœ€å¤šä¸€ä¸ªè¿”å›å€¼ã€‚
+    *    å¦‚æœéœ€è¦ä¼ å…¥è‡ªå®šä¹‰å¯¹è±¡ä½œä¸ºå‚æ•°ï¼Œé‚£ä¹ˆå¿…é¡»ä¼ å…¥å¯¹è±¡æŒ‡é’ˆï¼Œè€Œä¸æ˜¯å€¼æˆ–è€…å¼•ç”¨ã€‚
+    *    ä½œä¸ºå‚æ•°ä¼ å…¥çš„å¯¹è±¡å¿…é¡»ç»è¿‡å‡½æ•° addWrapperToCObj() å¤„ç†ã€‚
     *    @see addWrapperToCObj(T cobj)
     */
     template<typename R,typename P1>
@@ -386,11 +386,11 @@ public:
 		return R();
     }
     /**
-    *    µ÷ÓÃ½Å±¾ÖĞ¶¨ÒåµÄÈ«¾Öº¯Êı(¶ş¸ö²ÎÊı°æ±¾)¡£
-    *    @param func ³ÉÔ±º¯ÊıµÄÃû×Ö
-    *    @param p1 ²ÎÊı1
-    *    @param p2 ²ÎÊı2
-    *    @return º¯Êı·µ»ØÖµ(Èç¹ûÓĞ·µ»ØÖµ)
+    *    è°ƒç”¨è„šæœ¬ä¸­å®šä¹‰çš„å…¨å±€å‡½æ•°(äºŒä¸ªå‚æ•°ç‰ˆæœ¬)ã€‚
+    *    @param func æˆå‘˜å‡½æ•°çš„åå­—
+    *    @param p1 å‚æ•°1
+    *    @param p2 å‚æ•°2
+    *    @return å‡½æ•°è¿”å›å€¼(å¦‚æœæœ‰è¿”å›å€¼)
     *    @see callGlobalFunc(const char* func,P1 p1)
     */
     template<typename R,typename P1,typename P2>
@@ -412,12 +412,12 @@ public:
 		return R();
     }
     /**
-    *    µ÷ÓÃ½Å±¾ÖĞ¶¨ÒåµÄÈ«¾Öº¯Êı(Èı¸ö²ÎÊı°æ±¾)¡£
-    *    @param func ³ÉÔ±º¯ÊıµÄÃû×Ö
-    *    @param p1 ²ÎÊı1
-    *    @param p2 ²ÎÊı2
-    *    @param p3 ²ÎÊı3
-    *    @return º¯Êı·µ»ØÖµ(Èç¹ûÓĞ·µ»ØÖµ)
+    *    è°ƒç”¨è„šæœ¬ä¸­å®šä¹‰çš„å…¨å±€å‡½æ•°(ä¸‰ä¸ªå‚æ•°ç‰ˆæœ¬)ã€‚
+    *    @param func æˆå‘˜å‡½æ•°çš„åå­—
+    *    @param p1 å‚æ•°1
+    *    @param p2 å‚æ•°2
+    *    @param p3 å‚æ•°3
+    *    @return å‡½æ•°è¿”å›å€¼(å¦‚æœæœ‰è¿”å›å€¼)
     *    @see callGlobalFunc(const char* func,P1 p1)
     */
     template<typename R,typename P1,typename P2,typename P3>
@@ -440,13 +440,13 @@ public:
 		return R();
     }
     /**
-    *    µ÷ÓÃ½Å±¾ÖĞ¶¨ÒåµÄÈ«¾Öº¯Êı(ËÄ¸ö²ÎÊı°æ±¾)¡£
-    *    @param func ³ÉÔ±º¯ÊıµÄÃû×Ö
-    *    @param p1 ²ÎÊı1
-    *    @param p2 ²ÎÊı2
-    *    @param p3 ²ÎÊı3
-    *    @param p4 ²ÎÊı4
-    *    @return º¯Êı·µ»ØÖµ(Èç¹ûÓĞ·µ»ØÖµ)
+    *    è°ƒç”¨è„šæœ¬ä¸­å®šä¹‰çš„å…¨å±€å‡½æ•°(å››ä¸ªå‚æ•°ç‰ˆæœ¬)ã€‚
+    *    @param func æˆå‘˜å‡½æ•°çš„åå­—
+    *    @param p1 å‚æ•°1
+    *    @param p2 å‚æ•°2
+    *    @param p3 å‚æ•°3
+    *    @param p4 å‚æ•°4
+    *    @return å‡½æ•°è¿”å›å€¼(å¦‚æœæœ‰è¿”å›å€¼)
     *    @see callGlobalFunc(const char* func,P1 p1)
     */
     template<typename R,typename P1,typename P2,typename P3,typename P4>
@@ -470,14 +470,14 @@ public:
 		return R();
     }
     /**
-    *    µ÷ÓÃ½Å±¾ÖĞ¶¨ÒåµÄÈ«¾Öº¯Êı(Îå¸ö²ÎÊı°æ±¾)¡£
-    *    @param func ³ÉÔ±º¯ÊıµÄÃû×Ö
-    *    @param p1 ²ÎÊı1
-    *    @param p2 ²ÎÊı2
-    *    @param p3 ²ÎÊı3
-    *    @param p4 ²ÎÊı4
-    *    @param p5 ²ÎÊı5
-    *    @return º¯Êı·µ»ØÖµ(Èç¹ûÓĞ·µ»ØÖµ)
+    *    è°ƒç”¨è„šæœ¬ä¸­å®šä¹‰çš„å…¨å±€å‡½æ•°(äº”ä¸ªå‚æ•°ç‰ˆæœ¬)ã€‚
+    *    @param func æˆå‘˜å‡½æ•°çš„åå­—
+    *    @param p1 å‚æ•°1
+    *    @param p2 å‚æ•°2
+    *    @param p3 å‚æ•°3
+    *    @param p4 å‚æ•°4
+    *    @param p5 å‚æ•°5
+    *    @return å‡½æ•°è¿”å›å€¼(å¦‚æœæœ‰è¿”å›å€¼)
     *    @see callGlobalFunc(const char* func,P1 p1)
     */
     template<typename R,typename P1,typename P2,typename P3,typename P4,typename P5>
@@ -502,15 +502,15 @@ public:
 		return R();
     }
     /**
-    *    µ÷ÓÃ½Å±¾ÖĞ¶¨ÒåµÄÈ«¾Öº¯Êı(Áù¸ö²ÎÊı°æ±¾)¡£
-    *    @param func ³ÉÔ±º¯ÊıµÄÃû×Ö
-    *    @param p1 ²ÎÊı1
-    *    @param p2 ²ÎÊı2
-    *    @param p3 ²ÎÊı3
-    *    @param p4 ²ÎÊı4
-    *    @param p5 ²ÎÊı5
-    *    @param p6 ²ÎÊı6
-    *    @return º¯Êı·µ»ØÖµ(Èç¹ûÓĞ·µ»ØÖµ)
+    *    è°ƒç”¨è„šæœ¬ä¸­å®šä¹‰çš„å…¨å±€å‡½æ•°(å…­ä¸ªå‚æ•°ç‰ˆæœ¬)ã€‚
+    *    @param func æˆå‘˜å‡½æ•°çš„åå­—
+    *    @param p1 å‚æ•°1
+    *    @param p2 å‚æ•°2
+    *    @param p3 å‚æ•°3
+    *    @param p4 å‚æ•°4
+    *    @param p5 å‚æ•°5
+    *    @param p6 å‚æ•°6
+    *    @return å‡½æ•°è¿”å›å€¼(å¦‚æœæœ‰è¿”å›å€¼)
     *    @see callGlobalFunc(const char* func,P1 p1)
     */
     template<typename R,typename P1,typename P2,typename P3,typename P4,typename P5,typename P6>
@@ -536,7 +536,7 @@ public:
 		return R();
     }
     /**
-    *    µ÷ÓÃ½Å±¾ÖĞ¶¨ÒåµÄÈ«¾Öº¯Êı(Æß¸ö²ÎÊı°æ±¾)¡£
+    *    è°ƒç”¨è„šæœ¬ä¸­å®šä¹‰çš„å…¨å±€å‡½æ•°(ä¸ƒä¸ªå‚æ•°ç‰ˆæœ¬)ã€‚
     */
     template<typename R,typename P1,typename P2,typename P3,typename P4,typename P5,typename P6,typename P7>
     R callGlobalFunc(const char* func,P1 p1,P2 p2,P3 p3,P4 p4,P5 p5,P6 p6,P7 p7)
@@ -639,7 +639,7 @@ public:
     }
 
     /**
-    *    ´òÓ¡½âÊÍÆ÷µÄ¶ÑÕ»
+    *    æ‰“å°è§£é‡Šå™¨çš„å †æ ˆ
     */
     void DumpStack()
     {
@@ -669,17 +669,17 @@ public:
         }
     }
     /**
-    *    ×°Èë²¢Ö´ĞĞÄ³¸ö½Å±¾ÎÄ¼ş
-    *    @param fname ÎÄ¼şÃû
-    *    @return ½âÊÍÆ÷µÄÖ´ĞĞ½á¹û
+    *    è£…å…¥å¹¶æ‰§è¡ŒæŸä¸ªè„šæœ¬æ–‡ä»¶
+    *    @param fname æ–‡ä»¶å
+    *    @return è§£é‡Šå™¨çš„æ‰§è¡Œç»“æœ
     */
     int doFile(const char* fname)
     {
         return luaL_dofile(lua_state_,fname);
     }
     /**
-    *    °ÑÄ³¸öC++Éú³ÉµÄ¶ÔÏó´¦ÀíÒ»ÏÂ£¬Ê¹Ö®¿ÉÒÔ±»½Å±¾·ÃÎÊ¡£´Ë¶ÔÏóµÄÀàĞÍ±ØĞëÊÇÒÑ¾­Ó³Éäµ½½Å±¾ÀïµÄÀàĞÍ¡£
-    *    @param cobj ¶ÔÏóÖ¸Õë¡£±ØĞëÊÇÖ¸Õë£¬¶ø²»ÊÇÖµ»òÕßÒıÓÃ
+    *    æŠŠæŸä¸ªC++ç”Ÿæˆçš„å¯¹è±¡å¤„ç†ä¸€ä¸‹ï¼Œä½¿ä¹‹å¯ä»¥è¢«è„šæœ¬è®¿é—®ã€‚æ­¤å¯¹è±¡çš„ç±»å‹å¿…é¡»æ˜¯å·²ç»æ˜ å°„åˆ°è„šæœ¬é‡Œçš„ç±»å‹ã€‚
+    *    @param cobj å¯¹è±¡æŒ‡é’ˆã€‚å¿…é¡»æ˜¯æŒ‡é’ˆï¼Œè€Œä¸æ˜¯å€¼æˆ–è€…å¼•ç”¨
     *    @see callObjFunc(OBJTYPE obj,const char* func,P1 p1)
     */
     template<typename T>
@@ -747,7 +747,7 @@ public:
         //typedef typename TypeTraits<U>::PointeeType ParamType;
 
         if(!param) return;
-        //·ÏÆúÕâÖÖ×ö·¨ 
+        //åºŸå¼ƒè¿™ç§åšæ³• 
         //Cobj2LuaObjStack(param,param->className());
         WILL_NOT_COMPILE_PASS();
     }
@@ -769,7 +769,7 @@ protected:
         }
         lua_pushlightuserdata(lua_state_,cobj);
         lua_rawget(lua_state_,-2);
-        if (lua_isnil(lua_state_,-1))    // Ã»ÓĞ×¢²á¹ıÕâ¸ö¶ÔÏó
+        if (lua_isnil(lua_state_,-1))    // æ²¡æœ‰æ³¨å†Œè¿‡è¿™ä¸ªå¯¹è±¡
         {
             perror("lua has no such a obj!! \n");
             lua_pop(lua_state_,3);
@@ -787,7 +787,7 @@ protected:
         lua_setmetatable(lua_state_, -2);
     #endif
 
-		//·ÏÆúÕâÖÖ×ö·¨ 
+		//åºŸå¼ƒè¿™ç§åšæ³• 
         //tolua_pushusertype(lua_state_,(void*)cobj,className);
     }
     void Pop(int count = 1)
@@ -810,7 +810,7 @@ protected:
 
     void getValue(char*& v,int index=-1)
     {
-		//ÎªÁË·ÀÖ¹Lua·µ»Ønil¶øµÃµ½Ò»¸ö¿ÕÖ¸Õë£¬ÈçÏÂ
+		//ä¸ºäº†é˜²æ­¢Luaè¿”å›nilè€Œå¾—åˆ°ä¸€ä¸ªç©ºæŒ‡é’ˆï¼Œå¦‚ä¸‹
 		static const char *ss = "no value";
 		
 		size_t len = 0;
@@ -894,7 +894,7 @@ protected:
 
     void addWrapperToCObj(void* cobj,const char* class_name)
     {
-        // ·ÏÆú 
+        // åºŸå¼ƒ 
     }
     
     void ex_function(lua_State* luaVM);
