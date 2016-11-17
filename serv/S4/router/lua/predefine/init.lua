@@ -34,5 +34,8 @@ local function scan_sort_then_do(this_dir)
 	end
 end
 
-scan_sort_then_do('predefine/')
+if not g_init_flag_kf03jf then
+	scan_sort_then_do('predefine/')
+	g_init_flag_kf03jf = true
+end
 

@@ -144,6 +144,10 @@ void __defaultHandler(int sig)
 	if(SIGSEGV == sig){
 		_exit(-1);
 	}
+
+	if(SIGINT == sig){
+		_exit(-2);
+	}
 #endif
 }
 

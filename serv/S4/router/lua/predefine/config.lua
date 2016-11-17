@@ -18,7 +18,7 @@ local o = {}
 config = o
 
 function o.get_box_num()
-	return 50
+	return 5
 end
 
 function o.get_actor_per_box()
