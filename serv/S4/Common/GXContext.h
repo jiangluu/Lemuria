@@ -14,10 +14,11 @@
 
 
 //查了在我们的ubuntu系统上，系统的socket读、写缓存的上限都是163840 byte
+//It's 212992 at aliyun
 //命令：cat /proc/sys/net/core/rmem_max
 // cat /proc/sys/net/core/wmem_max
 // 故把这个值定为163840
-#define MY_SO_RCVBUF_MAX_LEN 163840
+#define MY_SO_RCVBUF_MAX_LEN 212992
 
 struct GXContext;
 #define LUA_GX_ID "gGXContextID"
