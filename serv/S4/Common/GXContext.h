@@ -13,10 +13,10 @@
 
 
 
-//²éÁËÔÚÎÒÃÇµÄubuntuÏµÍ³ÉÏ£¬ÏµÍ³µÄsocket¶Á¡¢Ğ´»º´æµÄÉÏÏŞ¶¼ÊÇ163840 byte
-//ÃüÁî£ºcat /proc/sys/net/core/rmem_max
+//æŸ¥äº†åœ¨æˆ‘ä»¬çš„ubuntuç³»ç»Ÿä¸Šï¼Œç³»ç»Ÿçš„socketè¯»ã€å†™ç¼“å­˜çš„ä¸Šé™éƒ½æ˜¯163840 byte
+//å‘½ä»¤ï¼šcat /proc/sys/net/core/rmem_max
 // cat /proc/sys/net/core/wmem_max
-// ¹Ê°ÑÕâ¸öÖµ¶¨Îª163840
+// æ•…æŠŠè¿™ä¸ªå€¼å®šä¸º163840
 #define MY_SO_RCVBUF_MAX_LEN 163840
 
 struct GXContext;
@@ -46,12 +46,12 @@ struct GXContext{
 #endif
 	
 	s16		type_;		// typeFullFunction or typeSimple
-	s16		layer_;		// ²ãÊı 
+	s16		layer_;		// å±‚æ•° 
 	s16		header_type_;
 	s16		stat_;
 	bool	enable_encrypt_;
-	// -------- ÅäÖÃĞÅÏ¢ --------
-	char	ip_and_port_[128];		// ±¾ÉÏÏÂÎÄµÄÎïÀíµØÖ·
+	// -------- é…ç½®ä¿¡æ¯ --------
+	char	ip_and_port_[128];		// æœ¬ä¸Šä¸‹æ–‡çš„ç‰©ç†åœ°å€
 	char	gx_id_[LINK_ID_LEN];
 	int		link_pool_size_conf_;
 	int		read_buf_len_;
@@ -81,7 +81,7 @@ struct GXContext{
 		
 		
 		
-		void reset(){	// ²»ÊÍ·ÅÄÚ´æ£¬Ö»ÊÇÎªÁË¸´ÓÃ 
+		void reset(){	// ä¸é‡Šæ”¾å†…å­˜ï¼Œåªæ˜¯ä¸ºäº†å¤ç”¨ 
 			gxc_ = 0;
 			src_link_pool_index_ = -1;
 			header_type_ = 0;
@@ -120,7 +120,7 @@ struct GXContext{
 	
 	bool resetLinkPool(int poolsize);
 	
-	void registerCallback(void* pfun,int ftype=0){	// ×¢²áÏûÏ¢·Ö·¢»Øµ÷º¯Êı¡£ftype Îª0±íÊ¾ÄÚ²¿ÏûÏ¢£¬1±íÊ¾¿Í»§¶ËÏûÏ¢ 
+	void registerCallback(void* pfun,int ftype=0){	// æ³¨å†Œæ¶ˆæ¯åˆ†å‘å›è°ƒå‡½æ•°ã€‚ftype ä¸º0è¡¨ç¤ºå†…éƒ¨æ¶ˆæ¯ï¼Œ1è¡¨ç¤ºå®¢æˆ·ç«¯æ¶ˆæ¯ 
 		callback_ = pfun;
 		header_type_ = ftype;
 	}
@@ -133,8 +133,8 @@ struct GXContext{
 	bool connect2(char *global_id,char *ip_and_port);
 	
 	
-	void frame_poll(timetype now,int block_time);	// Ò»Ö¡À­È¡Êı¾İ£¬×î¶à×èÈûblock_time¡£Ö¡ÂÊ¿ØÖÆÓÉÍâ²¿¿ØÖÆ£¬Õâ¸öº¯ÊıÎŞ·¨¿ØÖÆ 
-	int frame_flush(timetype now);	// °ÑÊä³ö»º³åÀïµÄÊı¾İflush³öÈ¥ 
+	void frame_poll(timetype now,int block_time);	// ä¸€å¸§æ‹‰å–æ•°æ®ï¼Œæœ€å¤šé˜»å¡block_timeã€‚å¸§ç‡æ§åˆ¶ç”±å¤–éƒ¨æ§åˆ¶ï¼Œè¿™ä¸ªå‡½æ•°æ— æ³•æ§åˆ¶ 
+	int frame_flush(timetype now);	// æŠŠè¾“å‡ºç¼“å†²é‡Œçš„æ•°æ®flushå‡ºå» 
 	
 	
 	Link* newLink();

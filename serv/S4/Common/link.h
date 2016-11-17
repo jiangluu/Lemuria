@@ -53,7 +53,7 @@ struct Link: public WSAOVERLAPPED{
 	WSABUF	iocp_buff_;
     DWORD	bytes_recv_;
     DWORD	iocp_flag_;
-    // IOCPÒòÎªÊÇÏÈÍ¶µİÇëÇó£¬Ö®ºóÏµÍ³»á°ÑÊı¾İĞ´µ½ÎÒÃÇÌá¹©µÄbufferÉÏ£¬ËùÒÔÃ¿¸öÍ¶µİ±ØĞëÓĞ×Ô¼ºµÄbuffer£¬²»ÄÜ¹²Ïí¡£ 
+    // IOCPå› ä¸ºæ˜¯å…ˆæŠ•é€’è¯·æ±‚ï¼Œä¹‹åç³»ç»Ÿä¼šæŠŠæ•°æ®å†™åˆ°æˆ‘ä»¬æä¾›çš„bufferä¸Šï¼Œæ‰€ä»¥æ¯ä¸ªæŠ•é€’å¿…é¡»æœ‰è‡ªå·±çš„bufferï¼Œä¸èƒ½å…±äº«ã€‚ 
 #else
 struct Link{
 	struct epoll_event ev_;
@@ -71,20 +71,20 @@ struct Link{
 	s16		link_stat_;
 	bool	enable_encrypt_;
 	char	link_id_[LINK_ID_LEN+4];
-	int		pool_index_;	// ÔÚ³ØÖĞµÄÏÂ±ê 
+	int		pool_index_;	// åœ¨æ± ä¸­çš„ä¸‹æ ‡ 
 	int		sock_;
 	int		read_buf_len_;
 	char	*read_buf_;
 	int		read_buf_offset_;
 	kfifo	write_fifo_;
 	
-	int		lk_times_;		// Á÷¿Ø-°ü¸öÊı 
-	int		lk_traffic_;	// Á÷¿Ø-Á÷Á¿ 
+	int		lk_times_;		// æµæ§-åŒ…ä¸ªæ•° 
+	int		lk_traffic_;	// æµæ§-æµé‡ 
 	u32		last_active_time_;
 	u32		first_packet_time_;
 	u32		total_traffic_;
-	// ========ÏÂÃæÕâ¼¸¸öÊı¾İ¸ÅÄîÉÏÀ´ËµÊôÓÚsessionÊı¾İ£¬·Ç¿Í»§¶ËÁ¬½ÓÒ²ĞíÓÃ²»µ½ 
-	s32		session_link_index_; 	// ´ËsessionÔÚÄÄ¸ölink 
+	// ========ä¸‹é¢è¿™å‡ ä¸ªæ•°æ®æ¦‚å¿µä¸Šæ¥è¯´å±äºsessionæ•°æ®ï¼Œéå®¢æˆ·ç«¯è¿æ¥ä¹Ÿè®¸ç”¨ä¸åˆ° 
+	s32		session_link_index_; 	// æ­¤sessionåœ¨å“ªä¸ªlink 
 	//s32		app_pool_index_[LINK_APP_POOL_INDEX_NUM];
 	u16		app_box_id_;
 	u16		app_actor_id_;
@@ -152,7 +152,7 @@ struct Link{
         return 0;
 	}
 	#else
-	// EPOLL£¬×¢²á¶ÁÊÂ¼ş£¨ÓÀ¾ÃµÄ£¬Ö±µ½ÏÔÊ½·´×¢²á£© 
+	// EPOLLï¼Œæ³¨å†Œè¯»äº‹ä»¶ï¼ˆæ°¸ä¹…çš„ï¼Œç›´åˆ°æ˜¾å¼åæ³¨å†Œï¼‰ 
 	int register_read_event(GXContext *nc);
 	#endif
 	
@@ -176,7 +176,7 @@ struct Link{
 		return 1==link_stat_;
 	}
 	
-	// ´ÓÎ´ÔÚÏßµÄLink²»·ÖÅäÊäÈëÊä³ö»º´æ 
+	// ä»æœªåœ¨çº¿çš„Linkä¸åˆ†é…è¾“å…¥è¾“å‡ºç¼“å­˜ 
 	void becomeOnline(int read_buf_len,int write_fifo_len){
 		if(!isOnline() && NULL==read_buf_){
 			allocate_mem(read_buf_len,write_fifo_len);

@@ -2,7 +2,7 @@
 #define __GX_C_FUNCTION_H
 
 
-// Õâ¸öÎÄ¼şµÄ±ØÒªĞÔÔÚÓÚ£¬ÒÔ´¿Cº¯ÊıµÄĞÎÊ½µ¼³öÒ»Ğ©¹¦ÄÜ£¬ÕâÑùluaJIT¿ÉÒÔÊ¹ÓÃ 
+// è¿™ä¸ªæ–‡ä»¶çš„å¿…è¦æ€§åœ¨äºï¼Œä»¥çº¯Cå‡½æ•°çš„å½¢å¼å¯¼å‡ºä¸€äº›åŠŸèƒ½ï¼Œè¿™æ ·luaJITå¯ä»¥ä½¿ç”¨ 
 
 
 #include "types.h"
@@ -15,7 +15,7 @@
 #endif
 
 
-// ÎªÁËÈÃLuaÄÜ¹»Ê¹ÓÃ¶øĞ´µÄCº¯Êı
+// ä¸ºäº†è®©Luaèƒ½å¤Ÿä½¿ç”¨è€Œå†™çš„Cå‡½æ•°
 extern "C"{
 	
 struct Slice{
@@ -67,14 +67,14 @@ CF_EXPORT bool gx_cur_stream_push_slice2(const char* v,int len);
 
 CF_EXPORT bool gx_cur_stream_push_bin(const char* v,int len);
 
-CF_EXPORT const char* gx_cur_stream_get_bin(int len);	// »ñÈ¡bin¿é£¨ÊÂÏÈÖªµÀlen£© 
+CF_EXPORT const char* gx_cur_stream_get_bin(int len);	// è·å–binå—ï¼ˆäº‹å…ˆçŸ¥é“lenï¼‰ 
 
 
 CF_EXPORT void gx_cur_writestream_cleanup();
 
-CF_EXPORT void gx_cur_writestream_protect(int n);	// ±£»¤ÊäÈëbufµÄÇ°n¸ö×Ö½Ú²»±»Çå³ı 
+CF_EXPORT void gx_cur_writestream_protect(int n);	// ä¿æŠ¤è¾“å…¥bufçš„å‰nä¸ªå­—èŠ‚ä¸è¢«æ¸…é™¤ 
 
-// Í¬²½Ô­Â··µ»Ø¡£messageid ÊÇreqµÄ+1£¬ÄÚÈİÊÇpushµ½ streamÀïµÄÄÚÈİ¡£ 
+// åŒæ­¥åŸè·¯è¿”å›ã€‚messageid æ˜¯reqçš„+1ï¼Œå†…å®¹æ˜¯pushåˆ° streamé‡Œçš„å†…å®¹ã€‚ 
 CF_EXPORT int gx_cur_writestream_syncback();
 
 CF_EXPORT int gx_cur_writestream_syncback2(int message_id);

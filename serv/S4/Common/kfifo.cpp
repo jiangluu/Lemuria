@@ -79,7 +79,7 @@ unsigned int __kfifo_put(struct kfifo *fifo, unsigned char *buffer, unsigned int
 	
 	unsigned int l = 0;
 
-	if (len > fifo->size - fifo->in + fifo->out)		//»º³åÇø ÂúÁË
+	if (len > fifo->size - fifo->in + fifo->out)		//ç¼“å†²åŒº æ»¡äº†
 	{
 		return 0;
 	}

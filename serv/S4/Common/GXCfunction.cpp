@@ -220,7 +220,7 @@ void gx_cur_writestream_protect(int n)
 	if(s_gx) s_gx->ws_->protect_n(n);
 }
 
-// Í¬²½Ô­Â··µ»Ø¡£messageid ÊÇreqµÄ+1£¬ÄÚÈİÊÇpushµ½ streamÀïµÄÄÚÈİ¡£ 
+// åŒæ­¥åŸè·¯è¿”å›ã€‚messageid æ˜¯reqçš„+1ï¼Œå†…å®¹æ˜¯pushåˆ° streamé‡Œçš„å†…å®¹ã€‚ 
 int gx_cur_writestream_syncback()
 {
 	if(s_gx){

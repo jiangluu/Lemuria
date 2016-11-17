@@ -40,7 +40,7 @@ int App::main_loop(GameTime *timer,int frame_min_time)
 	log_->setTimer(timer);
 	
 	while(0 == stop_loop_){
-		// Ö¡¿ªÊ¼Ç°ÏÈ¸üÐÂÊ±¼ä 
+		// å¸§å¼€å§‹å‰å…ˆæ›´æ–°æ—¶é—´ 
 		timer->setTime();
 		
 		timetype now = timer->currentTime();
@@ -48,7 +48,7 @@ int App::main_loop(GameTime *timer,int frame_min_time)
 		
 		timer->incLocalFrame();
 		
-		// Ö¡µÄ¿ªÍ·²¿·ÖÏÈÈ¡µÃËùÓÐÊäÈë²¢´¦Àí 
+		// å¸§çš„å¼€å¤´éƒ¨åˆ†å…ˆå–å¾—æ‰€æœ‰è¾“å…¥å¹¶å¤„ç† 
 		if(frontend_.stat_>0){
 			frontend_.frame_poll(now,poll_time);
 		}
@@ -56,12 +56,12 @@ int App::main_loop(GameTime *timer,int frame_min_time)
 			backend_.frame_poll(now,poll_time);
 		}
 		
-		// ÄÚ²¿Ê±¼äÇý¶¯µÄ
+		// å†…éƒ¨æ—¶é—´é©±åŠ¨çš„
 		if(callback_time_driven_/* && timer->isActiveMode()*/){
 			(FunFrameTimeDriven(callback_time_driven_))(now);
 		}
 		
-		// ×îºó°ÑÕâÒ»Ö¡µÄ´¦Àí½á¹ûflush³öÈ¥ 
+		// æœ€åŽæŠŠè¿™ä¸€å¸§çš„å¤„ç†ç»“æžœflushå‡ºåŽ» 
 		if(frontend_.stat_>0){
 			frontend_.frame_flush(now);
 		}
@@ -70,14 +70,14 @@ int App::main_loop(GameTime *timer,int frame_min_time)
 		}
 		
 		
-		// ×öÖ¡Êý¿ØÖÆ
+		// åšå¸§æ•°æŽ§åˆ¶
 		timer->setTime(); 
 		timetype frame_end = timer->localTime();
 		if(frame_begin+frame_min_time <= frame_end){
-			// ÕâÒ»Ö¡ÒÑ¾­ÓÃÁËÖÁÉÙ FRAME_MIN_TIMEÊ±¼ä£¬²»ÓÃÏÞÖÆÁË 
+			// è¿™ä¸€å¸§å·²ç»ç”¨äº†è‡³å°‘ FRAME_MIN_TIMEæ—¶é—´ï¼Œä¸ç”¨é™åˆ¶äº† 
 		}
 		else{
-			// ÈËÎªÏÞÖÆÖ¡Êý
+			// äººä¸ºé™åˆ¶å¸§æ•°
 			int left =  frame_begin+frame_min_time - frame_end;
 		#ifdef WIN32
 			Sleep(left);
@@ -87,7 +87,7 @@ int App::main_loop(GameTime *timer,int frame_min_time)
 		}
 	}
 	
-	// ÍË³öÑ­»·Ç°°ÑÈÕÖ¾flushÒ»ÏÂ£¬±ÜÃâ¶ªÊ§ 
+	// é€€å‡ºå¾ªçŽ¯å‰æŠŠæ—¥å¿—flushä¸€ä¸‹ï¼Œé¿å…ä¸¢å¤± 
 	if(log_){
 		log_->flush();
 	}
@@ -108,7 +108,7 @@ bool App::enterStartupMode(GameTime *timer)
 	
 	log_->setTimer(timer);
 	
-	// ÕâÊ±»¹Ã»ÓÐÄÃµ½ÅäÖÃ£¬ÏÈ°´ÕÕÒ»¸ö×îÐ¡ÖµÆô¶¯ 
+	// è¿™æ—¶è¿˜æ²¡æœ‰æ‹¿åˆ°é…ç½®ï¼Œå…ˆæŒ‰ç…§ä¸€ä¸ªæœ€å°å€¼å¯åŠ¨ 
 	if(frontend_.init(FrontEnd::typeFrontEnd,0,4,16*1024,16*1024)==false){
 		printf("FrontEnd init failed\n");
 		fprintf(stderr,"FrontEnd init failed\n");
@@ -157,12 +157,12 @@ bool App::enterStartupMode(GameTime *timer)
 		frontend_.frame_poll(timer->currentTime(),5);
 	}
 	
-	// ³öÀ´ËµÃ÷ÄÃµ½ÁËÅäÖÃ 
+	// å‡ºæ¥è¯´æ˜Žæ‹¿åˆ°äº†é…ç½® 
 	int bak_read_buf_len_ = frontend_.read_buf_len_;
 	int bak_write_fifo_len_ = frontend_.write_fifo_len_;
 	
 	
-	frontend_.read_buf_len_ = 1024*16;	// Á¬½Óconfigs¹Ì¶¨ÓÃÕâ¸öÅäÖÃ 
+	frontend_.read_buf_len_ = 1024*16;	// è¿žæŽ¥configså›ºå®šç”¨è¿™ä¸ªé…ç½® 
 	frontend_.write_fifo_len_ = 1024*16;
 	
 	if(frontend_.resetLinkPool(frontend_.link_pool_size_conf_)==false){
@@ -182,7 +182,7 @@ bool App::enterStartupMode(GameTime *timer)
 		_exit(-1);
 	}
 	
-	frontend_.read_buf_len_ = bak_read_buf_len_;	// »Ö¸´ÓÃ»§µÄÅäÖÃÖµ 
+	frontend_.read_buf_len_ = bak_read_buf_len_;	// æ¢å¤ç”¨æˆ·çš„é…ç½®å€¼ 
 	frontend_.write_fifo_len_ = bak_write_fifo_len_;
 	
 	stat_ = 2;
@@ -210,7 +210,7 @@ bool App::enterStartupMode(GameTime *timer)
 	
 	r = main_loop(timer,30);
 	
-	// ³öÀ´ËµÃ÷Á¬½ÓÉÏÁËÏÖÓÐapp 
+	// å‡ºæ¥è¯´æ˜Žè¿žæŽ¥ä¸Šäº†çŽ°æœ‰app 
 	
 	stop_loop_ = 0;
 	
@@ -253,7 +253,7 @@ int message_dispatch_startup(Link* src_link,InternalHeader *hh,int body_len,char
 				app->backend_.write_fifo_len_ = rs.get<s32>();
 			}
 			
-			// »ù±¾ÅäÖÃÄÃµ½£¬ÖØÐÂ³õÊ¼»¯
+			// åŸºæœ¬é…ç½®æ‹¿åˆ°ï¼Œé‡æ–°åˆå§‹åŒ–
 			app->stop_loop_ = 1;
 			
 			break;

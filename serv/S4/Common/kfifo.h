@@ -3,11 +3,11 @@
 
 
 
-/* kfifoÊÇÒ»¸öFirst In First OutÊı¾İ½á¹¹£¬Ëü²ÉÓÃ»·ĞÎÑ­»·¶ÓÁĞµÄÊı¾İ½á¹¹À´ÊµÏÖ£»
-ËüÌá¹©Ò»¸öÎŞ±ß½çµÄ×Ö½ÚÁ÷·şÎñ£¬×îÖØÒªµÄÒ»µãÊÇ£¬ËüÊ¹ÓÃ²¢ĞĞÎŞËø±à³Ì¼¼Êõ£¬
-¼´µ±ËüÓÃÓÚÖ»ÓĞÒ»¸öÈë¶ÓÏß³ÌºÍÒ»¸ö³ö¶ÓÏß³ÌµÄ³¡ÇéÊ±£¬Á½¸öÏß³Ì¿ÉÒÔ²¢·¢²Ù×÷£¬
-¶ø²»ĞèÒªÈÎºÎ¼ÓËøĞĞÎª£¬¾Í¿ÉÒÔ±£Ö¤kfifoµÄÏß³Ì°²È«¡£
-×¢ÒâkfifoµÄsize±ØĞëÊÇ2µÄÃİ´Î·½¡£
+/* kfifoæ˜¯ä¸€ä¸ªFirst In First Outæ•°æ®ç»“æ„ï¼Œå®ƒé‡‡ç”¨ç¯å½¢å¾ªç¯é˜Ÿåˆ—çš„æ•°æ®ç»“æ„æ¥å®ç°ï¼›
+å®ƒæä¾›ä¸€ä¸ªæ— è¾¹ç•Œçš„å­—èŠ‚æµæœåŠ¡ï¼Œæœ€é‡è¦çš„ä¸€ç‚¹æ˜¯ï¼Œå®ƒä½¿ç”¨å¹¶è¡Œæ— é”ç¼–ç¨‹æŠ€æœ¯ï¼Œ
+å³å½“å®ƒç”¨äºåªæœ‰ä¸€ä¸ªå…¥é˜Ÿçº¿ç¨‹å’Œä¸€ä¸ªå‡ºé˜Ÿçº¿ç¨‹çš„åœºæƒ…æ—¶ï¼Œä¸¤ä¸ªçº¿ç¨‹å¯ä»¥å¹¶å‘æ“ä½œï¼Œ
+è€Œä¸éœ€è¦ä»»ä½•åŠ é”è¡Œä¸ºï¼Œå°±å¯ä»¥ä¿è¯kfifoçš„çº¿ç¨‹å®‰å…¨ã€‚
+æ³¨æ„kfifoçš„sizeå¿…é¡»æ˜¯2çš„å¹‚æ¬¡æ–¹ã€‚
 */
 struct kfifo {
 	unsigned char *buffer;      /* the buffer holding the data */
@@ -24,8 +24,8 @@ extern int kfifo_init(struct kfifo *fifo,unsigned int size);
 
 extern int kfifo_init2(struct kfifo *fifo,char *buf,unsigned int size);
 
-/* ×¢Òâkfifo_free()ÊÇÊÍ·ÅÄÚ´æµÄ£¬Ò²¾ÍÊÇkfifo_init()µÄÄæ²Ù×÷£»
-ÏÂÃæµÄkfifo_cleanup()Ö»ÊÇÈÃkfifoÄÜ¹»¸´ÓÃ
+/* æ³¨æ„kfifo_free()æ˜¯é‡Šæ”¾å†…å­˜çš„ï¼Œä¹Ÿå°±æ˜¯kfifo_init()çš„é€†æ“ä½œï¼›
+ä¸‹é¢çš„kfifo_cleanup()åªæ˜¯è®©kfifoèƒ½å¤Ÿå¤ç”¨
 */
 extern void kfifo_free(struct kfifo *fifo);
 
@@ -35,10 +35,10 @@ extern unsigned int __kfifo_put(struct kfifo *fifo, unsigned char *buffer, unsig
 
 extern unsigned int __kfifo_get(struct kfifo *fifo,     unsigned char *buffer, unsigned int len);
 
-// ÏÂÃæµÄ½Ó¿ÚÊÇºËĞÄÖ®ÍâµÄ£¬ÎªÁË·½±ã»òÕß½ÚÔ¼ĞÔÄÜ¶øÌí¼ÓµÄ
-extern int kfifo_size(struct kfifo *fifo);		// ·µ»Øsize 
+// ä¸‹é¢çš„æ¥å£æ˜¯æ ¸å¿ƒä¹‹å¤–çš„ï¼Œä¸ºäº†æ–¹ä¾¿æˆ–è€…èŠ‚çº¦æ€§èƒ½è€Œæ·»åŠ çš„
+extern int kfifo_size(struct kfifo *fifo);		// è¿”å›size 
 
-extern int kfifo_get_getable(struct kfifo *fifo);	// ¿´¿´ÓĞ¶àÉÙ¿ÉÒÔgetµÄÊı¾İ £¨µ«²¢²»ÕæµÄgetËüÃÇ£© 
+extern int kfifo_get_getable(struct kfifo *fifo);	// çœ‹çœ‹æœ‰å¤šå°‘å¯ä»¥getçš„æ•°æ® ï¼ˆä½†å¹¶ä¸çœŸçš„getå®ƒä»¬ï¼‰ 
 
 
 #endif

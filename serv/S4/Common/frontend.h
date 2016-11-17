@@ -8,10 +8,10 @@
 
 
 
-//²éÁËÔÚÎÒÃÇµÄubuntuÏµÍ³ÉÏ£¬ÏµÍ³µÄsocket¶Á¡¢Ğ´»º´æµÄÉÏÏŞ¶¼ÊÇ131071 byte
-//ÃüÁî£ºcat /proc/sys/net/core/rmem_max
+//æŸ¥äº†åœ¨æˆ‘ä»¬çš„ubuntuç³»ç»Ÿä¸Šï¼Œç³»ç»Ÿçš„socketè¯»ã€å†™ç¼“å­˜çš„ä¸Šé™éƒ½æ˜¯131071 byte
+//å‘½ä»¤ï¼šcat /proc/sys/net/core/rmem_max
 // cat /proc/sys/net/core/wmem_max
-// ¹Ê°ÑÕâ¸öÖµ¶¨Îª131071
+// æ•…æŠŠè¿™ä¸ªå€¼å®šä¸º131071
 #define MY_SO_RCVBUF_MAX_LEN 131071
 
 
@@ -33,12 +33,12 @@ struct FrontEnd{
 #endif
 	
 	int		type_;		// FrontEnd or BackEnd
-	int		layer_;		// ²ãÊı 
+	int		layer_;		// å±‚æ•° 
 	s16		header_type_;
 	s16		stat_;
 	bool	enable_encrypt_;
-	// -------- ÅäÖÃĞÅÏ¢ --------
-	char	ip_and_port_[128];		// FrontEndÀàĞÍµÄÓÃ 
+	// -------- é…ç½®ä¿¡æ¯ --------
+	char	ip_and_port_[128];		// FrontEndç±»å‹çš„ç”¨ 
 	int		link_pool_size_conf_;
 	int		read_buf_len_;
 	int		write_fifo_len_;
@@ -68,7 +68,7 @@ struct FrontEnd{
 	
 	bool resetLinkPool(int poolsize);
 	
-	void registerCallback(void* pfun,int ftype=0){	// ×¢²áÏûÏ¢·Ö·¢»Øµ÷º¯Êı¡£ftype Îª0±íÊ¾ÄÚ²¿ÏûÏ¢£¬1±íÊ¾¿Í»§¶ËÏûÏ¢ 
+	void registerCallback(void* pfun,int ftype=0){	// æ³¨å†Œæ¶ˆæ¯åˆ†å‘å›è°ƒå‡½æ•°ã€‚ftype ä¸º0è¡¨ç¤ºå†…éƒ¨æ¶ˆæ¯ï¼Œ1è¡¨ç¤ºå®¢æˆ·ç«¯æ¶ˆæ¯ 
 		callback_ = pfun;
 		header_type_ = ftype;
 	}
@@ -76,13 +76,13 @@ struct FrontEnd{
 		link_cut_callback_ = pfun;
 	}
 	
-	bool start_listening();	// FrontEndÀàĞÍµÄ²ÅÓ¦¸ÃÓĞ 
+	bool start_listening();	// FrontEndç±»å‹çš„æ‰åº”è¯¥æœ‰ 
 	
-	bool connect2(char *global_id,char *ip_and_port);	// ÀíÂÛÉÏ BackEndÀàĞÍµÄ²ÅÓ¦¸ÃÓĞ£¬µ«ÊÇÊµÏÖÉÏ²»ÏŞÖÆÁË 
-	int connect2_no_care_id(char *ip_and_port);		// ÄÚ²¿Ê¹ÓÃ£¬Íâ²¿²»Òªµ÷ÓÃ 
+	bool connect2(char *global_id,char *ip_and_port);	// ç†è®ºä¸Š BackEndç±»å‹çš„æ‰åº”è¯¥æœ‰ï¼Œä½†æ˜¯å®ç°ä¸Šä¸é™åˆ¶äº† 
+	int connect2_no_care_id(char *ip_and_port);		// å†…éƒ¨ä½¿ç”¨ï¼Œå¤–éƒ¨ä¸è¦è°ƒç”¨ 
 	
-	void frame_poll(timetype now,int block_time);	// Ò»Ö¡À­È¡Êı¾İ£¬×î¶à×èÈûblock_time¡£Ö¡ÂÊ¿ØÖÆÓÉÍâ²¿¿ØÖÆ£¬Õâ¸öº¯ÊıÎŞ·¨¿ØÖÆ 
-	int frame_flush(timetype now);	// °ÑÊä³ö»º³åÀïµÄÊı¾İflush³öÈ¥ 
+	void frame_poll(timetype now,int block_time);	// ä¸€å¸§æ‹‰å–æ•°æ®ï¼Œæœ€å¤šé˜»å¡block_timeã€‚å¸§ç‡æ§åˆ¶ç”±å¤–éƒ¨æ§åˆ¶ï¼Œè¿™ä¸ªå‡½æ•°æ— æ³•æ§åˆ¶ 
+	int frame_flush(timetype now);	// æŠŠè¾“å‡ºç¼“å†²é‡Œçš„æ•°æ®flushå‡ºå» 
 	
 	
 	Link* newLink();

@@ -26,7 +26,7 @@
 #endif
 
 
-typedef u32 timetype;	// ÓÎÏ·Ê±¼äÀàĞÍÔİ¶¨Îª32Î»¡£µ«ÊÇÕâ¸öÖ»ÄÜ³Å¼¸Ê®Ìì¾Í»á×ßÍê¡£ĞèÒªÊ±¶¨Òå timetypeÎªu64¼´¿É 
+typedef u32 timetype;	// æ¸¸æˆæ—¶é—´ç±»å‹æš‚å®šä¸º32ä½ã€‚ä½†æ˜¯è¿™ä¸ªåªèƒ½æ’‘å‡ åå¤©å°±ä¼šèµ°å®Œã€‚éœ€è¦æ—¶å®šä¹‰ timetypeä¸ºu64å³å¯ 
 
 
 struct GameTime
@@ -71,19 +71,19 @@ struct GameTime
 		setTime();
     }
 
-    //µ±Ç°Ê±¼ä¼ÆÊıÖµ£¬ÓÎÏ·ÀïµÃÊ±¼ä¶¼Ó¦¸ÃÓÃÕâ¸öº¯Êı¡£×¢Òâ¸úÏÖÊµÊ±¼ä²¢²»µÈÍ¬
-    //·µ»ØµÄÖµÎª£ºÇ§·ÖÖ®Ò»Ãëµ¥Î»µÄÊ±¼äÖµ
+    //å½“å‰æ—¶é—´è®¡æ•°å€¼ï¼Œæ¸¸æˆé‡Œå¾—æ—¶é—´éƒ½åº”è¯¥ç”¨è¿™ä¸ªå‡½æ•°ã€‚æ³¨æ„è·Ÿç°å®æ—¶é—´å¹¶ä¸ç­‰åŒ
+    //è¿”å›çš„å€¼ä¸ºï¼šåƒåˆ†ä¹‹ä¸€ç§’å•ä½çš„æ—¶é—´å€¼
     timetype        currentTime(){ return m_CurrentTime ; }
     
     timetype		localTime(){ return m_LocalTime; }
     
     u64				localUsecTime(){ return m_local_usec_time; }
     
-    //½«µ±Ç°µÄÏµÍ³Ê±¼ä¸ñÊ½»¯µ½Ê±¼ä¹ÜÀíÆ÷Àï
-    //¿ò¼ÜÀïÔÚÃ¿Ò»Ö¡µ÷ÓÃÁË£¬Âß¼­´úÂë²»Ó¦¸ÃÔÙµ÷ÓÃ 
+    //å°†å½“å‰çš„ç³»ç»Ÿæ—¶é—´æ ¼å¼åŒ–åˆ°æ—¶é—´ç®¡ç†å™¨é‡Œ
+    //æ¡†æ¶é‡Œåœ¨æ¯ä¸€å¸§è°ƒç”¨äº†ï¼Œé€»è¾‘ä»£ç ä¸åº”è¯¥å†è°ƒç”¨ 
     void            setTime(){	    
 	    struct timespec ss;
-	    // ²»»áÏòÇ°ÌøÔ¾µÄÊ±¼ä 
+	    // ä¸ä¼šå‘å‰è·³è·ƒçš„æ—¶é—´ 
 	    int r2 = clock_gettime(GX_CLOCK_MONOTONIC,&ss);
 	    m_local_usec_time = ((u64)ss.tv_sec)*1000000L + ss.tv_nsec/1000 - m_local_usec_start_time;
 	    m_LocalTime = timetype(m_local_usec_time / 1000);
@@ -100,7 +100,7 @@ struct GameTime
     
     bool isActiveMode(){ return 0!=m_active_mode; }
     
-    // ÔÚ  active_mode==0Ê±£¬ÒÀÀµÍâ²¿À´¸üĞÂÊ±¼äµÄ£¨localÊ±¼ä»¹ÊÇ×Ô¼º¸üĞÂ£© 
+    // åœ¨  active_mode==0æ—¶ï¼Œä¾èµ–å¤–éƒ¨æ¥æ›´æ–°æ—¶é—´çš„ï¼ˆlocalæ—¶é—´è¿˜æ˜¯è‡ªå·±æ›´æ–°ï¼‰ 
     void setValue(timetype cur_time,timetype ansi_time,u64 frame){
     	if(0==m_active_mode){
     		m_CurrentTime = cur_time;
@@ -109,12 +109,12 @@ struct GameTime
     	}
     }
 
-    //È¡µÃ·şÎñÆ÷¶Ë³ÌĞòÆô¶¯Ê±µÄÊ±¼ä¼ÆÊıÖµ
+    //å–å¾—æœåŠ¡å™¨ç«¯ç¨‹åºå¯åŠ¨æ—¶çš„æ—¶é—´è®¡æ•°å€¼
     u64        		getStartTime(){ return (timetype)m_local_usec_start_time ; }
 
     
 
-    // µÃµ½ÏÖÊµÊ±¼ä£¨±ê×¼Ê±Çø£©
+    // å¾—åˆ°ç°å®æ—¶é—´ï¼ˆæ ‡å‡†æ—¶åŒºï¼‰
     timetype        getANSITime(){ return (timetype)m_SetTime; }
     
     u64				getFrame(){ return m_frame_no; }
