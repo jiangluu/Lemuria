@@ -76,7 +76,7 @@ void gx_cur_writestream_cleanup();
 
 void gx_cur_writestream_protect(int);
 
-// Í¬²½Ô­Â··µ»Ø¡£messageid ÊÇreqµÄ+1£¬ÄÚÈİÊÇpushµ½ streamÀïµÄÄÚÈİ¡£ 
+// åŒæ­¥åŸè·¯è¿”å›ã€‚messageid æ˜¯reqçš„+1ï¼Œå†…å®¹æ˜¯pushåˆ° streamé‡Œçš„å†…å®¹ã€‚ 
 int gx_cur_writestream_syncback();
 
 int gx_cur_writestream_syncback2(int message_id);
@@ -131,7 +131,7 @@ bool cur_stream_push_string(const char* v,int len);
 
 void cur_write_stream_cleanup();
 
-// Í¬²½Ô­Â··µ»Ø¡£messageid ÊÇreqµÄ+1£¬ÄÚÈİÊÇpushµ½ streamÀïµÄÄÚÈİ¡£ 
+// åŒæ­¥åŸè·¯è¿”å›ã€‚messageid æ˜¯reqçš„+1ï¼Œå†…å®¹æ˜¯pushåˆ° streamé‡Œçš„å†…å®¹ã€‚ 
 void cur_stream_write_back();
 
 void cur_stream_write_back2(int message_id);
@@ -154,7 +154,7 @@ int cur_message_loopback();
 
 int cur_stream_get_readbuf_len();
 
-const char* cur_stream_get_bin(int len);	// »ñÈ¡bin¿é£¨ÊÂÏÈÖªµÀlen£© 
+const char* cur_stream_get_bin(int len);	// è·å–binå—ï¼ˆäº‹å…ˆçŸ¥é“lenï¼‰ 
 
 
 ]]

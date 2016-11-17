@@ -113,4 +113,82 @@ void cur_stream_broadcast(int message_id)
 
 
 
-// 注：山寨王的游戏时间定义为ansitime，这是
+// 注：山寨王的游戏时间定义为ansitime，这是因为手游是碎片化的，时间一般都要求跨越session 后还有意义。 
+// 除了以后的一场战斗中用到的时间外，都应该使用ansi时间。 
+u32 cur_game_time()
+{
+	u32 aa = g_time->getANSITime();
+	return aa;
+}
+
+u64 cur_game_usec()
+{
+	return g_time->localUsecTime();
+}
+
+void cur_write_stream_cleanup()
+{
+	gx_cur_writestream_cleanup();
+}
+
+
+bool log_write(int level,const char *ss,int len)
+{
+	if(NULL==ss) return false;
+	
+	if(g_log){
+		return g_log->write(level,ss,len);
+	}
+	return false;
+}
+
+bool log_write2(int index,const char *ss,int len)
+{
+	if(NULL==ss) return false;
+	
+	if(g_yylog){
+		return g_yylog->write(ALog::verbose,ss,len);
+	}
+	return false;
+}
+
+
+void log_force_flush()
+{
+	if(g_log){
+		g_log->flush();
+	}
+}
+
+int string_hash(const char *str)
+{
+	return string_hash_with_client(str);
+}
+
+
+int cur_message_loopback()
+{
+	g_gx1->input_context_.flag_ |= 0x2;
+	
+	return 0;
+}
+
+int cur_stream_get_readbuf_len()
+{
+	if(g_gx1->rs_){
+		return g_gx1->rs_->getreadbuflen();
+	}
+	
+	return -1;
+}
+
+const char* cur_stream_get_bin(int len)
+{
+	if(g_gx1->rs_ && len>0){
+		return g_gx1->rs_->get_bin(len);
+	}
+	
+	return NULL;
+}
+
+
