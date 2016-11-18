@@ -169,7 +169,7 @@ struct GXContext{
 	
 private:
 	int try_deal_one_msg_s(Link *ioable,int &begin);
-	int deal_one_http(Link *ioable,int end);
+	int try_deal_one_http(Link *ioable,int &begin);
 	
 };
 

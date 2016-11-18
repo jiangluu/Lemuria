@@ -869,8 +869,7 @@ public:
         getValue(r,index);
         return r;
     }
-
-protected:
+    
     template<typename R>
     R _Call(int param_num)
     {

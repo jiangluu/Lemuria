@@ -1177,30 +1177,68 @@ int GXContext::try_deal_one_msg_s(Link *ioable,int &begin)
 	return -1;
 }
 
-int GXContext::deal_one_http(Link *ioable,int end){
-	printf("HTTP:  %s\n", ioable->read_buf_);
-	printf("len:  %d\n", end);
+#define PHR_MAX_HEADER 8
+struct _phr_parse_data{
+	char *method, *path;
+	int minor_version;
+	struct phr_header headers[PHR_MAX_HEADER];
+	size_t method_len, path_len, num_headers;
+	const char* src;
+	size_t src_len;
+};
+
+int GXContext::try_deal_one_http(Link *ioable,int &begin){
+	int begin22 = begin;
 	if(0==ioable) return -1;
+	if(begin22+4 >= ioable->read_buf_offset_) return 0;
 
-	if(callback_http_){
-					// 准备好上下文
-					input_context_.reset();
-					
-					input_context_.gxc_ = this;
-					input_context_.src_link_pool_index_ = ioable->pool_index_;
-					input_context_.header_type_ = 80;
-					
-					rs_ = rs_bak_;
-					ws_ = ws_bak_;
-					ws_->cleanup();
-					rs_->reset(end,ioable->read_buf_);
 
-					int r = 0;
-					
-					//r = ((GXContextMessageDispatch2)callback_http_)(this,ioable);
+	//printf("HTTP:  %s\n", ioable->read_buf_+begin22);
 
-					return r;
-				}
+						struct _phr_parse_data aa;
+						memset(&aa, 0, sizeof(aa));
+						aa.num_headers = PHR_MAX_HEADER;
+						aa.src = ioable->read_buf_+begin22;
+						aa.src_len = ioable->read_buf_offset_ - begin22;
+
+						int pret = phr_parse_request(aa.src, aa.src_len,
+							&aa.method, &aa.method_len,&aa.path, &aa.path_len,
+							&aa.minor_version, aa.headers, &aa.num_headers, 0);
+
+						if(pret > 0){
+							// parse success
+							begin += pret;
+
+							if(true){
+								// 准备好上下文
+								input_context_.reset();
+								
+								input_context_.gxc_ = this;
+								input_context_.src_link_pool_index_ = ioable->pool_index_;
+								input_context_.header_type_ = 80;
+								
+								rs_ = rs_bak_;
+								ws_ = ws_bak_;
+								ws_->cleanup();
+								rs_->reset(pret,ioable->read_buf_+begin22);
+
+								lua_State *L = this->lua_vm2_->L();
+								lua_getglobal(L, "OnHttpReq");
+								lua_pushlightuserdata(L, (void*)&aa);
+
+								int r = this->lua_vm2_->_Call<int>(1);
+							}
+
+							return 1;
+						}
+						else if(-1 == pret){
+							// parse Error
+							return -4;
+						}
+						else{
+							// incomplete, do nothing
+							return 0;
+						}
 
 	return -1;
 }
@@ -1468,21 +1506,27 @@ void GXContext::frame_poll(timetype now,int block_time)
 						}
 					}
 					else{	// a http header
-						char *method, *path;
-						int pret, minor_version;
-						struct phr_header headers[8];
-						size_t buflen = 0, prevbuflen = 0, method_len, path_len, num_headers = 8;
-						pret = phr_parse_request(ioable->read_buf_, ioable->read_buf_offset_, &method, &method_len, &path, &path_len,
-                             &minor_version, headers, &num_headers, 0);
-						if(pret>0){
-							//successfully parsed the request
-							deal_one_http(ioable, pret);
+						int byte_begin = 0;
+						FOR(limiter,9999){
+							int suc = try_deal_one_http(ioable,byte_begin);
+							if(unlikely(1 != suc)){
+								if(-4==suc){
+									need_kick = true;
+								}
+								break;
+							}
 						}
-						else if(-1 == pret){
-							// parse Error
-							need_kick = true;
+						if(byte_begin == ioable->read_buf_offset_){
+							ioable->read_buf_offset_ = 0;
 						}
-						// else incomplete, do nothing
+						else if(ioable->read_buf_offset_ > byte_begin){
+							memmove(ioable->read_buf_,ioable->read_buf_+byte_begin,ioable->read_buf_offset_-byte_begin);
+							ioable->read_buf_offset_ = ioable->read_buf_offset_-byte_begin;
+						}
+						else{
+							// unlegal
+							ioable->read_buf_offset_ = 0;
+						}
 					}
 					
 				}

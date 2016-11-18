@@ -14,6 +14,10 @@ function l_gx_cur_stream_push_slice(bin)
 	return lcf.gx_cur_stream_push_slice2(bin,#bin)
 end
 
+function l_gx_cur_stream_push_text(s)
+	return lcf.gx_cur_stream_push_bin(s,#s)
+end
+
 function l_gx_cur_writestream_cleanup()
 	lcf.gx_cur_writestream_cleanup()
 end
