@@ -81,10 +81,9 @@ _env_register(lua_State *L) {
 	return 0;
 }
 
-extern int
-pbc_enum_id(struct pbc_env *env, const char *enum_type, const char *enum_name);
+extern int pbc_enum_id(struct pbc_env *env, const char *enum_type, const char *enum_name);
 
-static int
+int
 _env_enum_id(lua_State *L) {
 	struct pbc_env * env = (struct pbc_env *)checkuserdata(L,1);
 	size_t sz = 0;
