@@ -1,0 +1,580 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"str",
+				"strncmp"
+			],
+			[
+				"n",
+				"NewDecoder\tmahonia.Decoder ƒ"
+			],
+			[
+				"ne",
+				"NewEncoder\tmahonia.Encoder ƒ"
+			],
+			[
+				"s",
+				"HasSuffix\tbool ƒ"
+			],
+			[
+				"op",
+				"OpenFile\t*os.File, error ƒ"
+			],
+			[
+				"r",
+				"NewReader\t*iconv.Reader, error ƒ"
+			],
+			[
+				"p",
+				"Println\tn int, err error ƒ"
+			],
+			[
+				"u",
+				"UserValue\tinterface{} ƒ"
+			],
+			[
+				"us",
+				"UserValue\tinterface{} ƒ"
+			],
+			[
+				"da",
+				"datex\ttime.Time ν"
+			],
+			[
+				"a",
+				"AddDate\ttime.Time ƒ"
+			],
+			[
+				"no",
+				"Now\ttime.Time ƒ"
+			],
+			[
+				"ad",
+				"AddDate\ttime.Time ƒ"
+			],
+			[
+				"prin",
+				"Println\tn int, err error ƒ"
+			],
+			[
+				"spri",
+				"Sprint\tstring ƒ"
+			],
+			[
+				"mo",
+				"Month\tint ʈ"
+			],
+			[
+				"y",
+				"YearDay\tint ƒ"
+			],
+			[
+				"sp",
+				"Split\t[][]byte ƒ"
+			],
+			[
+				"pr",
+				"Println\tn int, err error ƒ"
+			],
+			[
+				"new",
+				"NewThreadUnsafeSet\tmapset.Set ƒ"
+			],
+			[
+				"pri",
+				"Printf\tn int, err error ƒ"
+			],
+			[
+				"_pa",
+				"_parse_a_line\t ƒ"
+			],
+			[
+				"re",
+				"ReadBytes\tline []byte, err error ƒ"
+			],
+			[
+				"sc",
+				"ScanBytes\tadvance int, token []byte, err error ƒ"
+			],
+			[
+				"log",
+				"log_dir\t ν"
+			],
+			[
+				"read",
+				"ReadDir\t[]os.FileInfo, error ƒ"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "router/Makefile",
+			"settings":
+			{
+				"buffer_size": 2859,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Common/GXContext.cpp",
+			"settings":
+			{
+				"buffer_size": 37096,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "router/message_dispatch.cpp",
+			"settings":
+			{
+				"buffer_size": 821,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "router/lua/zero/box1.lua",
+			"settings":
+			{
+				"buffer_size": 1661,
+				"line_ending": "Windows"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 394.0,
+		"last_filter": "GoSublime: ",
+		"selected_items":
+		[
+			[
+				"GoSublime: ",
+				"GoSublime: Browse Packages"
+			]
+		],
+		"width": 404.0
+	},
+	"console":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/home/jl/my/Lemuria/serv/S4/router"
+	],
+	"file_history":
+	[
+		"/home/jl/my/Lemuria/serv/S4/router/cfunction.h",
+		"/home/jl/my/Lemuria/serv/S4/router/cfunction.cpp",
+		"/home/jl/github/picohttpparser/test.c",
+		"/home/jl/my/hgrc_server/Destiny_Server/trunk/Destiny.Server/GameServer.cs",
+		"/home/jl/my/hgrc_server/Destiny_Server/trunk/Destiny.Server/RouteTable.cs",
+		"/home/jl/my/hgrc_server/Destiny_Server/trunk/Destiny.Server/Modules$Core/System/StoreManager.cs",
+		"/home/jl/my/hgrc_server/Destiny_Server/trunk/Destiny.Server/_Cache/Gamer/GamerCache.cs",
+		"/home/jl/my/hgrc_server/Destiny_Server/trunk/Destiny.Server/Modules$Core/Gamer/GamerManager.cs",
+		"/home/jl/my/hgrc_server/Destiny_Server/trunk/Destiny.Server/_Cache/Gamer/GamerFactory.cs",
+		"/home/jl/my/hgrc_server/Destiny_Server/trunk/Destiny.Server/Modules$Core/Gamer/CoreManager.cs",
+		"/home/jl/my/hgrc_server/Patrix_Lib/ZinEngine.Framework.Server/Modules/Server/Components/ServerTask.cs",
+		"/home/jl/my/hgrc_server/Patrix_Lib/ZinEngine.Framework.Server/Modules/Task/TaskHelper.cs",
+		"/home/jl/my/hgrc_server/Destiny_Server/trunk/Destiny.Server/Program.cs",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/zero/OnGXMessage.lua",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/zero/boxraid.lua",
+		"/home/jl/my/Lemuria/serv/S4/router/LuaInterface.cpp",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/box/ma.lua",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/init.lua",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/predefine/gx_lua.lua",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/predefine/redis_common.lua",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/zero/OnFrame.lua",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/predefine/1init_ffi.lua",
+		"/home/jl/my/Lemuria/serv/S4/Common/GXCfunction.h",
+		"/home/jl/my/Lemuria/serv/S4/Common/GXCfunction.cpp",
+		"/home/jl/my/Lemuria/serv/S4/Common/types.h",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/predefine/init.lua",
+		"/home/jl/my/Lemuria/serv/S3/service/cfunction.h",
+		"/home/jl/my/Lemuria/serv/S3/service/Makefile",
+		"/home/jl/.bashrc",
+		"/home/jl/my/Lemuria/serv/S4/Common/GXContext.h",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/predefine/111.lua",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/predefine/log.lua",
+		"/home/jl/my/Lemuria/serv/S4/router/main.cpp",
+		"/home/jl/my/Lemuria/serv/S4/Common/GameTime.h",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/zero/init.lua",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/zero/PostInit.lua",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/predefine/config.lua",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/box/init.lua",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/zero/redis_dispatch.lua",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/predefine/config_port.lua",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/box/msghandle_1.lua",
+		"/home/jl/my/Lemuria/serv/S4/Common/packet_header.h",
+		"/home/jl/github/picohttpparser/picohttpparser.h",
+		"/home/jl/my/Lemuria/serv/S4/Common/link.h",
+		"/home/jl/my/Lemuria/serv/S4/Common/link.cpp",
+		"/home/jl/my/gbkconv/gbkconv.go",
+		"/home/jl/my/gbkconv/aa.go",
+		"/home/jl/my/Lemuria/serv/S4/Common/GameTime.h.gbkzzz",
+		"/home/jl/my/Lemuria/serv/S4/Common/frontend.cpp",
+		"/home/jl/my/Lemuria/serv/S4/router/LuaInterface.h",
+		"/home/jl/my/Lemuria/serv/S4/router/LuaInterface.h.gbkzzz",
+		"/home/jl/my/Lemuria/serv/S4/router/main.cpp.gbkzzz",
+		"/home/jl/my/Lemuria/serv/S4/router/cfunction.h.gbkzzz",
+		"/home/jl/my/Lemuria/serv/S4/router/message_dispatch.cpp",
+		"/home/jl/my/Lemuria/serv/S4/router/cfunction.cpp.gbkzzz",
+		"/home/jl/my/zzz1/kklog.go",
+		"/home/jl/my/Lemuria/serv/include/tolua++/luajit.h",
+		"/home/jl/my/Lemuria/serv/S4/gate/Makefile",
+		"/home/jl/my/Lemuria/serv/S4/router/redis_thread.cpp",
+		"/home/jl/zzz1/kklog.go",
+		"/etc/hosts",
+		"/home/jl/github/lua-resty-mysql/lib/resty/mysql.lua",
+		"/home/jl/github/mysql-async-example/mysql_async_example.c",
+		"/home/jl/github/mysql-async-example/mysql_example.c",
+		"/home/jl/github/lua-resty-mysql/README.markdown",
+		"/home/jl/github/lua-resty-mysql/Makefile",
+		"/home/jl/github/lua-resty-mysql/t/world.t",
+		"/home/jl/github/lua-resty-mysql/t/big.t",
+		"/home/jl/github/twemproxy/README.md",
+		"/home/jl/github/twemproxy/src/nc_message.c",
+		"/home/jl/github/twemproxy/src/nc_request.c",
+		"/home/jl/github/twemproxy/src/nc_core.h",
+		"/home/jl/golang/src/github.com/buaazp/fasthttprouter/README.md",
+		"/home/jl/golang/src/github.com/deckarep/golang-set/README.md",
+		"/home/jl/KK_Log/INFO/INFO_2016110100.txt",
+		"/home/jl/golang/src/github.com/aodin/date/date.go",
+		"/home/jl/zzz2/LogAnalysis/Src/client/app/analysis/analysis.service.ts",
+		"/home/jl/KK_Log/INFO/INFO_2016103123.txt",
+		"/home/jl/zzz2/LogAnalysis/Src/package.json",
+		"/home/jl/zzz2/LogAnalysis/Runtime/data/db.sql",
+		"/home/jl/zzz2/LogAnalysis/Src/client/app/analysis/analysis.component.ts",
+		"/home/jl/zzz2/LogAnalysis/Src/client/app/analysis/analysis-retain.component.ts",
+		"/home/jl/zzz2/LogAnalysis/Src/client/app/shared/file.service.ts",
+		"/home/jl/zzz2/LogAnalysis/Src/tsconfig.json",
+		"/home/jl/golang/src/zu1go/sd.go",
+		"/home/jl/KK_Log/INFO/INFO_2016110102.txt",
+		"/home/jl/.config/sublime-text-3/Packages/User/GoSublime.sublime-settings",
+		"/home/jl/zzz1/sd.go",
+		"/home/jl/.config/sublime-text-3/Packages/.config/sublime-text-3/Packages/User/GoSublime.sublime-settings",
+		"/home/jl/golang/src/zu1go/kklog.go",
+		"/home/jl/.config/sublime-text-3/Packages/GoSublime/USAGE.md",
+		"/home/jl/golang/src/zu1go/index.go",
+		"/home/jl/KK_Log/log_format.txt",
+		"/home/jl/svn1/mint/conf/passwd",
+		"/home/jl/svn1/nuts/conf/authz",
+		"/home/jl/svn1/nuts/conf/passwd",
+		"/home/jl/svn1/mint/conf/authz",
+		"/home/jl/svn1/nuts/conf/svnserve.conf",
+		"/home/jl/svn1/mint/conf/svnserve.conf",
+		"/home/jl/.config/sublime-text-3/Packages/GoSublime/CHANGELOG.md"
+	],
+	"find":
+	{
+		"height": 23.0
+	},
+	"find_in_files":
+	{
+		"height": 90.0,
+		"where_history":
+		[
+			"/home/jl/my/Lemuria/serv/S4/router",
+			"/home/jl/my/Lemuria/serv/S4/router/lua",
+			"/home/jl/my/Lemuria/serv/S4/Common",
+			"/home/jl/zzz2/LogAnalysis/Src"
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"c_lua_new_vm",
+			"cur_game_time",
+			"cur_stream_get_bin",
+			"c_luaopen_bson",
+			"get_box_num",
+			"lua_vm_",
+			"lua_vm2_",
+			"cur_game_time",
+			"GXContextMessageDispatch2",
+			"_is_http_header",
+			"CLIENT_HEADER_LEN",
+			"bufio",
+			"F_liucun",
+			"last_10_op",
+			"_parse_a_line",
+			"|1|",
+			"calcRetainData",
+			"LogData",
+			"11711444"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 2,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "router/Makefile",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2859,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1183,
+								1183
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Makefile/Makefile.sublime-syntax",
+							"word_wrap": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "Common/GXContext.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 37096,
+						"regions":
+						{
+							"bookmarks":
+							{
+								"flags": 144,
+								"icon": "bookmark",
+								"regions":
+								[
+									[
+										34624,
+										34624
+									]
+								],
+								"scope": "bookmarks"
+							}
+						},
+						"selection":
+						[
+							[
+								7272,
+								7272
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 4742.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "router/message_dispatch.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 821,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								402,
+								402
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "router/lua/zero/box1.lua",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1661,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								772,
+								772
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 90.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 23.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.9o:///home/jl/golang/src/zu1go":
+	{
+		"height": 100.0
+	},
+	"output.9o:///home/jl/zzz1":
+	{
+		"height": 70.0
+	},
+	"output.GoSublime-output":
+	{
+		"height": 128.0
+	},
+	"output.MarGo-output":
+	{
+		"height": 100.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "le.sublime-project",
+	"replace":
+	{
+		"height": 42.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 151.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
