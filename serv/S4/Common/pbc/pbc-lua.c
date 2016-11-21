@@ -81,7 +81,8 @@ _env_register(lua_State *L) {
 	return 0;
 }
 
-extern int pbc_enum_id(struct pbc_env *env, const char *enum_type, const char *enum_name);
+extern int
+pbc_enum_id(struct pbc_env *env, const char *enum_type, const char *enum_name);
 
 int
 _env_enum_id(lua_State *L) {
@@ -89,10 +90,13 @@ _env_enum_id(lua_State *L) {
 	size_t sz = 0;
 	const char* enum_type = luaL_checklstring(L, 2, &sz);
 	const char* enum_name = luaL_checklstring(L, 3, &sz);
-	int32_t enum_id = pbc_enum_id(env, enum_type, enum_name);
+	/*
+	int32_t enum_id = (int32_t)pbc_enum_id(env, enum_type, enum_name);
 	if (enum_id < 0)
 		return 0;
 	lua_pushinteger(L, enum_id);
+	*/
+	lua_pushnil(L);
 	return 1;
 }
 
