@@ -6,18 +6,18 @@
 
 
 
-// ¿Í»§¶ËÓë·şÎñÆ÷Ö®¼äµÄ°üÍ· 
+// å®¢æˆ·ç«¯ä¸æœåŠ¡å™¨ä¹‹é—´çš„åŒ…å¤´ 
 struct ClientHeader{
-	u16 len_;			// °ü³¤¶È£¨°üº¬°üÍ·³¤¶ÈÔÚÄÚ£© 
-	u16 message_id_;	// ÏûÏ¢ID 
+	u16 len_;			// åŒ…é•¿åº¦ï¼ˆåŒ…å«åŒ…å¤´é•¿åº¦åœ¨å†…ï¼‰ 
+	u16 message_id_;	// æ¶ˆæ¯ID 
 };
 
 
 
-// ·şÎñÆ÷ÄÚ²¿Ö®¼äµÄ°üÍ· 
+// æœåŠ¡å™¨å†…éƒ¨ä¹‹é—´çš„åŒ…å¤´ 
 struct InternalHeader{
-	u16 len_;			// °ü³¤¶È£¨°üº¬°üÍ·³¤¶ÈÔÚÄÚ£© 
-	u16 message_id_;	// ÏûÏ¢ID 
+	u16 len_;			// åŒ…é•¿åº¦ï¼ˆåŒ…å«åŒ…å¤´é•¿åº¦åœ¨å†…ï¼‰ 
+	u16 message_id_;	// æ¶ˆæ¯ID 
 	u16 flag_;
 	u16 jumpnum_;
 };
@@ -38,7 +38,7 @@ struct TailJump{
 #define TAIL_JUMP_LEN 12
 
 
-#define TAIL_JUMP_MEM_LEN (TAIL_JUMP_LEN*8)		// ÖØÒª£ºÄÜÁ¦2×î¶àÖ§³Ö8¸öÎ²°Í£¨Ìø7´Î£© 
+#define TAIL_JUMP_MEM_LEN (TAIL_JUMP_LEN*8)		// é‡è¦ï¼šèƒ½åŠ›2æœ€å¤šæ”¯æŒ8ä¸ªå°¾å·´ï¼ˆè·³7æ¬¡ï¼‰ 
 
 
 #define HEADER_FLAG_BACK 0x1
