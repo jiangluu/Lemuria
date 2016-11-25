@@ -289,51 +289,6 @@ int gx_get_message_id()
 	return -1;
 }
 
-int gx_make_portal_sync(const char* ID,const char* port)
-{
-	if(s_gx && ID && port){
-		int r = s_gx->connect2_no_care_id(port);
-		if(r>=0){
-			Link* ll = s_gx->getLink(r);
-			s_gx->bindLinkWithGlobalID((char*)ID,ll);
-			
-			return r;
-		}
-	}
-	
-	return -1;
-}
-
-int gx_bind_portal_id(int index,const char* id)
-{
-	if(s_gx && id){
-		Link *ll = s_gx->getLink(index);
-		if(ll){
-			s_gx->bindLinkWithGlobalID(id,ll);
-			return 0;
-		}
-	}
-	
-	return -1;
-}
-
-int gx_cur_writestream_route_to(const char* destID,int message_id,int flag)
-{
-	if(s_gx && destID){
-		AStream *aa = s_gx->ws_;
-		u16 bak = s_gx->input_context_.header_.flag_;
-		if(0 != flag){
-			s_gx->input_context_.header_.flag_ |= flag;
-		}
-		int r = s_gx->packetRouteToNode(destID,message_id,aa->getwritebuflen(),aa->getbuf());
-		
-		s_gx->input_context_.header_.flag_ = bak;
-		
-		return r;
-	}
-	
-	return -1;
-}
 
 int gx_get_input_context_size()
 {

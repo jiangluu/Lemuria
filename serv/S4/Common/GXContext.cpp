@@ -768,78 +768,8 @@ bool GXContext::start_listening()
 }
 
 
-bool GXContext::connect2(char *global_id,char *ip_and_port)
-{
-/*
-	if(0 == ip_and_port) return false;
-	
-	
-	
-	char buf2[256];
-	strncpy(buf2,ip_and_port,255);
-	
-	char *delimiter = strstr(buf2,":");
-	if(0 == delimiter) return false;
-	
-	int port = atoi(delimiter+1);
-	delimiter[0] = 0;
-	
-	
-	int sock = ::socket(PF_INET,SOCK_STREAM,0);
-    nc_setsockopt_client(sock);
-    nc_set_no_delay(sock);
-    
-    
-    if(nc_connect(sock,buf2,port)!=0){
-    	printf("connect to peer failed.\n");
-    	return false;
-    }
-    
-	nc_set_nonblock(sock);
-	
-	link *ll = newLink();
-	if(0 == ll || ll->isOnline()){
-		return false;
-	}
-	
-	
-	ll->sock_ = sock;
-	
-	
-#ifdef __USING_WINDOWS_IOCP
-	HANDLE new_hd = CreateIoCompletionPort((HANDLE)sock, iocp_handle_, (DWORD)ll , 1);
-	if(NULL == new_hd){
-	    fprintf(stderr,"CreateIoCompletionPort return NULL after accept(). fd[%d]\n",sock);
-	    // free resource
-	    releaseLink(ll);
-	    closesocket(sock);
-	    return false;
-	}
-	
-	ll->becomeOnline(read_buf_len_,write_fifo_len_);
-	
-	ll->post_recv();
-#else
-	ll->register_read_event(this);
-#endif
-*/
-	int link_index = connect2_no_care_id(ip_and_port);
-	if(link_index < 0) return false;
-	
-	Link *ll = getLink(link_index);
-	if(NULL == ll) return false;
-	
-	bindLinkWithGlobalID(global_id,ll);
-
-	{
-		// Auth
-		// I_SayHi
-	}
-	
-	return true;
-}
-
-int GXContext::connect2_no_care_id(char *ip_and_port)
+// @TODO
+int GXContext::connect2_async(char *ip_and_port)
 {
 	if(0 == ip_and_port) return -1;
 	
@@ -900,282 +830,6 @@ int GXContext::connect2_no_care_id(char *ip_and_port)
 
 #define CLIENT_MSG_MAX_LEN (1024*7)
 
-int GXContext::try_deal_one_msg_s(Link *ioable,int &begin)
-{
-	if(0==ioable) return -1;
-	
-	int end = ioable->read_buf_offset_;
-	
-	if(0 == header_type_){
-		if((end-begin)>=INTERNAL_HEADER_LEN){
-			InternalHeader *hh = (InternalHeader*)(ioable->read_buf_+begin);
-			if(hh->len_<CLIENT_HEADER_LEN){
-				// 这个是内部连接，高抬贵手
-				begin = ioable->read_buf_offset_;
-				return -1;
-			}
-			
-			if(0 == (hh->flag_ & HEADER_FLAG_ROUTE)){
-				int full_len = hh->len_+(INTERNAL_HEADER_LEN-CLIENT_HEADER_LEN);
-				if(full_len<=(end-begin)){
-					if(callback_){
-						// 准备好上下文
-						input_context_.reset();
-						
-						input_context_.gxc_ = this;
-						input_context_.src_link_pool_index_ = ioable->pool_index_;
-						input_context_.header_type_ = header_type_;
-						memcpy(&input_context_.header_,hh,INTERNAL_HEADER_LEN);
-						
-						rs_ = rs_bak_;
-						ws_ = ws_bak_;
-						ws_->cleanup();
-						rs_->reset(full_len-INTERNAL_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
-						
-						int r = ((GXContextMessageDispatch)callback_)(this,ioable,hh,full_len-INTERNAL_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
-					}
-					
-					begin += full_len;
-					return 1;
-				}
-			}
-			else{	// 是route包 
-				int full_len = hh->len_+(INTERNAL_HEADER_LEN-CLIENT_HEADER_LEN) + TAIL_JUMP_LEN*hh->jumpnum_;
-				if(full_len<=(end-begin)){
-					if(0 != (hh->flag_ & HEADER_FLAG_BACK)){
-						// 是回包 
-						if(hh->jumpnum_ > 1){
-							// 还未到达目的地 
-							-- hh->jumpnum_;
-							TailJump *jj = (TailJump*)(ioable->read_buf_+begin+hh->len_+(INTERNAL_HEADER_LEN-CLIENT_HEADER_LEN));
-							jj += hh->jumpnum_;
-							
-							int r = sendToPortal(jj->local_index_,jj->portal_id_,full_len-TAIL_JUMP_LEN,ioable->read_buf_+begin);
-							if(-1 == r){
-								r = sendToPortal(jj->portal_id_,full_len-TAIL_JUMP_LEN,ioable->read_buf_+begin);
-							}
-							if(r != full_len-TAIL_JUMP_LEN){
-								fprintf(stderr,"auto back send failed. request [%d] sent [%d]\n",full_len-TAIL_JUMP_LEN,r);
-								// TODO: 是否需要有更多处理，比方发送一个表示没有送达的回包 
-							}
-						}
-						else{
-							// 这里就是目的地 
-							// ========================================================================================
-							if(callback_){
-								// 准备好上下文
-								input_context_.reset();
-								
-								input_context_.gxc_ = this;
-								input_context_.src_link_pool_index_ = ioable->pool_index_;
-								input_context_.header_type_ = header_type_;
-								memcpy(&input_context_.header_,hh,INTERNAL_HEADER_LEN);
-								input_context_.header_.flag_ = 0;	// 重要：已经完成了一个来回，标记清空 
-								input_context_.header_.jumpnum_ = 0;
-								
-								rs_ = rs_bak_;
-								ws_ = ws_bak_;
-								ws_->cleanup();
-								rs_->reset(hh->len_-CLIENT_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
-								
-								int r = ((GXContextMessageDispatch)callback_)(this,ioable,hh,hh->len_-CLIENT_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
-							}
-							// ========================================================================================
-						}
-					}
-					else{
-						// 是去包 
-						TailJump *jj = (TailJump*)(ioable->read_buf_+begin+hh->len_+(INTERNAL_HEADER_LEN-CLIENT_HEADER_LEN));
-						
-						if(0 == strncmp(jj->portal_id_,this->gx_id_,TAIL_ID_LEN)){
-							// it's me
-							// ========================================================================================
-							if(callback_){
-								// 准备好上下文
-								input_context_.reset();
-								
-								input_context_.gxc_ = this;
-								input_context_.src_link_pool_index_ = ioable->pool_index_;
-								input_context_.header_type_ = header_type_;
-								memcpy(&input_context_.header_,hh,INTERNAL_HEADER_LEN);
-								
-								int ee = TAIL_JUMP_LEN*hh->jumpnum_ <= TAIL_JUMP_MEM_LEN ? TAIL_JUMP_LEN*hh->jumpnum_ : TAIL_JUMP_MEM_LEN;
-								memcpy(input_context_.tail_mem_,jj,ee);
-								rs_ = rs_bak_;
-								ws_ = ws_bak_;
-								ws_->cleanup();
-								rs_->reset(hh->len_-CLIENT_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
-								
-								int r = ((GXContextMessageDispatch)callback_)(this,ioable,hh,hh->len_-CLIENT_HEADER_LEN,ioable->read_buf_+begin+INTERNAL_HEADER_LEN);
-							}
-							// ========================================================================================
-						}
-						else{
-							// find destiny
-							int r = findPortal(0,jj->portal_id_);
-							if(r >= 0){
-								Link *ll = getLink(r);
-								if(ll){
-									++ hh->jumpnum_;
-									int r2 = __kfifo_put(&ll->write_fifo_,(unsigned char*)hh,full_len);
-									if(r2 == full_len){
-										pushTailJump(ioable->pool_index_,ioable->link_id_,&ll->write_fifo_);
-									}
-								}
-								else{
-									begin += full_len;
-									return -1;
-								}
-							}
-							else{
-								// continue route
-								// 下面的2层循环是 在本上下文里找出一个没有“经过” 过的router 
-								Link *next_router = NULL;
-								FOR(i,link_pool_size_){
-									Link *ll = link_pool_+i;
-									if(ll->isOnline() && 'R'==ll->link_id_[0]){
-										bool found = false;
-										for(int rev=hh->jumpnum_-1;rev>=0;--rev){
-											TailJump *aa = jj+rev;
-											if(0 == strncmp(ll->link_id_,aa->portal_id_,TAIL_ID_LEN)){
-												found = true;
-												break;
-											}
-										}
-										
-										if(!found){
-											next_router = ll;
-											break;
-										}
-									}
-								}
-								
-								if(next_router){
-									++ hh->jumpnum_;
-									int r2 = __kfifo_put(&next_router->write_fifo_,(unsigned char*)hh,full_len);
-									if(r2 == full_len){
-										pushTailJump(ioable->pool_index_,ioable->link_id_,&next_router->write_fifo_);
-									}
-								}
-								else{
-									fprintf(stderr,"NO more router\n");
-									begin += full_len;
-									return -1;
-								}
-							}
-						}
-					}
-					
-					
-					begin += full_len;
-					return 1;
-				}
-			}
-		}
-	}
-	else if(1 == header_type_){
-		if((end-begin) >= CLIENT_HEADER_LEN){
-			ClientHeader *hh = (ClientHeader*)(ioable->read_buf_+begin);
-			if(hh->len_<CLIENT_HEADER_LEN || hh->len_>CLIENT_MSG_MAX_LEN){
-				return -4;
-			}
-			
-			int full_len = hh->len_;
-		#ifdef ENABLE_ENCRYPT
-			#define ENCRYPT_OFFSET 2
-			#define ENCRYPT_KEY_LEN 128
-			#define ENCRYPT_ECB_BLOCK 16
-			#define E_BUF_LEN 256
-			#define E_BUF_OUTPUT_OFFSET 128
-			
-			int encrypt_len = full_len - ENCRYPT_OFFSET;
-			
-			if(ioable->enable_encrypt_){
-				// 对齐到最近的16的整数 
-				int dd = encrypt_len / ENCRYPT_ECB_BLOCK;
-				if(dd*ENCRYPT_ECB_BLOCK != encrypt_len){
-					encrypt_len = (dd+1)*ENCRYPT_ECB_BLOCK;
-				}
-				else{
-					encrypt_len = (dd+1)*ENCRYPT_ECB_BLOCK;		// 还是要补16个字节 囧 
-				}
-			}
-			//printf("full_len[%d]  encrypt_len[%d]\n",full_len,encrypt_len);
-			if(encrypt_len+ENCRYPT_OFFSET<=(end-begin)){
-		#else
-			if(full_len<=(end-begin)){
-		#endif
-			
-			#ifdef ENABLE_ENCRYPT
-				if(ioable->enable_encrypt_){
-					static char *e_buf = NULL;
-					if(NULL == e_buf){
-						e_buf = (char*)	malloc(E_BUF_LEN);
-					}
-					
-					int plain_len = full_len - ENCRYPT_OFFSET;
-					char *e_begin = ioable->read_buf_+begin+ENCRYPT_OFFSET;
-					int encrypt_len_bak = encrypt_len;
-					while(encrypt_len > 0){
-						int len2 = encrypt_len>=ENCRYPT_ECB_BLOCK ? ENCRYPT_ECB_BLOCK : encrypt_len;
-						memcpy(e_buf,e_begin,len2);
-						int e_r = aes_crypt_ecb(&ioable->aes_c_dec_,AES_DECRYPT,e_buf,e_buf+E_BUF_OUTPUT_OFFSET);
-						// 把解密后的数据填回去
-						memcpy(e_begin,e_buf+E_BUF_OUTPUT_OFFSET,len2);
-						
-						encrypt_len -= ENCRYPT_ECB_BLOCK;
-						plain_len -= ENCRYPT_ECB_BLOCK;
-						e_begin += ENCRYPT_ECB_BLOCK;
-						
-						if(0 != e_r){
-							fprintf(stderr,"DECRYPT error\n");
-						}
-					}
-					encrypt_len = encrypt_len_bak;
-				}
-			#endif
-				int r = 0;
-				if(callback_){
-					// 准备好上下文
-					input_context_.reset();
-					
-					input_context_.gxc_ = this;
-					input_context_.src_link_pool_index_ = ioable->pool_index_;
-					input_context_.header_type_ = header_type_;
-					input_context_.header2_ = *hh;
-					//memcpy(&input_context_.header2_,hh,CLIENT_HEADER_LEN);
-					
-					rs_ = rs_bak_;
-					ws_ = ws_bak_;
-					ws_->cleanup();
-					rs_->reset(full_len-CLIENT_HEADER_LEN,ioable->read_buf_+begin+CLIENT_HEADER_LEN);
-					
-					r = ((GXContextMessageDispatch2)callback_)(this,ioable,hh,full_len-CLIENT_HEADER_LEN,ioable->read_buf_+begin+CLIENT_HEADER_LEN);
-				}
-				
-				if(-999 == r){
-					full_len = hh->len_+(INTERNAL_HEADER_LEN-CLIENT_HEADER_LEN);
-					begin += full_len;
-				}
-				else{
-				#ifdef ENABLE_ENCRYPT
-					if(ioable->enable_encrypt_){
-						begin += encrypt_len+ENCRYPT_OFFSET;
-					}
-					else{
-						begin += full_len;
-					}
-				#else
-					begin += full_len;
-				#endif
-				}
-				return 1;
-			}
-		}
-	}
-	
-	return -1;
-}
 
 #define PHR_MAX_HEADER 8
 struct _phr_parse_data{
@@ -1244,10 +898,17 @@ int GXContext::try_deal_one_http(Link *ioable,int &begin){
 }
 
 // only GET and POST supported
-inline bool _is_http_header(const char* buf){
-	return 0==strncmp("GET",buf,3) || 0==strncmp("POST",buf,4) || 0==strncmp("HTTP",buf,4);
+inline bool _is_http_request(const char* buf){
+	return 0==strncmp("GET",buf,3) || 0==strncmp("POST",buf,4);
 }
 
+inline bool _is_http_response(const char* buf){
+	return 0==strncmp("HTTP",buf,4);
+}
+
+inline bool _is_lemuria_header(const char* buf){
+	return 0==strncmp("LEM",buf,3);
+}
 
 /*
  使用IOCP需要注意的一些问题
@@ -1467,77 +1128,52 @@ void GXContext::frame_poll(timetype now,int block_time)
 					
 					continue; 
 				}
-				
-				int err = 1;
-				int real_read = 0;
-				int ok = nc_read(ioable->sock_,ioable->read_buf_+ioable->read_buf_offset_,ioable->read_buf_len_-ioable->read_buf_offset_,real_read);
-				if(unlikely(ok != 1)){
-					err = 1;
-				}
 				else{
-					err = 0;
-					ioable->read_buf_offset_ += real_read;
-				}
-				bool need_kick = false;
-				
-				if(likely(0==err && ioable->read_buf_offset_>=CLIENT_HEADER_LEN)){
-					if(likely(false==_is_http_header(ioable->read_buf_))){
-						// 是服务端内部包，绝大多数情况下应该是 InternalHeader 包头 
-						int byte_begin = 0;
-						FOR(limiter,9999){
-							int suc = try_deal_one_msg_s(ioable,byte_begin);
-							if(unlikely(1 != suc)){
-								if(-4==suc){
-									need_kick = true;
-								}
-								break;
-							}
-						}
-						if(byte_begin == ioable->read_buf_offset_){
-							ioable->read_buf_offset_ = 0;
-						}
-						else if(ioable->read_buf_offset_ > byte_begin){
-							memmove(ioable->read_buf_,ioable->read_buf_+byte_begin,ioable->read_buf_offset_-byte_begin);
-							ioable->read_buf_offset_ = ioable->read_buf_offset_-byte_begin;
+					int err = 1;
+					int real_read = 0;
+					int luar = 0;
+					bool need_kick = false;
+
+					if(unlikely(0!=(EPOLLOUT & ev->events))){
+
+					}
+					else if(likely(0!=(EPOLLIN & ev->events))){
+					#define _MIN_MESSAGE_LEN 16
+						int ok = nc_read(ioable->sock_,ioable->read_buf_+ioable->read_buf_offset_,ioable->read_buf_len_-ioable->read_buf_offset_,real_read);
+						if(unlikely(ok != 1)){
+							err = 1;
 						}
 						else{
-							// unlegal
-							ioable->read_buf_offset_ = 0;
+							err = 0;
+							ioable->read_buf_offset_ += real_read;
 						}
-					}
-					else{	// a http header
-						int byte_begin = 0;
-						FOR(limiter,9999){
-							int suc = try_deal_one_http(ioable,byte_begin);
-							if(unlikely(1 != suc)){
-								if(-4==suc){
-									need_kick = true;
-								}
-								break;
+
+						if(likely(0==err && ioable->read_buf_offset_>=_MIN_MESSAGE_LEN)){
+							if(likely(_is_lemuria_header(ioable->read_buf_))){
+								luar = this->lua_vm2_->callGlobalFunc<int>("LemuriaParse",
+									(const char*)ioable->read_buf_,ioable->read_buf_offset_,ioable->pool_index_);
+							}
+							else if(_is_http_request(ioable->read_buf_)){
+								luar = this->lua_vm2_->callGlobalFunc<int>("HttpReqParse",
+									(const char*)ioable->read_buf_,ioable->read_buf_offset_,ioable->pool_index_);
+							}
+							else if(_is_http_response(ioable->read_buf_)){
+								luar = this->lua_vm2_->callGlobalFunc<int>("HttpResponseParse",
+									(const char*)ioable->read_buf_,ioable->read_buf_offset_,ioable->pool_index_);
+							}
+							else{
+								// NO other protocol valid
+								need_kick = true;
 							}
 						}
-						if(byte_begin == ioable->read_buf_offset_){
-							ioable->read_buf_offset_ = 0;
+						if(-4 == luar){
+							need_kick = true;
 						}
-						else if(ioable->read_buf_offset_ > byte_begin){
-							memmove(ioable->read_buf_,ioable->read_buf_+byte_begin,ioable->read_buf_offset_-byte_begin);
-							ioable->read_buf_offset_ = ioable->read_buf_offset_-byte_begin;
-						}
-						else{
-							// unlegal
-							ioable->read_buf_offset_ = 0;
-						}
+
 					}
-					
-				}
-				else if(0!=err){
-					need_kick = true;
-				}
-				
-				
-				if(need_kick){
+
+					if(need_kick || 1==err){
 					// 做断开处理 
-					{
 						printf("做断开处理   [%d]\n",ioable->pool_index_);
 						
 						if(link_cut_callback_){
@@ -1546,9 +1182,9 @@ void GXContext::frame_poll(timetype now,int block_time)
 						ioable->link_stat_ = 0;
 						ioable->releaseSystemHandle(this);
 						releaseLink(ioable);
-		
 					}
 				}
+				
 			}
 		}
 	}

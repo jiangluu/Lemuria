@@ -109,7 +109,7 @@ int main(int argc, char** argv) {
 	}
 	
 	// 进入主循环 
-	static int frame_time_max = 10;		// 每帧最多让CPU等待10个千分之一秒 
+	static int frame_time_max = 5;		// 每帧最多让CPU等待10个千分之一秒 
 	
 	printf("server inited. start running...\n");
 	

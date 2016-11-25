@@ -132,8 +132,6 @@ struct GXContext{
 	
 	bool start_listening();
 	
-	bool connect2(char *global_id,char *ip_and_port);
-	
 	
 	void frame_poll(timetype now,int block_time);	// 一帧拉取数据，最多阻塞block_time。帧率控制由外部控制，这个函数无法控制 
 	int frame_flush(timetype now);	// 把输出缓冲里的数据flush出去 
@@ -147,7 +145,7 @@ struct GXContext{
 	
 	void forceCutLink(Link*);
 	
-	int connect2_no_care_id(char *ip_and_port);
+	int connect2_async(char *ip_and_port);
 	
 	
 	// GX functions
