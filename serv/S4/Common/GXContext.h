@@ -72,29 +72,6 @@ struct GXContext{
 	int lua_indicator_[GX_LUA_INDICATOR_NUM];
 	LuaInterface *lua_vm2_;
 	
-	struct InputContext{
-		struct GXContext *gxc_;
-		int src_link_pool_index_;
-		int header_type_;
-		InternalHeader header_;
-		ClientHeader header2_;
-		char tail_mem_[TAIL_JUMP_MEM_LEN];
-		u16 flag_;
-		
-		
-		
-		void reset(){	// 不释放内存，只是为了复用 
-			gxc_ = 0;
-			src_link_pool_index_ = -1;
-			header_type_ = 0;
-			memset(tail_mem_,0,TAIL_JUMP_MEM_LEN);
-			flag_ = 0;
-			memset(&header_,0,sizeof(header_));
-			memset(&header2_,0,sizeof(header2_));
-		}
-	};
-	
-	InputContext input_context_;
 	
 	AStream *rs_;
 	AStream *ws_;

@@ -91,27 +91,6 @@ bool cur_stream_push_string(const char* v,int len)
 }
 
 
-// 同步原路返回。messageid 是req的+1，内容是push到 stream里的内容。 
-void cur_stream_write_back()
-{
-	gx_cur_writestream_syncback();
-}
-
-void cur_stream_write_back2(int message_id)
-{	
-	gx_cur_writestream_syncback2(message_id);
-}
-
-void cur_stream_broadcast(int message_id)
-{
-	u16 bak = g_gx1->input_context_.header_.flag_;
-	g_gx1->input_context_.header_.flag_ |= HEADER_FLAG_BROADCAST;
-	gx_cur_writestream_syncback2(message_id);
-	
-	g_gx1->input_context_.header_.flag_ = bak;
-}
-
-
 
 // 注：山寨王的游戏时间定义为ansitime，这是因为手游是碎片化的，时间一般都要求跨越session 后还有意义。 
 // 除了以后的一场战斗中用到的时间外，都应该使用ansi时间。 
@@ -165,13 +144,6 @@ int string_hash(const char *str)
 	return string_hash_with_client(str);
 }
 
-
-int cur_message_loopback()
-{
-	g_gx1->input_context_.flag_ |= 0x2;
-	
-	return 0;
-}
 
 int cur_stream_get_readbuf_len()
 {

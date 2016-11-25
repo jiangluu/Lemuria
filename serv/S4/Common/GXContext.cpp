@@ -291,7 +291,7 @@ bool GXContext::init(int type,const char* ID,int pool_size,int read_buf_len,int 
 	
 	stat_ = 1;
 	
-	input_context_.reset();
+	
 	rs_ = new AStream(0,0);
 	void* mem = calloc(1,write_buf_len);
 	ws_ = new AStream(write_buf_len,(char*)mem);
@@ -509,149 +509,6 @@ int GXContext::sendToPortal(const char* destID,int datalen,void *data)
 	return -1;
 }
 
-int GXContext::syncWriteBack(int msgid,int datalen,void *data)
-{
-	datalen = datalen>0?datalen:0;
-	
-	int index = input_context_.src_link_pool_index_;
-	Link *l = getLink(index);
-	if(l){
-		kfifo *ff = &l->write_fifo_;
-		if(0 == input_context_.header_type_){
-			InternalHeader h;
-			// 这里不直接用 input_context_.header_的原因是，下面会改h，不想造成side effect 
-			memcpy(&h,&input_context_.header_,sizeof(h));
-			h.message_id_ = msgid;
-			h.len_ = CLIENT_HEADER_LEN + datalen;
-			h.flag_ |= HEADER_FLAG_BACK;
-			
-			__kfifo_put(ff,(unsigned char*)&h,INTERNAL_HEADER_LEN);
-		}
-		else{
-			ClientHeader &h = input_context_.header2_;
-			h.message_id_ = msgid;
-			h.len_ = CLIENT_HEADER_LEN + datalen;
-			
-			__kfifo_put(ff,(unsigned char*)&h,CLIENT_HEADER_LEN);
-		}
-		
-		int r = 0;
-		if(data && datalen>0){
-			r = __kfifo_put(ff,(unsigned char*)data,datalen);
-		}
-		
-		if(0 == input_context_.header_type_){
-			InternalHeader &h = input_context_.header_;
-			if(0 != (h.flag_ & HEADER_FLAG_ROUTE)){
-				int ee = TAIL_JUMP_LEN*h.jumpnum_ <= TAIL_JUMP_MEM_LEN ? TAIL_JUMP_LEN*h.jumpnum_ : TAIL_JUMP_MEM_LEN;
-				__kfifo_put(ff,(unsigned char*)input_context_.tail_mem_,ee);
-			}
-		}
-		
-		return r;
-	}
-	
-	return -1;
-}
-
-int GXContext::pushTailJump(u32 local_link_index,const char *ID,kfifo *f)
-{
-	if(NULL == ID || NULL == f) return -1;
-	
-	TailJump aa;
-	aa.local_index_ = local_link_index;
-	strncpy(aa.portal_id_,ID,TAIL_ID_LEN);
-	
-	return __kfifo_put(f,(unsigned char*)&aa,TAIL_JUMP_LEN);
-}
-
-int GXContext::packetRouteToNode(const char* destID,int msgid,int datalen,void *data)
-{
-	datalen = datalen>0?datalen:0;
-	if(NULL == destID){
-		return -1;
-	}
-	
-	u16 flag_bak = input_context_.header_.flag_;
-	flag_bak &= (~HEADER_FLAG_ROUTE);
-	
-	int r = findPortal(0,destID);
-	if(r >= 0){
-		// 在本上下文中直接定位到了，不必route了（PS，认为这种情况不常见） 
-		Link *l = getLink(r);
-		if(l){
-			kfifo *ff = &l->write_fifo_;
-			
-			if(0 == input_context_.header_type_){
-				InternalHeader h;
-				memcpy(&h,&input_context_.header_,sizeof(h));
-				h.message_id_ = msgid;
-				h.len_ = CLIENT_HEADER_LEN + datalen;
-				h.flag_ = flag_bak;
-				
-				__kfifo_put(ff,(unsigned char*)&h,INTERNAL_HEADER_LEN);
-			}
-			else{
-				ClientHeader &h = input_context_.header2_;
-				h.message_id_ = msgid;
-				h.len_ = CLIENT_HEADER_LEN + datalen;
-				
-				__kfifo_put(ff,(unsigned char*)&h,CLIENT_HEADER_LEN);
-			}
-			
-			if(data && datalen>0){
-				return __kfifo_put(ff,(unsigned char*)data,datalen);
-			}
-			else{
-				return 0;
-			}
-		}
-		else{
-			return -1;
-		}
-	}
-	else{
-		// 定位不到，要route 
-		if(0 != input_context_.header_type_){	// 不支持自定义格式包的route 
-			return -1;
-		}
-		
-		Link *first_router = NULL;
-		FOR(i,link_pool_size_){
-			Link *ll = link_pool_+i;
-			if(ll->isOnline() && 'R'==ll->link_id_[0]){
-				first_router = ll;
-				break;
-			}
-		}
-		
-		if(NULL == first_router){
-			fprintf(stderr,"find NO router\n");
-			return -1;
-		}
-		
-				InternalHeader h;
-				memcpy(&h,&input_context_.header_,sizeof(h));
-				h.message_id_ = msgid;
-				h.len_ = CLIENT_HEADER_LEN + datalen;
-				h.flag_ = flag_bak;
-				h.flag_ |= HEADER_FLAG_ROUTE;
-				h.jumpnum_ = 1;
-				
-				kfifo *ff = &first_router->write_fifo_;
-				__kfifo_put(ff,(unsigned char*)&h,INTERNAL_HEADER_LEN);
-				
-				if(data && datalen>0){
-					__kfifo_put(ff,(unsigned char*)data,datalen);
-				}
-				
-				return pushTailJump(-1,destID,ff);
-	}
-	
-	
-	return -1;
-}
-
 
 void GXContext::forceCutLink(Link* ll)
 {
@@ -864,12 +721,7 @@ int GXContext::try_deal_one_http(Link *ioable,int &begin){
 							begin += pret;
 
 							if(true){
-								// 准备好上下文
-								input_context_.reset();
 								
-								input_context_.gxc_ = this;
-								input_context_.src_link_pool_index_ = ioable->pool_index_;
-								input_context_.header_type_ = 80;
 								
 								rs_ = rs_bak_;
 								ws_ = ws_bak_;
