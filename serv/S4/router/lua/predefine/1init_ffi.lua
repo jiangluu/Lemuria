@@ -7,8 +7,6 @@ ffi.cdef[[
 typedef struct lua_State lua_State;
 int c_luaopen_lfs(lua_State *L);
 
-int c_luaopen_bson(lua_State *L);
-
 int c_luaopen_atablepointer(lua_State *L);
 
 int c_lua_ex_function(lua_State *L);
@@ -76,24 +74,7 @@ void gx_cur_writestream_cleanup();
 
 void gx_cur_writestream_protect(int);
 
-// 同步原路返回。messageid 是req的+1，内容是push到 stream里的内容。 
-int gx_cur_writestream_syncback();
-
-int gx_cur_writestream_syncback2(int message_id);
-
-int gx_cur_writestream_send_to(int portal_index,int message_id);
-
-int gx_get_portal_pool_index();
-
-int gx_get_message_id();
-
-int gx_make_portal_sync(const char* ID,const char* port);
-
-int gx_bind_portal_id(int index,const char* id);
-
-int gx_get_input_context_size();
-
-void* gx_get_input_context();
+unsigned int gx_push_link_buffer(int link_index, unsigned int len, const char *buf);
 
 // GX END
 
@@ -131,12 +112,6 @@ bool cur_stream_push_string(const char* v,int len);
 
 void cur_write_stream_cleanup();
 
-// 同步原路返回。messageid 是req的+1，内容是push到 stream里的内容。 
-void cur_stream_write_back();
-
-void cur_stream_write_back2(int message_id);
-
-void cur_stream_broadcast(int message_id);
 
 uint32_t cur_game_time();
 

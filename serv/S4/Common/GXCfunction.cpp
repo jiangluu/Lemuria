@@ -223,5 +223,15 @@ void gx_cur_writestream_protect(int n)
 // 同步原路返回。messageid 是req的+1，内容是push到 stream里的内容。 
 
 
+unsigned int gx_push_link_buffer(int link_index, unsigned int len, const char *buf){
+	if(s_gx){
+		Link *l = s_gx->getLink(link_index);
+		if(l){
+			unsigned int r = __kfifo_put(&l->write_fifo_, buf,len);
+			return r;
+		}
+	}
 
+	return 0;
+}
 

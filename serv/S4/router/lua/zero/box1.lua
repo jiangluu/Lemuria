@@ -36,8 +36,6 @@ typedef __attribute__((aligned(4))) struct Box{
 } Box;
 ]]
 
-o.input_context_size = lcf.gx_get_input_context_size()
-o.app_context_size = 16
 
 function o.get_transdata(boxc,id)
 	return boxc.transdata + id - 1

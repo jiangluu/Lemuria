@@ -75,25 +75,9 @@ CF_EXPORT void gx_cur_writestream_cleanup();
 CF_EXPORT void gx_cur_writestream_protect(int n);	// 保护输入buf的前n个字节不被清除 
 
 // 同步原路返回。messageid 是req的+1，内容是push到 stream里的内容。 
-CF_EXPORT int gx_cur_writestream_syncback();
 
-CF_EXPORT int gx_cur_writestream_syncback2(int message_id);
 
-CF_EXPORT int gx_cur_writestream_send_to(int portal_index,int message_id);
-
-CF_EXPORT s32 gx_get_portal_pool_index();
-
-CF_EXPORT int gx_get_message_id();
-
-CF_EXPORT int gx_make_portal_sync(const char* ID,const char* port);
-
-CF_EXPORT int gx_bind_portal_id(int index,const char* id);
-
-CF_EXPORT int gx_cur_writestream_route_to(const char* destID,int message_id, int flag);
-
-CF_EXPORT int gx_get_input_context_size();
-
-CF_EXPORT void* gx_get_input_context();
+CF_EXPORT unsigned int gx_push_link_buffer(int link_index, unsigned int len, const char *buf);
 
 }
 
