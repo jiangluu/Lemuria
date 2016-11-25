@@ -291,7 +291,7 @@ bool GXContext::init(int type,const char* ID,int pool_size,int read_buf_len,int 
 	
 	stat_ = 1;
 	
-	
+
 	rs_ = new AStream(0,0);
 	void* mem = calloc(1,write_buf_len);
 	ws_ = new AStream(write_buf_len,(char*)mem);
@@ -1006,8 +1006,17 @@ void GXContext::frame_poll(timetype now,int block_time)
 									(const char*)ioable->read_buf_,ioable->read_buf_offset_,ioable->pool_index_);
 							}
 							else if(_is_http_request(ioable->read_buf_)){
-								luar = this->lua_vm2_->callGlobalFunc<int>("HttpReqParse",
-									(const char*)ioable->read_buf_,ioable->read_buf_offset_,ioable->pool_index_);
+								lua_State *L = this->lua_vm2_->L();
+								lua_getglobal(L, "HttpReqParse");
+								lua_pushlstring(L, ioable->read_buf_,ioable->read_buf_offset_);
+								lua_pushnumber(L, ioable->pool_index_);
+								lua_pcall(L, 2,2,0);
+
+								luar = lua_tointeger(L, -2);
+								int passed = lua_tointeger(L, -1);
+								lua_pop(L, 2);
+
+								printf("AAAAAA %d  %d\n",luar, passed);
 							}
 							else if(_is_http_response(ioable->read_buf_)){
 								luar = this->lua_vm2_->callGlobalFunc<int>("HttpResponseParse",
