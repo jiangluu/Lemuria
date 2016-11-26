@@ -1034,6 +1034,9 @@ void GXContext::frame_poll(timetype now,int block_time)
 								int passed = lua_tointeger(L, -1);
 								lua_pop(L, 2);
 
+								printf("WWWWW %d  %d\n",luar, passed);
+
+								err = luar;
 								if(-4 == luar){
 									need_kick = true;
 								}
