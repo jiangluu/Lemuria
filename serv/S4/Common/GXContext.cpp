@@ -1053,12 +1053,23 @@ void GXContext::frame_poll(timetype now,int block_time)
 							ioable->read_buf_offset_ += real_read;
 						}
 
+					#define _LLLUA(a)	lua_State *L = this->lua_vm2_->L();\
+								lua_getglobal(L, a);\
+								lua_pushlstring(L, ioable->read_buf_,ioable->read_buf_offset_);\
+								lua_pushnumber(L, ioable->pool_index_);\
+								lua_pcall(L, 2,2,0);\
+								luar = lua_tointeger(L, -2);\
+								int passed = lua_tointeger(L, -1);\
+								lua_pop(L, 2);\
+								printf(#a" OVER %d  %d\n",luar, passed);
+
 						if(likely(0==err && ioable->read_buf_offset_>=_MIN_MESSAGE_LEN)){
 							if(likely(_is_lemuria_header(ioable->read_buf_))){
-								luar = this->lua_vm2_->callGlobalFunc<int>("LemuriaParse",
-									(const char*)ioable->read_buf_,ioable->read_buf_offset_,ioable->pool_index_);
+								_LLLUA("LemuriaParse")
 							}
 							else if(_is_http_request(ioable->read_buf_)){
+								_LLLUA("HttpReqParse")
+								/*
 								lua_State *L = this->lua_vm2_->L();
 								lua_getglobal(L, "HttpReqParse");
 								lua_pushlstring(L, ioable->read_buf_,ioable->read_buf_offset_);
@@ -1070,10 +1081,10 @@ void GXContext::frame_poll(timetype now,int block_time)
 								lua_pop(L, 2);
 
 								printf("AAAAAA %d  %d\n",luar, passed);
+								*/
 							}
 							else if(_is_http_response(ioable->read_buf_)){
-								luar = this->lua_vm2_->callGlobalFunc<int>("HttpResponseParse",
-									(const char*)ioable->read_buf_,ioable->read_buf_offset_,ioable->pool_index_);
+								_LLLUA("HttpResponseParse")
 							}
 							else{
 								// NO other protocol valid

@@ -1,5 +1,7 @@
 
-function LemuriaParse(buf, endd, pindex)
+function LemuriaParse(buf, pindex)
 	print("LemuriaParse")
-	print(buf, endd, pindex)
+	print(buf, #buf, pindex)
+
+	return 0,1
 end

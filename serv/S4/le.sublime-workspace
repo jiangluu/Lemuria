@@ -137,55 +137,47 @@
 			}
 		},
 		{
-			"file": "Common/GXCfunction.cpp",
+			"file": "router/lua/zero/HttpReqParse.lua",
 			"settings":
 			{
-				"buffer_size": 3776,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
+				"buffer_size": 102,
+				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "router/redis_thread.cpp",
+			"file": "router/lua/zero/LemuriaParse.lua",
 			"settings":
 			{
-				"buffer_size": 4479,
+				"buffer_size": 102,
 				"encoding": "UTF-8",
-				"line_ending": "Windows"
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "router/lua/zero/HttpResponseParse.lua",
+			"settings":
+			{
+				"buffer_size": 112,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "router/lua/zero/C_Writeable.lua",
+			"settings":
+			{
+				"buffer_size": 92,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
 			}
 		},
 		{
 			"file": "Common/GXContext.cpp",
 			"settings":
 			{
-				"buffer_size": 25032,
+				"buffer_size": 26211,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "Common/GXContext.h",
-			"settings":
-			{
-				"buffer_size": 4017,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "Common/hiredis/async.c",
-			"settings":
-			{
-				"buffer_size": 21655,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "Common/hiredis/net.c",
-			"settings":
-			{
-				"buffer_size": 15194,
-				"line_ending": "Unix"
 			}
 		}
 	],
@@ -225,11 +217,22 @@
 	},
 	"expanded_folders":
 	[
-		"/home/jl/my/lemuria/serv/S4/router",
-		"/home/jl/my/lemuria/serv/S4/Common"
+		"/home/jl/my/Lemuria/serv/S4/router",
+		"/home/jl/my/Lemuria/serv/S4/Common"
 	],
 	"file_history":
 	[
+		"/home/jl/my/Lemuria/serv/S4/router/lua/zero/OnHttpReq.lua",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/zero/OnFrame.lua",
+		"/home/jl/my/Lemuria/serv/S4/router/redis_thread.cpp",
+		"/home/jl/my/Lemuria/serv/S4/Common/GXCfunction.h",
+		"/home/jl/my/Lemuria/serv/S4/Common/GXCfunction.cpp",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/predefine/1init_ffi.lua",
+		"/home/jl/my/Lemuria/serv/S4/Common/GXContext.h",
+		"/home/jl/my/Lemuria/serv/S4/Common/hiredis/async.c",
+		"/home/jl/my/Lemuria/serv/S4/Common/link.cpp",
+		"/home/jl/my/Lemuria/serv/S4/Common/link.h",
+		"/home/jl/my/Lemuria/serv/S4/Common/hiredis/net.c",
 		"/home/jl/my/lemuria/serv/S4/Common/link.cpp",
 		"/home/jl/my/lemuria/serv/S4/Common/link.h",
 		"/home/jl/my/lemuria/serv/S4/Common/hiredis/async.h",
@@ -252,7 +255,6 @@
 		"/home/jl/my/Lemuria/serv/S4/Common/ae/ae.h",
 		"/home/jl/my/Lemuria/serv/S4/Common/ae/ae.c",
 		"/home/jl/my/Lemuria/serv/S4/Common/hiredis/net.h",
-		"/home/jl/my/Lemuria/serv/S4/Common/hiredis/net.c",
 		"/home/jl/my/Lemuria/serv/S4/Common/hiredis/hiredis.h",
 		"/home/jl/my/Lemuria/serv/S4/Common/ae/ae_epoll.c",
 		"/home/jl/github/luasys/src/event/epoll.h",
@@ -292,13 +294,10 @@
 		"/home/jl/github/pbc/README.md",
 		"/home/jl/github/pbc/src/varint.c",
 		"/home/jl/github/pbc/Makefile",
-		"/home/jl/my/Lemuria/serv/S4/router/lua/predefine/1init_ffi.lua",
 		"/home/jl/my/Lemuria/serv/S4/Common/picohttpparser/test.c",
-		"/home/jl/my/Lemuria/serv/S4/Common/GXCfunction.cpp",
 		"/home/jl/my/Lemuria/serv/S4/Common/picohttpparser/picohttpparser.h",
 		"/home/jl/my/Lemuria/serv/S4/router/lua/zero/OnGXMessage.lua",
 		"/home/jl/my/Lemuria/serv/S4/router/LuaInterface.h",
-		"/home/jl/my/Lemuria/serv/S4/Common/GXContext.h",
 		"/home/jl/my/Lemuria/serv/S4/router/message_dispatch.cpp",
 		"/home/jl/my/Lemuria/serv/S4/router/cfunction.h",
 		"/home/jl/my/Lemuria/serv/S4/router/cfunction.cpp",
@@ -318,8 +317,6 @@
 		"/home/jl/my/Lemuria/serv/S4/router/lua/box/ma.lua",
 		"/home/jl/my/Lemuria/serv/S4/router/lua/init.lua",
 		"/home/jl/my/Lemuria/serv/S4/router/lua/predefine/redis_common.lua",
-		"/home/jl/my/Lemuria/serv/S4/router/lua/zero/OnFrame.lua",
-		"/home/jl/my/Lemuria/serv/S4/Common/GXCfunction.h",
 		"/home/jl/my/Lemuria/serv/S4/Common/types.h",
 		"/home/jl/my/Lemuria/serv/S4/router/lua/predefine/init.lua",
 		"/home/jl/my/Lemuria/serv/S3/service/cfunction.h",
@@ -337,8 +334,6 @@
 		"/home/jl/my/Lemuria/serv/S4/router/lua/box/msghandle_1.lua",
 		"/home/jl/my/Lemuria/serv/S4/Common/packet_header.h",
 		"/home/jl/github/picohttpparser/picohttpparser.h",
-		"/home/jl/my/Lemuria/serv/S4/Common/link.h",
-		"/home/jl/my/Lemuria/serv/S4/Common/link.cpp",
 		"/home/jl/my/gbkconv/gbkconv.go",
 		"/home/jl/my/gbkconv/aa.go",
 		"/home/jl/my/Lemuria/serv/S4/Common/GameTime.h.gbkzzz",
@@ -350,18 +345,15 @@
 		"/home/jl/my/zzz1/kklog.go",
 		"/home/jl/my/Lemuria/serv/include/tolua++/luajit.h",
 		"/home/jl/my/Lemuria/serv/S4/gate/Makefile",
-		"/home/jl/my/Lemuria/serv/S4/router/redis_thread.cpp",
 		"/home/jl/zzz1/kklog.go",
 		"/etc/hosts",
 		"/home/jl/github/lua-resty-mysql/lib/resty/mysql.lua",
 		"/home/jl/github/mysql-async-example/mysql_async_example.c",
-		"/home/jl/github/mysql-async-example/mysql_example.c",
-		"/home/jl/github/lua-resty-mysql/README.markdown",
-		"/home/jl/github/lua-resty-mysql/Makefile"
+		"/home/jl/github/mysql-async-example/mysql_example.c"
 	],
 	"find":
 	{
-		"height": 34.0
+		"height": 23.0
 	},
 	"find_in_files":
 	{
@@ -382,6 +374,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"connect",
 			"delWrite",
 			"ev.delWrite = ",
 			"delWrite",
@@ -476,91 +469,88 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "Common/GXCfunction.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3776,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 2624.0,
-						"zoom_level": 1.0
-					},
 					"stack_index": 5,
 					"type": "text"
 				},
 				{
-					"buffer": 2,
-					"file": "router/redis_thread.cpp",
+					"buffer": 1,
+					"file": "router/lua/zero/HttpReqParse.lua",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4479,
+						"buffer_size": 102,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1940,
-								1940
+								84,
+								84
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.sublime-syntax",
-							"translate_tabs_to_spaces": false
+							"syntax": "Packages/Lua/Lua.sublime-syntax"
 						},
 						"translation.x": 0.0,
-						"translation.y": 1134.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "router/lua/zero/LemuriaParse.lua",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 102,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								102,
+								102
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
 					"buffer": 3,
-					"file": "Common/GXContext.cpp",
+					"file": "router/lua/zero/HttpResponseParse.lua",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 25032,
+						"buffer_size": 112,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								22446,
-								22446
+								112,
+								112
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.sublime-syntax",
-							"translate_tabs_to_spaces": false
+							"syntax": "Packages/Lua/Lua.sublime-syntax"
 						},
-						"translation.x": -0.0,
-						"translation.y": 14928.0,
+						"translation.x": 0.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -568,19 +558,47 @@
 				},
 				{
 					"buffer": 4,
-					"file": "Common/GXContext.h",
+					"file": "router/lua/zero/C_Writeable.lua",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4017,
+						"buffer_size": 92,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3581,
-								3581
+								92,
+								92
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "Common/GXContext.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 26211,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								24943,
+								24943
 							]
 						],
 						"settings":
@@ -589,67 +607,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1200.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "Common/hiredis/async.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 21655,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2408,
-								2408
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 429.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "Common/hiredis/net.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 15194,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								5693,
-								5693
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 2514.0,
+						"translation.y": 15628.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 2,
