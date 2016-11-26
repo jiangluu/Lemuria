@@ -9,6 +9,16 @@ extern ARand *g_rand;
 
 // HELP FUNCTIONS
 
+int nc_check_socket_error(int fd)
+{
+	int err = 0;
+    socklen_t errlen = sizeof(err);
+	if(0==getsockopt(fd, SOL_SOCKET, SO_ERROR, (char *)&err, &errlen)){
+		return err;
+	}
+	return -1;
+}
+
 int nc_setsockopt_server(int fd)
 {
     int size = MY_SO_RCVBUF_MAX_LEN;
@@ -251,7 +261,7 @@ struct PortalPrint{
 };
 	
 
-bool GXContext::init(int type,const char* ID,int pool_size,int read_buf_len,int write_buf_len)
+bool GXContext::init(int type,const char* ID,int pool_size,int read_buf_len,int write_buf_len,int req_read_buf_len,int req_write_buf_len)
 {
 	type_ = type;
 	
@@ -260,6 +270,8 @@ bool GXContext::init(int type,const char* ID,int pool_size,int read_buf_len,int 
 	link_pool_size_conf_ = pool_size;
 	read_buf_len_ = read_buf_len;
 	write_fifo_len_ = write_buf_len;
+	req_read_buf_len_ = req_read_buf_len;
+	req_write_fifo_len_ = req_write_buf_len;
 	
 #ifdef WIN32
 	WORD wVersionRequested;
@@ -319,6 +331,9 @@ bool GXContext::init(int type,const char* ID,int pool_size,int read_buf_len,int 
 	return true;
 }
 
+#define REQ_READ_BUF_LEN (1024*16)
+#define REQ_WRITE_BUF_LEN (1024*8)
+
 bool GXContext::initWrap(int type,const char* ID)
 {
 	lua_vm2_ = new LuaInterface();
@@ -336,7 +351,7 @@ bool GXContext::initWrap(int type,const char* ID)
 	
 	std::string my_port = lua_vm2_->callGlobalFunc<std::string>("getMyPort");
 	
-	bool r = init(type,ID,config_maxconn,config_readbuflen,config_writebuflen);
+	bool r = init(type,ID,config_maxconn,config_readbuflen,config_writebuflen,REQ_READ_BUF_LEN, REQ_WRITE_BUF_LEN);
 	strncpy(this->ip_and_port_,my_port.c_str(),127);
 	
 	
@@ -625,7 +640,7 @@ bool GXContext::start_listening()
 }
 
 
-// @TODO
+// @TODO: WIN32
 int GXContext::connect2_async(char *ip_and_port)
 {
 	if(0 == ip_and_port) return -1;
@@ -645,15 +660,21 @@ int GXContext::connect2_async(char *ip_and_port)
 	int sock = ::socket(PF_INET,SOCK_STREAM,0);
     nc_setsockopt_client(sock);
     nc_set_no_delay(sock);
+    nc_set_nonblock(sock);
     
-    
+    bool need_sche_write = true;	// however schedule one
     if(nc_connect(sock,buf2,port)!=0){
-    	printf("connect to peer failed.\n");
-    	return -1;
+    	if (EINPROGRESS == errno) {
+    		/* This is ok. */
+    		need_sche_write = true;
+    	}
+    	else{
+    		close(sock);
+    		printf("connect2_async failed.\n");
+            return -1;
+    	}
     }
     
-	nc_set_nonblock(sock);
-	
 	Link *ll = newLink();
 	if(0 == ll || ll->isOnline()){
 		return -1;
@@ -673,13 +694,19 @@ int GXContext::connect2_async(char *ip_and_port)
 	    return -1;
 	}
 	
-	ll->becomeOnline(read_buf_len_,write_fifo_len_);
+	ll->becomeOnline(req_read_buf_len_,req_write_fifo_len_);
 	
 	ll->post_recv();
 #else
-	ll->register_read_event(this);
+	if(need_sche_write){
+		ll->register_write_event(this);
+	}
+	else{
+		ll->register_read_event(this);
+	}
 	
-	ll->becomeOnline(read_buf_len_,write_fifo_len_);
+	
+	ll->becomeOnline(req_read_buf_len_, req_write_fifo_len_);
 #endif
 
 	return ll->pool_index_;
@@ -987,7 +1014,30 @@ void GXContext::frame_poll(timetype now,int block_time)
 					bool need_kick = false;
 
 					if(unlikely(0!=(EPOLLOUT & ev->events))){
+						// write event
+						int er = nc_check_socket_error(ioable->sock_);
+						if(EINPROGRESS == er){
+							// nothing...
+						}
+						else{
+							ioable->unregister_event(this);
+							ioable->register_read_event(this);
 
+								lua_State *L = this->lua_vm2_->L();
+								lua_getglobal(L, "C_Writeable");
+								//lua_pushlstring(L, ioable->read_buf_,ioable->read_buf_offset_);
+								lua_pushnumber(L, ioable->pool_index_);
+								lua_pushnumber(L, er);
+								lua_pcall(L, 2,2,0);
+
+								luar = lua_tointeger(L, -2);
+								int passed = lua_tointeger(L, -1);
+								lua_pop(L, 2);
+
+								if(-4 == luar){
+									need_kick = true;
+								}
+						}
 					}
 					else if(likely(0!=(EPOLLIN & ev->events))){
 					#define _MIN_MESSAGE_LEN 16
@@ -1032,6 +1082,7 @@ void GXContext::frame_poll(timetype now,int block_time)
 						}
 
 					}
+
 
 					if(need_kick || 1==err){
 					// 做断开处理 

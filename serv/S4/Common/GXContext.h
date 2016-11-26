@@ -57,6 +57,8 @@ struct GXContext{
 	int		link_pool_size_conf_;
 	int		read_buf_len_;
 	int		write_fifo_len_;
+	int		req_read_buf_len_;
+	int		req_write_fifo_len_;
 	
 	
 	int listening_socket_;
@@ -80,7 +82,7 @@ struct GXContext{
 	
 	
 	GXContext():type_(0),layer_(0),header_type_(0),stat_(0),enable_encrypt_(false),link_pool_size_conf_(0),
-	link_pool_size_(0),read_buf_len_(0),write_fifo_len_(0),listening_socket_(-1),
+	link_pool_size_(0),read_buf_len_(0),write_fifo_len_(0),req_read_buf_len_(0),req_write_fifo_len_(0),listening_socket_(-1),
 	callback_(0),callback_http_(0),link_cut_callback_(0),link_pool_(NULL),lua_vm_(NULL),lua_vm2_(NULL),rs_(0),ws_(0),rs_bak_(0),ws_bak_(0),
 	#ifdef __USING_WINDOWS_IOCP
 		iocp_handle_(0)
@@ -92,7 +94,7 @@ struct GXContext{
 		gx_id_[0] = 0;
 	}
 	
-	bool init(int type,const char* ID,int pool_size,int read_buf_len,int write_buf_len);
+	bool init(int type,const char* ID,int pool_size,int read_buf_len,int write_buf_len,int,int);
 	bool initWrap(int type,const char* ID);
 	
 	void free();
@@ -151,6 +153,7 @@ private:
 
 
 // JUST HELP FUNCTIONS
+int nc_check_socket_error(int fd);
 int nc_setsockopt_server(int fd);
 int nc_setsockopt_client(int fd);
 int nc_connect(int sock,const char *ip,int port);

@@ -137,81 +137,19 @@
 			}
 		},
 		{
-			"file": "router/lua/zero/OnHttpReq.lua",
-			"settings":
-			{
-				"buffer_size": 800,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "router/lua/zero/OnGXMessage.lua",
-			"settings":
-			{
-				"buffer_size": 2939,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "router/lua/zero/box1.lua",
-			"settings":
-			{
-				"buffer_size": 1661,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "router/lua/zero/redis_dispatch.lua",
-			"settings":
-			{
-				"buffer_size": 4354,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "Common/pbc/pbc-lua.c",
-			"settings":
-			{
-				"buffer_size": 26653,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
 			"file": "Common/GXCfunction.cpp",
 			"settings":
 			{
-				"buffer_size": 5991,
+				"buffer_size": 3776,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "Common/GXContext.h",
+			"file": "router/redis_thread.cpp",
 			"settings":
 			{
-				"buffer_size": 4519,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "Common/link.h",
-			"settings":
-			{
-				"buffer_size": 4055,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "Common/link.cpp",
-			"settings":
-			{
-				"buffer_size": 799,
+				"buffer_size": 4479,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -220,17 +158,18 @@
 			"file": "Common/GXContext.cpp",
 			"settings":
 			{
-				"buffer_size": 38151,
+				"buffer_size": 25032,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "Common/hiredis/hiredis.c",
+			"file": "Common/GXContext.h",
 			"settings":
 			{
-				"buffer_size": 37728,
-				"line_ending": "Unix"
+				"buffer_size": 4017,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
 			}
 		},
 		{
@@ -242,39 +181,10 @@
 			}
 		},
 		{
-			"file": "Common/packet_header.h",
+			"file": "Common/hiredis/net.c",
 			"settings":
 			{
-				"buffer_size": 663,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"contents": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <string>\n#include <assert.h>\n#include <stdint.h>\n#include \"gate.h\"\n#include \"AStream.h\"\n#include \"GXCfunction.h\"\n#include \"LuaInterface.h\"\n#include \"omt.h\"\n\n\n\n#define OFFLINE_TIMEOUT 60000\t// 60ÃëÃ»ÓÐÈÎºÎÏûÏ¢ËãÏÂÏß \n\n#define DUANLIANJIE_TIMEOUT 120000\t// 120ÃëÖ®ÄÚ¶ÌÁ¬½Ó²»ËãÊ§Ð§ \n\n\n\nextern LuaInterface *g_luavm;\n\n\nstatic struct omt_tree *table1 = NULL;\n\nstruct DuanLianJie_Imprint{\n\tint last_pool_id_;\n\ttimetype last_time_;\n\ts32\t\tsession_link_index_; \t// ´ËsessionÔÚÄÄ¸ölink \n\tu16\t\tapp_box_id_;\n\tu16\t\tapp_actor_id_;\n};\n\n#define IMPRINT_POOL_NUM 60000\nstatic struct DuanLianJie_Imprint *a_imprint = NULL;\nstatic int imprint_free_offset = 0;\n\n\nint server_kick_client(Link *ll,int reason);\n\n\nDuanLianJie_Imprint* help_omt_get_imprint(omt_tree* tr,const char* key)\n{\n\tstruct slice s1;\n\ts1.size = strlen(key);\n\ts1.data = key;\n\ts1.v_ = 0;\n\t\n\tu32 index = -1;\n\t\n\tint r = omt_find_order(tr,&s1,&index);\n\tif(-1 == r){\n\t\treturn (DuanLianJie_Imprint*)tr->nodes[index].value->v_;\n\t}\n\t\n\treturn NULL;\n}\n\n\n// ¿Í»§¶ËÀ´µÄÏûÏ¢£¬°üÍ·ÊÇClientHeader \nint message_dispatch_2(GXContext*,Link* src_link,ClientHeader *hh,int body_len,char *body)\n{\n\tint message_id = hh->message_id_;\n\t\n#ifdef ENABLE_ENCRYPT\n\tif(body_len<1){\n\t\t// ÈÏÎª²»ºÏ·¨£¬Ìßµô´ËÍæ¼Ò \n\t\treturn -1;\n\t}\n\t\n\tif(! src_link->enc_is_first_){\n\t\t++ src_link->enc_inc_;\n\t\tif((*body) != src_link->enc_inc_) return -1;\n\t}\n\telse{\n\t\tsrc_link->enc_inc_ = *body;\n\t\tsrc_link->enc_is_first_ = false;\n\t}\n\t\n\t++body;\n\t--body_len;\n\t-- hh->len_;\n\t//printf(\"OK  %d  %d  %d\\n\",(int)src_link->enc_inc_,body_len,message_id);\n#endif\n\t\n\t\n\t// ¶ÌÁ¬½ÓÏà¹Ø\n#define DUAN_LIANJIE_OPEN_ID 9001\n\tif(g_duanlianjie>=1 &&  DUAN_LIANJIE_OPEN_ID == message_id){\n\t\tAStream rs(body_len,body);\t// rs means read stream\n\t\tstd::string session_id = rs.getStr();\n\t\t\n\t\tif(NULL == table1){\n\t\t\ttable1 = omt_new();\n\t\t\tassert(table1);\n\t\t\t\n\t\t\ta_imprint = new struct DuanLianJie_Imprint[IMPRINT_POOL_NUM];\n\t\t\tassert(a_imprint);\n\t\t}\n\t\t\n\t\t// ·ÀÖ¹ table1 ÎÞÏÞÔö³¤ \n\t\tif(table1->free_idx > 50000){\n\t\t\tprintf(\"re-generate table1...\\n\");\n\t\t\tstruct omt_tree *new_tree = omt_new();\n\t\t\tassert(new_tree);\n\t\t\t\n\t\t\ttimetype now = g_time->getANSITime();\n\t\t\t\n\t\t\tFOR(i,table1->free_idx){\n\t\t\t\tstruct omt_node &node = table1->nodes[i];\n\t\t\t\tif(0 != node.value->v_){\n\t\t\t\t\tDuanLianJie_Imprint *p = (DuanLianJie_Imprint*)node.value->v_;\n\t\t\t\t\tif(now <= p->last_time_+DUANLIANJIE_TIMEOUT){\n\t\t\t\t\t\tomt_insert(new_tree,node.value);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t\t\n\t\t\tomt_free(table1);\n\t\t\ttable1 = new_tree;\n\t\t\tprintf(\"re-generate table1 over. new tree has [%d] leaf\\n\",table1->free_idx);\n\t\t}\n\t\t// ================\n\t\t\n\t\tif(0 == src_link->link_id_[0]){\n\t\t\t\n\t\t\tstruct slice *v = NULL;\n\t\t\tDuanLianJie_Imprint *p = help_omt_get_imprint(table1,session_id.c_str());\n\t\t\tbool need_new_session = true;\n\t\t\tif(NULL != p){\t// found\n\t\t\t\ttimetype now = g_time->getANSITime();\n\t\t\t\tif(now <= p->last_time_+DUANLIANJIE_TIMEOUT){\n\t\t\t\t\tneed_new_session = false;\n\t\t\t\t\t\n\t\t\t\t\tp->last_time_ = now;\n\t\t\t\t\tp->last_pool_id_ = src_link->pool_index_;\n\t\t\t\t\t\n\t\t\t\t\tsrc_link->session_link_index_ = p->session_link_index_;\n\t\t\t\t\tsrc_link->app_box_id_ = p->app_box_id_;\n\t\t\t\t\tsrc_link->app_actor_id_ = p->app_actor_id_;\n\t\t\t\t\t\n\t\t\t\t\tstrncpy(src_link->link_id_,session_id.c_str(),LINK_ID_LEN);\n\t\t\t\t}\n\t\t\t}\n\t\t\t\n\t\t\tif(need_new_session){\n\t\t\t\t// gen a random string\n\t\t\t\tstatic char *buf = NULL;\n\t\t\t\tif(NULL == buf){\n\t\t\t\t\tbuf = (char*)malloc(32);\n\t\t\t\t}\n\t\t\t\tmemset(buf,0,32);\n\t\t\t\t\n\t\t\t\tFOR(i,LINK_ID_LEN){\n\t\t\t\t\tbuf[i] = 'A' + (g_rand->rand32()%26);\n\t\t\t\t}\n\t\t\t\t\n\t\t\t\tstrncpy(src_link->link_id_,buf,LINK_ID_LEN);\n\t\t\t\t\n\t\t\t\t// alloc a free imprint\n\t\t\t\tstruct DuanLianJie_Imprint *im = NULL;\n\t\t\t\tFOR(i,IMPRINT_POOL_NUM){\n\t\t\t\t\tint idx = imprint_free_offset + i;\n\t\t\t\t\tidx = idx<IMPRINT_POOL_NUM?idx:(idx-IMPRINT_POOL_NUM);\n\t\t\t\t\tif(-2 == a_imprint[idx].session_link_index_){\n\t\t\t\t\t\tim = a_imprint+idx;\n\t\t\t\t\t\tbreak;\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\t\n\t\t\t\tif(im){\n\t\t\t\t\tim->last_pool_id_ = src_link->pool_index_;\n\t\t\t\t\tim->last_time_ = g_time->getANSITime();\n\t\t\t\t\t\n\t\t\t\t\tstruct slice sl;\n\t\t\t\t\tsl.data = buf;\n\t\t\t\t\tsl.size = LINK_ID_LEN;\n\t\t\t\t\tsl.v_ = im;\n\t\t\t\t\t\n\t\t\t\t\tomt_insert(table1,&sl);\n\t\t\t\t\t++ imprint_free_offset;\n\t\t\t\t\timprint_free_offset = imprint_free_offset<IMPRINT_POOL_NUM?imprint_free_offset:(imprint_free_offset-IMPRINT_POOL_NUM);\n\t\t\t\t}\n\t\t\t}\n\t\t\t\n\t\t}\n\t}\n\t\n\t// Á÷¿Ø¡¢°²È«ÐÔµÈ¼ÓÔÚÕâÀï \n#define LK_LIMIT_TIMES 200\n#define LK_LIMIT_TRAFFIC\t1024*100\n\tif(src_link->lk_times_+1<=LK_LIMIT_TIMES && (s64)(src_link->lk_traffic_)+body_len+CLIENT_HEADER_LEN<=LK_LIMIT_TRAFFIC){\n\t\t++ src_link->lk_times_;\n\t\tsrc_link->lk_traffic_ += body_len+CLIENT_HEADER_LEN;\n\t\t\n\t\tsrc_link->last_active_time_ = g_time->currentTime();\n\t\t\n\t\tif(0 == src_link->first_packet_time_){\t// init it\n\t\t\tsrc_link->first_packet_time_ = (u32)g_time->getANSITime();\n\t\t}\n\t\tsrc_link->total_traffic_ += body_len+CLIENT_HEADER_LEN+20;\n\t}\n\telse{\n\t\t// ¶îÍâÈÕÖ¾\n\t\tstatic char *buf = NULL;\n\t\tif(NULL == buf){\n\t\t\tbuf = (char*)malloc(256);\n\t\t}\n\t\tmemset(buf,0,256);\n\t\tif(src_link->lk_times_+1 > LK_LIMIT_TIMES){\n\t\t\tsprintf(buf,\"too many packets in short time. actor_id[%d]\",src_link->app_actor_id_);\n\t\t}\n\t\telse{\n\t\t\tsprintf(buf,\"traffic flowup. actor_id[%d]\",src_link->app_actor_id_);\n\t\t}\n\t\tg_log->write(1,buf,strlen(buf));\n\t\tg_log->flush();\n\t\t\n\t\t// ÈÏÎª²»ºÏ·¨£¬Ìßµô´ËÍæ¼Ò \n\t\tserver_kick_client(src_link,2);\n\t\treturn -1;\n\t}\n\t\n\tif(g_duanlianjie>=1 &&  DUAN_LIANJIE_OPEN_ID == message_id){\n\t\tkfifo *ff = &src_link->write_fifo_;\n\t\tClientHeader bb;\n\t\tbb.message_id_ = DUAN_LIANJIE_OPEN_ID+1;\n\t\t\n\t\tu16 len = LINK_ID_LEN;\n\t\tbb.len_ = CLIENT_HEADER_LEN+len+2;\n\t\t\n\t\t__kfifo_put(ff,(unsigned char*)&bb,CLIENT_HEADER_LEN);\n\t\t__kfifo_put(ff,(unsigned char*)&len,2);\n\t\t__kfifo_put(ff,(unsigned char*)src_link->link_id_,len);\n\t\t\n\t\treturn 0;\t// gateÀ¹½Ø´ËÏûÏ¢ \n\t}\n\t\n\t\n\tif(message_id>0 && message_id < 50000){\t// Õâ¸öÖ®Ç°µÄÈÏÎªÓ¦¸Ã×ª·¢µ½Service \n\t\t// ÏÖÔÚ»¹Ã»ÓÐÕæÕýµÄ¶¨Î»ÄÜÁ¦ \n\t\tif(src_link->session_link_index_ < 0){\n\t\t\t// »¹Ã»ÓÐÈ·¶¨session¸øÄÄÒ»¸öservice£¬¸øËü·ÖÅäÒ»¸ö ¡£ÕâÀïÏÈÓÃÒ»ÖÖºÜ¼òµ¥µÄrandom·ÖÅä \n\t\t\tconst int piece_num = 2;\n\t\t\tint whom = ARAND32 % piece_num;\n\t\t\t\n\t\t\tint counter = 0;\n\t\t\tint result = -1;\n\t\t\tint first_met = -1;\n\t\t\tFOR(i,g_gx1->link_pool_size_){\n\t\t\t\tLink *aa = g_gx1->link_pool_ + i;\n\t\t\t\tif(1==aa->pool_stat_ && aa->isService()){\n\t\t\t\t\tif(first_met < 0){\n\t\t\t\t\t\tfirst_met = i;\n\t\t\t\t\t}\n\t\t\t\t\t\n\t\t\t\t\tif(counter == whom){\n\t\t\t\t\t\tresult = i;\n\t\t\t\t\t\tbreak;\n\t\t\t\t\t}\n\t\t\t\t\telse{\n\t\t\t\t\t\t++counter;\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t\t\n\t\t\tif(result>=0){\n\t\t\t\tsrc_link->session_link_index_ = result;\n\t\t\t}\n\t\t\telse{\n\t\t\t\tsrc_link->session_link_index_ = first_met;\n\t\t\t}\n\t\t}\n\t\t\n\t\tLink *ll = g_gx1->getLink(src_link->session_link_index_);\n\t\tif(ll){\n\t\t\tstatic char* buffer = NULL;\n\t\t\tif(NULL == buffer){\n\t\t\t\tbuffer = (char*)malloc(g_gx1->read_buf_len_ * 2);\n\t\t\t}\n\t\t\tstatic char* buffer3 = NULL;\n\t\t\tif(NULL == buffer3){\n\t\t\t\tbuffer3 = (char*)malloc(128);\n\t\t\t\tmemset(buffer3,0,128);\n\t\t\t}\n\t\t\t\n\t\t\t\n\t\t\t\n\t\t\t\t\tkfifo *ff = &ll->write_fifo_;\n\t\t\t\t\tInternalHeader *tt = (InternalHeader*)buffer;\n\t\t\t\t\tmemcpy(tt,hh,CLIENT_HEADER_LEN);\n\t\t\t\t\ttt->flag_ = 0;\n\t\t\t\t\ttt->jumpnum_ = 0;\n\t\t\t\t\t\n\t\t\t\t\tBoxProtocolTier *bt = (BoxProtocolTier*)(buffer+INTERNAL_HEADER_LEN);\n\t\t\t\t\tbt->reset();\n\t\t\t\t\tbt->box_id_ = src_link->app_box_id_;\n\t\t\t\t\tbt->actor_id_ = src_link->app_actor_id_;\n\t\t\t\t\tbt->gate_pool_index_ = src_link->pool_index_;\n\t\t\t\t\tbt->padding_ = 0;\n\t\t\t\t\tbt->usersn_ = src_link->usersn_;\n\t\t\t\t\t\n\t\t\t\t\ttt->len_ += sizeof(BoxProtocolTier);\n\t\t\t\t\t\n\t\t\t\t\t\n\t\t\t\t\tmemcpy(buffer+INTERNAL_HEADER_LEN+sizeof(BoxProtocolTier),body,body_len);\n\t\t\t\t\t\n#define IS_LOGIN_MESSAGE(id) (1==id || 9==id)\n\t\t\t\t\tif(! IS_LOGIN_MESSAGE(message_id)){\n\t\t\t\t\t\t__kfifo_put(ff,(unsigned char*)buffer,INTERNAL_HEADER_LEN+sizeof(BoxProtocolTier)+body_len);\n\t\t\t\t\t}\n\t\t\t\t\telse{\n\t\t\t\t\t\tnc_get_ip(src_link->sock_,buffer3,127);\n\t\t\t\t\t\tint len = strlen(buffer3);\n\t\t\t\t\t\t// append Ò»¸ö×Ö·û´®ÔÚ×îºó \n\t\t\t\t\t\tu16 *uu = (u16*)(buffer+INTERNAL_HEADER_LEN+sizeof(BoxProtocolTier)+body_len);\n\t\t\t\t\t\t*uu = len;\n\t\t\t\t\t\tmemcpy(buffer+INTERNAL_HEADER_LEN+sizeof(BoxProtocolTier)+body_len+sizeof(u16),buffer3,len);\n\t\t\t\t\t\ttt->len_ += sizeof(u16)+len;\n\t\t\t\t\t\t\n\t\t\t\t\t\t__kfifo_put(ff,(unsigned char*)buffer,INTERNAL_HEADER_LEN+sizeof(BoxProtocolTier)+body_len+sizeof(u16)+len);\n\t\t\t\t\t}\n\t\t}\n\t}\n\telse{\n\t\tprintf(\"message_id out of range:%d\\n\",message_id);\n\t}\n\t\n\treturn 0;\n}\n\nvoid on_client_cut_2(GXContext*,Link *ll,int reason,int gxcontext_type)\n{\n\tprintf(\"on_client_cut  link_index [%d]  reason [%d]  gxcontext_type[%d]\\n\",ll->pool_index_,reason,gxcontext_type);\n\t\n\tif(0 != ll->first_packet_time_){\n\t\tstatic char *buf2 = NULL;\n\t\tstatic int counter = 0;\n\t\t\n\t\t++counter;\n\t\tif(0 == buf2){\n\t\t\tbuf2 = (char*)malloc(2048);\n\t\t}\n\t\t\n\t\tint inteval = g_time->getANSITime() - ll->first_packet_time_;\n\t\tif(0 == inteval){\n\t\t\tinteval = 1;\n\t\t}\n\t\tsprintf(buf2,\"traffic-report  tps[%d] total[%u] timeremain[%d] link_index[%d] reason[%d]\",\n\t\tll->total_traffic_/inteval,ll->total_traffic_,inteval,ll->pool_index_,reason);\n\t\t\n\t\tg_log->write(1,buf2,strlen(buf2));\n\t\tif(counter >= 100){\n\t\t\tg_log->flush();\n\t\t\tcounter = 0;\n\t\t}\n\t}\n\t\n\t{\n\t\tbool send_nodify = true;\n\t\tif(g_duanlianjie >= 1 && table1){\n\t\t\tchar buf[32];\n\t\t\tstrcpy(buf,ll->link_id_);\n\t\t\tDuanLianJie_Imprint *p = help_omt_get_imprint(table1,buf);\n\t\t\tif(NULL != p){\n\t\t\t\tp->last_pool_id_ = ll->pool_index_;\n\t\t\t\tp->last_time_ = g_time->getANSITime();\n\t\t\t\tp->session_link_index_ = ll->session_link_index_;\n\t\t\t\tp->app_box_id_ = ll->app_box_id_;\n\t\t\t\tp->app_actor_id_ = ll->app_actor_id_;\n\t\t\t\t\n\t\t\t\tsend_nodify = false;\n\t\t\t}\n\t\t}\n\t\t\n\t\tif(send_nodify){\n\t\t\t// ÊÇ¿Í»§¶Ë¶ÏÏß£¬·¢ÏûÏ¢ \n\t\t\tLink *ta_service = g_gx1->getLink(ll->session_link_index_);\n\t\t\tif(ta_service){\n\t\t\t\tInternalHeader tt;\n\t\t\t\ttt.message_id_ = 1001;\n\t\t\t\ttt.len_ = CLIENT_HEADER_LEN+sizeof(BoxProtocolTier);\n\t\t\t\ttt.flag_ = 0;\n\t\t\t\ttt.jumpnum_ = 0;\n\t\t\t\t\n\t\t\t\tBoxProtocolTier bt;\n\t\t\t\tbt.reset();\n\t\t\t\tbt.box_id_ = ll->app_box_id_;\n\t\t\t\tbt.actor_id_ = ll->app_actor_id_;\n\t\t\t\tbt.gate_pool_index_ = ll->pool_index_;\n\t\t\t\tbt.padding_ = 0;\n\t\t\t\tbt.usersn_ = ll->usersn_;\n\t\t\t\t\n\t\t\t\t__kfifo_put(&ta_service->write_fifo_,(unsigned char*)&tt,INTERNAL_HEADER_LEN);\n\t\t\t\t__kfifo_put(&ta_service->write_fifo_,(unsigned char*)&bt,sizeof(BoxProtocolTier));\n\t\t\t}\n\t\t}\n\t}\n}\n\n\nint message_dispatch(GXContext *gx,Link* src_link,InternalHeader *hh,int body_len,char *body)\n{\n\tgx_set_context(gx);\n\t\n\tint msg_id = hh->message_id_;\n\tif(msg_id>=8000 && msg_id<=8100){\n\t\tint r = g_luavm->callGlobalFunc<int>(\"OnInternalMessage\");\n\t}\n\telse{\n\t\tif(0 == (hh->flag_ & HEADER_FLAG_BROADCAST)){\n\t\t\tBoxProtocolTier *bt = (BoxProtocolTier*)body;\n\t\t\tLink *ll = g_gx2->getLink(bt->gate_pool_index_);\n\t\t\tif(ll){\n\t\t\t\t\t\thh->len_ -= sizeof(BoxProtocolTier);\n\t\t\t\t\t\tll->app_box_id_ = bt->box_id_;\n\t\t\t\t\t\tll->app_actor_id_ = bt->actor_id_;\n\t\t\t\t\t\tif(bt->usersn_ != (u64)-1) ll->usersn_ = bt->usersn_;\n\t\t\t\t\t\tkfifo *ff = &ll->write_fifo_;\n\t\t\t\t\t\t__kfifo_put(ff,(unsigned char*)hh,CLIENT_HEADER_LEN);\n\t\t\t\t\t\t__kfifo_put(ff,(unsigned char*)(bt+1),body_len-sizeof(BoxProtocolTier));\n\t\t\t\t\t\t\n\t\t\t\t\t\tll->total_traffic_ += body_len+CLIENT_HEADER_LEN+20;\n\t\t\t}\n\t\t}\n\t\telse{\n\t\t\t// BROADCAST\n\t\t\tBoxProtocolTier *bt = (BoxProtocolTier*)body;\n\t\t\thh->len_ -= sizeof(BoxProtocolTier);\n\t\t\tFOR(i,g_gx2->link_pool_size_){\n\t\t\t\tLink *ll = g_gx2->getLink(i);\n\t\t\t\tif(ll){\n\t\t\t\t\t\tkfifo *ff = &ll->write_fifo_;\n\t\t\t\t\t\t__kfifo_put(ff,(unsigned char*)hh,CLIENT_HEADER_LEN);\n\t\t\t\t\t\t__kfifo_put(ff,(unsigned char*)(bt+1),body_len-sizeof(BoxProtocolTier));\n\t\t\t\t\t\t\n\t\t\t\t\t\tll->total_traffic_ += body_len+CLIENT_HEADER_LEN+20;\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\t\n\t}\n\t\n\treturn 0;\n}\n\n// ÎïÀíÁ¬½Ó¶ÏµôÊ±µÄ»Øµ÷ \nvoid on_client_cut(GXContext *gx,Link *ll,int reason,int gxcontext_type)\n{\n\tgx_set_context(gx);\n\t\n\tint r = g_luavm->callGlobalFunc<int>(\"OnCut\",ll->pool_index_,reason);\n\t\n\tif(0 != ll->link_id_[0]){\n\t\tgx->unbind(ll->link_id_);\n\t}\n}\n\n// ·þÎñ¶ËÖ÷¶¯ÌßµôÒ»¸öÈË \nint server_kick_client(Link *ll,int reason)\n{\n\t// ¸øservice·¢ÏûÏ¢Í¨ÖªÏÂÏß\n\ton_client_cut_2(g_gx2,ll,reason,1);\n\t\n\t// ÊÍ·ÅËü\n\tg_gx2->forceCutLink(ll);\n\t \n\treturn 0;\n}\n\nint check_client_links(timetype now)\n{\n\tstatic timetype pre_point_1 = 0;\n\tif(0 == pre_point_1){\n\t\tpre_point_1 = now;\n\t\treturn 0;\n\t}\n\t\n\tif(now >= pre_point_1+5000){\n\t\tpre_point_1 = now;\n\t\t\n\t\tFOR(i,g_gx2->link_pool_size_){\n\t\t\tLink *ll = g_gx2->getLink(i);\n\t\t\tif(ll){\n\t\t\t\tll->lk_times_ = 0;\n\t\t\t\tll->lk_traffic_ = 0;\n\t\t\t}\n\t\t\tif(ll && 0!=ll->last_active_time_ && ll->last_active_time_+OFFLINE_TIMEOUT<now){\n\t\t\t\t// ÈÏÎª¶ÏÏß£¬ÌßµôÖ® \n\t\t\t\tserver_kick_client(ll,3);\n\t\t\t}\n\t\t}\n\t\t\n\t\tif(g_duanlianjie >= 1 && table1){\n\t\t\tFOR(i,table1->free_idx){\n\t\t\t\tstruct omt_node &node = table1->nodes[i];\n\t\t\t\tif(0 != node.value->v_){\n\t\t\t\t\tDuanLianJie_Imprint *p = (DuanLianJie_Imprint*)node.value->v_;\n\t\t\t\t\tif(now > p->last_time_+DUANLIANJIE_TIMEOUT){\n\t\t\t\t\t\t// send notify \n\t\t\t\t\t\tLink *ta_service = g_gx2->getLink(p->session_link_index_);\n\t\t\t\t\t\tif(ta_service){\n\t\t\t\t\t\t\tInternalHeader tt;\n\t\t\t\t\t\t\ttt.message_id_ = 1000;\n\t\t\t\t\t\t\ttt.len_ = CLIENT_HEADER_LEN+sizeof(BoxProtocolTier);\n\t\t\t\t\t\t\ttt.flag_ = 0;\n\t\t\t\t\t\t\ttt.jumpnum_ = 0;\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\tBoxProtocolTier bt;\n\t\t\t\t\t\t\tbt.reset();\n\t\t\t\t\t\t\tbt.box_id_ = p->app_box_id_;\n\t\t\t\t\t\t\tbt.actor_id_ = p->app_actor_id_;\n\t\t\t\t\t\t\tbt.gate_pool_index_ = p->last_pool_id_;\n\t\t\t\t\t\t\tbt.padding_ = 0;\n\t\t\t\t\t\t\tbt.usersn_ = 0;\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t__kfifo_put(&ta_service->write_fifo_,(unsigned char*)&tt,INTERNAL_HEADER_LEN);\n\t\t\t\t\t\t\t__kfifo_put(&ta_service->write_fifo_,(unsigned char*)&bt,sizeof(BoxProtocolTier));\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t\t\n\t\t\t\t\t// cleanup  node.value->val\n\t\t\t\t\t// free(node.value->v_);\tneed NO free\n\t\t\t\t\tstruct DuanLianJie_Imprint *im = (struct DuanLianJie_Imprint*)node.value->v_;\n\t\t\t\t\tim->session_link_index_ = -2;\t// mark as free\n\t\t\t\t\tnode.value->v_ = 0;\n\t\t\t\t\t\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\t\n\t}\n\t\n\t\n\treturn 0;\n}\n\n\nvoid frame_time_driven(timetype now)\n{\n\tcheck_client_links(now);\n}\n\n",
-			"file": "gate/message_dispatch.cpp",
-			"file_size": 14176,
-			"file_write_time": 131237383760000000,
-			"settings":
-			{
-				"buffer_size": 13633,
-				"encoding": "Western (Windows 1252)",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "router/lua/mod/luastate.lua",
-			"settings":
-			{
-				"buffer_size": 10709,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/usr/local/nginx/conf/nginx.conf",
-			"settings":
-			{
-				"buffer_size": 1269,
+				"buffer_size": 15194,
 				"line_ending": "Unix"
 			}
 		}
@@ -315,11 +225,30 @@
 	},
 	"expanded_folders":
 	[
-		"/home/jl/my/Lemuria/serv/S4/router",
-		"/home/jl/my/Lemuria/serv/S4/Common"
+		"/home/jl/my/lemuria/serv/S4/router",
+		"/home/jl/my/lemuria/serv/S4/Common"
 	],
 	"file_history":
 	[
+		"/home/jl/my/lemuria/serv/S4/Common/link.cpp",
+		"/home/jl/my/lemuria/serv/S4/Common/link.h",
+		"/home/jl/my/lemuria/serv/S4/Common/hiredis/async.h",
+		"/home/jl/my/lemuria/serv/S4/Common/hiredis/net.h",
+		"/home/jl/my/lemuria/serv/S4/Common/hiredis/hiredis.h",
+		"/home/jl/my/lemuria/serv/S4/Common/hiredis/hiredis.c",
+		"/home/jl/my/lemuria/serv/S4/Common/hiredis/net.c",
+		"/home/jl/my/lemuria/serv/S4/router/lua/zero/OnHttpReq.lua",
+		"/home/jl/my/lemuria/serv/S4/router/lua/zero/OnGXMessage.lua",
+		"/home/jl/my/lemuria/serv/S4/router/lua/zero/box1.lua",
+		"/home/jl/my/lemuria/serv/S4/router/lua/zero/redis_dispatch.lua",
+		"/home/jl/my/lemuria/serv/S4/Common/pbc/pbc-lua.c",
+		"/home/jl/my/lemuria/serv/S4/Common/GXContext.h",
+		"/home/jl/my/lemuria/serv/S4/router/lua/mod/luastate.lua",
+		"/home/jl/my/lemuria/serv/S4/Common/GXContext.cpp",
+		"/home/jl/my/lemuria/serv/S4/gate/message_dispatch.cpp",
+		"/home/jl/my/lemuria/serv/S4/Common/packet_header.h",
+		"/home/jl/my/lemuria/serv/S4/Common/hiredis/async.c",
+		"/usr/local/nginx/conf/nginx.conf",
 		"/home/jl/my/Lemuria/serv/S4/Common/ae/ae.h",
 		"/home/jl/my/Lemuria/serv/S4/Common/ae/ae.c",
 		"/home/jl/my/Lemuria/serv/S4/Common/hiredis/net.h",
@@ -428,26 +357,7 @@
 		"/home/jl/github/mysql-async-example/mysql_async_example.c",
 		"/home/jl/github/mysql-async-example/mysql_example.c",
 		"/home/jl/github/lua-resty-mysql/README.markdown",
-		"/home/jl/github/lua-resty-mysql/Makefile",
-		"/home/jl/github/lua-resty-mysql/t/world.t",
-		"/home/jl/github/lua-resty-mysql/t/big.t",
-		"/home/jl/github/twemproxy/README.md",
-		"/home/jl/github/twemproxy/src/nc_message.c",
-		"/home/jl/github/twemproxy/src/nc_request.c",
-		"/home/jl/github/twemproxy/src/nc_core.h",
-		"/home/jl/golang/src/github.com/buaazp/fasthttprouter/README.md",
-		"/home/jl/golang/src/github.com/deckarep/golang-set/README.md",
-		"/home/jl/KK_Log/INFO/INFO_2016110100.txt",
-		"/home/jl/golang/src/github.com/aodin/date/date.go",
-		"/home/jl/zzz2/LogAnalysis/Src/client/app/analysis/analysis.service.ts",
-		"/home/jl/KK_Log/INFO/INFO_2016103123.txt",
-		"/home/jl/zzz2/LogAnalysis/Src/package.json",
-		"/home/jl/zzz2/LogAnalysis/Runtime/data/db.sql",
-		"/home/jl/zzz2/LogAnalysis/Src/client/app/analysis/analysis.component.ts",
-		"/home/jl/zzz2/LogAnalysis/Src/client/app/analysis/analysis-retain.component.ts",
-		"/home/jl/zzz2/LogAnalysis/Src/client/app/shared/file.service.ts",
-		"/home/jl/zzz2/LogAnalysis/Src/tsconfig.json",
-		"/home/jl/golang/src/zu1go/sd.go"
+		"/home/jl/github/lua-resty-mysql/Makefile"
 	],
 	"find":
 	{
@@ -472,6 +382,11 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"delWrite",
+			"ev.delWrite = ",
+			"delWrite",
+			"DEL_W",
+			"del_write",
 			"redisConnectNonBlock",
 			"redisContextConnectTcp",
 			"timeout",
@@ -532,7 +447,7 @@
 	"groups":
 	[
 		{
-			"selected": 9,
+			"selected": 3,
 			"sheets":
 			[
 				{
@@ -561,170 +476,24 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 15,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "router/lua/zero/OnHttpReq.lua",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 800,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								700,
-								700
-							]
-						],
-						"settings":
-						{
-							"auto_name": "",
-							"syntax": "Packages/Lua/Lua.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 13,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "router/lua/zero/OnGXMessage.lua",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2939,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1059,
-								1059
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Lua/Lua.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 45.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 12,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "router/lua/zero/box1.lua",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1661,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								388,
-								388
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Lua/Lua.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 90.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 11,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "router/lua/zero/redis_dispatch.lua",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4354,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								497,
-								497
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Lua/Lua.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 45.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 16,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "Common/pbc/pbc-lua.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 26653,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1519,
-								1519
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 894.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 10,
-					"type": "text"
-				},
-				{
-					"buffer": 6,
 					"file": "Common/GXCfunction.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5991,
+						"buffer_size": 3776,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								5967,
-								5967
+								0,
+								0
 							]
 						],
 						"settings":
@@ -733,27 +502,27 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 4529.0,
+						"translation.y": 2624.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 5,
 					"type": "text"
 				},
 				{
-					"buffer": 7,
-					"file": "Common/GXContext.h",
+					"buffer": 2,
+					"file": "router/redis_thread.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4519,
+						"buffer_size": 4479,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2491,
-								2491
+								1940,
+								1940
 							]
 						],
 						"settings":
@@ -762,84 +531,27 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1305.0,
+						"translation.y": 1134.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 4,
 					"type": "text"
 				},
 				{
-					"buffer": 8,
-					"file": "Common/link.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4055,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3376,
-								3376
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1800.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "Common/link.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 799,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								543,
-								543
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 10,
+					"buffer": 3,
 					"file": "Common/GXContext.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 38151,
+						"buffer_size": 25032,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								35892,
-								35892
+								22446,
+								22446
 							]
 						],
 						"settings":
@@ -848,44 +560,43 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": -0.0,
-						"translation.y": 22367.0,
+						"translation.y": 14928.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 11,
-					"file": "Common/hiredis/hiredis.c",
+					"buffer": 4,
+					"file": "Common/GXContext.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 37728,
+						"buffer_size": 4017,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								30078,
-								30078
+								3581,
+								3581
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 15607.0,
+						"translation.y": 1200.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
-					"buffer": 12,
+					"buffer": 5,
 					"file": "Common/hiredis/async.c",
 					"semi_transient": false,
 					"settings":
@@ -897,8 +608,8 @@
 						"selection":
 						[
 							[
-								5689,
-								5689
+								2408,
+								2408
 							]
 						],
 						"settings":
@@ -908,126 +619,40 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 2340.0,
+						"translation.y": 429.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 13,
-					"file": "Common/packet_header.h",
+					"buffer": 6,
+					"file": "Common/hiredis/net.c",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 663,
+						"buffer_size": 15194,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								364,
-								364
+								5693,
+								5693
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 14,
-					"file": "gate/message_dispatch.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 13633,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								7203,
-								7203
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": -0.0,
-						"translation.y": 4062.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 9,
-					"type": "text"
-				},
-				{
-					"buffer": 15,
-					"file": "router/lua/mod/luastate.lua",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 10709,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								443,
-								443
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Lua/Lua.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 8,
-					"type": "text"
-				},
-				{
-					"buffer": 16,
-					"file": "/usr/local/nginx/conf/nginx.conf",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1269,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								771,
-								771
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Text/Plain text.tmLanguage",
-							"tab_size": 2,
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 2514.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 14,
+					"stack_index": 2,
 					"type": "text"
 				}
 			]

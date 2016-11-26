@@ -154,7 +154,7 @@ struct Link{
 	#else
 	// EPOLL，注册读事件（永久的，直到显式反注册） 
 	int register_read_event(GXContext *nc);
-	int register_readwrite_event(GXContext *nc);
+	int register_write_event(GXContext *nc);
 	int unregister_event(GXContext *nc);
 	#endif
 	

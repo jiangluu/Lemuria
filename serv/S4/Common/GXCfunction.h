@@ -79,6 +79,8 @@ CF_EXPORT void gx_cur_writestream_protect(int n);	// 保护输入buf的前n个�
 
 CF_EXPORT unsigned int gx_push_link_buffer(int link_index, unsigned int len, const char *buf);
 
+CF_EXPORT int gx_connect_async(const char *ip_and_port);
+
 }
 
 

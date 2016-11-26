@@ -17,6 +17,11 @@ function OnFrame()
 			local box = boxraid.getboxc(i)
 			ls.gc(box.L, ls.C.LUA_GCSTEP ,10)
 		end
+
+		if true then
+			local r = lcf.gx_connect_async("98.138.253.109:80")
+			print("lcf.gx_connect_async", r)
+		end
 		
 	end
 end

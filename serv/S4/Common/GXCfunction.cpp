@@ -235,3 +235,11 @@ unsigned int gx_push_link_buffer(int link_index, unsigned int len, const char *b
 	return 0;
 }
 
+int gx_connect_async(const char *ip_and_port){
+	if(s_gx){
+		return s_gx->connect2_async(ip_and_port);
+	}
+
+	return -1;
+}
+
