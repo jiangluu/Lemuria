@@ -1,14 +1,14 @@
 
 function getMaxConn()
-	return 8
+	return 2048
 end
 
 function getReadBufLen()
-	return 1024*1024*8
+	return 1024*8
 end
 
 function getWriteBufLen()
-	return 1024*1024*8
+	return 1024*16
 end
 
 
@@ -22,5 +22,5 @@ function o.get_box_num()
 end
 
 function o.get_actor_per_box()
-	return 200
+	return 2000
 end

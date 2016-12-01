@@ -1011,6 +1011,7 @@ void GXContext::frame_poll(timetype now,int block_time)
 					int err = 1;
 					int real_read = 0;
 					int luar = 0;
+					int passed = -1;
 					bool need_kick = false;
 
 					if(unlikely(0!=(EPOLLOUT & ev->events))){
@@ -1059,7 +1060,7 @@ void GXContext::frame_poll(timetype now,int block_time)
 								lua_pushnumber(L, ioable->pool_index_);\
 								lua_pcall(L, 2,2,0);\
 								luar = lua_tointeger(L, -2);\
-								int passed = lua_tointeger(L, -1);\
+								passed = lua_tointeger(L, -1);\
 								lua_pop(L, 2);\
 								printf(#a" OVER %d  %d\n",luar, passed);
 
@@ -1069,19 +1070,6 @@ void GXContext::frame_poll(timetype now,int block_time)
 							}
 							else if(_is_http_request(ioable->read_buf_)){
 								_LLLUA("HttpReqParse")
-								/*
-								lua_State *L = this->lua_vm2_->L();
-								lua_getglobal(L, "HttpReqParse");
-								lua_pushlstring(L, ioable->read_buf_,ioable->read_buf_offset_);
-								lua_pushnumber(L, ioable->pool_index_);
-								lua_pcall(L, 2,2,0);
-
-								luar = lua_tointeger(L, -2);
-								int passed = lua_tointeger(L, -1);
-								lua_pop(L, 2);
-
-								printf("AAAAAA %d  %d\n",luar, passed);
-								*/
 							}
 							else if(_is_http_response(ioable->read_buf_)){
 								_LLLUA("HttpResponseParse")
@@ -1089,6 +1077,20 @@ void GXContext::frame_poll(timetype now,int block_time)
 							else{
 								// NO other protocol valid
 								need_kick = true;
+							}
+
+							if(!need_kick){
+								if(likely(passed == ioable->read_buf_offset_)){
+									ioable->read_buf_offset_ = 0;
+								}
+								else if(-1!=passed && ioable->read_buf_offset_ > passed){
+									memmove(ioable->read_buf_,ioable->read_buf_+passed,ioable->read_buf_offset_-passed);
+									ioable->read_buf_offset_ -= passed;
+								}
+								else{
+									// unlegal
+									ioable->read_buf_offset_ = 0;
+								}
 							}
 						}
 						if(-4 == luar){
@@ -1100,7 +1102,7 @@ void GXContext::frame_poll(timetype now,int block_time)
 
 					if(need_kick || 1==err){
 					// 做断开处理 
-						printf("做断开处理   [%d]\n",ioable->pool_index_);
+						//printf("做断开处理   [%d]\n",ioable->pool_index_);
 						
 						if(link_cut_callback_){
 							link_cut_callback_(this,ioable,1,type_);

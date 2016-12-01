@@ -4,6 +4,22 @@
 		"selected_items":
 		[
 			[
+				"_is_http_re",
+				"_is_http_response"
+			],
+			[
+				"po",
+				"pool_index_"
+			],
+			[
+				"call",
+				"callGlobalFunc"
+			],
+			[
+				"lua",
+				"lua_vm2_"
+			],
+			[
 				"sr",
 				"src_len"
 			],
@@ -137,47 +153,30 @@
 			}
 		},
 		{
-			"file": "router/lua/zero/HttpReqParse.lua",
+			"file": "Common/GXContext.h",
 			"settings":
 			{
-				"buffer_size": 102,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "router/lua/zero/LemuriaParse.lua",
-			"settings":
-			{
-				"buffer_size": 102,
+				"buffer_size": 4121,
 				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "router/lua/zero/HttpResponseParse.lua",
-			"settings":
-			{
-				"buffer_size": 112,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "router/lua/zero/C_Writeable.lua",
-			"settings":
-			{
-				"buffer_size": 92,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
+				"line_ending": "Windows"
 			}
 		},
 		{
 			"file": "Common/GXContext.cpp",
 			"settings":
 			{
-				"buffer_size": 26211,
+				"buffer_size": 26257,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "router/lua/zero/LemuriaParse.lua",
+			"settings":
+			{
+				"buffer_size": 177,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
 			}
 		}
 	],
@@ -218,43 +217,39 @@
 	"expanded_folders":
 	[
 		"/home/jl/my/Lemuria/serv/S4/router",
+		"/home/jl/my/Lemuria/serv/S4/router/lua",
 		"/home/jl/my/Lemuria/serv/S4/Common"
 	],
 	"file_history":
 	[
+		"/home/jl/my/Lemuria/serv/S4/router/lua/predefine/config.lua",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/predefine/config_port.lua",
+		"/home/jl/my/Lemuria/serv/S4/Common/link.cpp",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/zero/HttpReqParse.lua",
+		"/home/jl/my/Lemuria/serv/S4/Common/link.h",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/zero/LemuriaParse.lua",
+		"/home/jl/my/Lemuria/serv/S4/router/LuaInterface.h",
 		"/home/jl/my/Lemuria/serv/S4/router/lua/zero/OnHttpReq.lua",
-		"/home/jl/my/Lemuria/serv/S4/router/lua/zero/OnFrame.lua",
-		"/home/jl/my/Lemuria/serv/S4/router/redis_thread.cpp",
+		"/home/jl/my/Lemuria/serv/S4/router/LuaInterface.cpp",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/zero/box1.lua",
 		"/home/jl/my/Lemuria/serv/S4/Common/GXCfunction.h",
 		"/home/jl/my/Lemuria/serv/S4/Common/GXCfunction.cpp",
 		"/home/jl/my/Lemuria/serv/S4/router/lua/predefine/1init_ffi.lua",
-		"/home/jl/my/Lemuria/serv/S4/Common/GXContext.h",
-		"/home/jl/my/Lemuria/serv/S4/Common/hiredis/async.c",
-		"/home/jl/my/Lemuria/serv/S4/Common/link.cpp",
-		"/home/jl/my/Lemuria/serv/S4/Common/link.h",
-		"/home/jl/my/Lemuria/serv/S4/Common/hiredis/net.c",
-		"/home/jl/my/lemuria/serv/S4/Common/link.cpp",
-		"/home/jl/my/lemuria/serv/S4/Common/link.h",
-		"/home/jl/my/lemuria/serv/S4/Common/hiredis/async.h",
-		"/home/jl/my/lemuria/serv/S4/Common/hiredis/net.h",
-		"/home/jl/my/lemuria/serv/S4/Common/hiredis/hiredis.h",
-		"/home/jl/my/lemuria/serv/S4/Common/hiredis/hiredis.c",
-		"/home/jl/my/lemuria/serv/S4/Common/hiredis/net.c",
-		"/home/jl/my/lemuria/serv/S4/router/lua/zero/OnHttpReq.lua",
-		"/home/jl/my/lemuria/serv/S4/router/lua/zero/OnGXMessage.lua",
-		"/home/jl/my/lemuria/serv/S4/router/lua/zero/box1.lua",
-		"/home/jl/my/lemuria/serv/S4/router/lua/zero/redis_dispatch.lua",
-		"/home/jl/my/lemuria/serv/S4/Common/pbc/pbc-lua.c",
-		"/home/jl/my/lemuria/serv/S4/Common/GXContext.h",
-		"/home/jl/my/lemuria/serv/S4/router/lua/mod/luastate.lua",
-		"/home/jl/my/lemuria/serv/S4/Common/GXContext.cpp",
-		"/home/jl/my/lemuria/serv/S4/gate/message_dispatch.cpp",
-		"/home/jl/my/lemuria/serv/S4/Common/packet_header.h",
-		"/home/jl/my/lemuria/serv/S4/Common/hiredis/async.c",
+		"/home/jl/my/Lemuria/serv/S4/router/cfunction.cpp",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/zero/OnGXMessage.lua",
+		"/home/jl/my/Lemuria/serv/S4/router/main.cpp",
 		"/usr/local/nginx/conf/nginx.conf",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/mod/luastate.lua",
+		"/home/jl/my/Lemuria/serv/S4/gate/message_dispatch.cpp",
+		"/home/jl/my/Lemuria/serv/S4/Common/packet_header.h",
+		"/home/jl/my/Lemuria/serv/S4/Common/hiredis/async.c",
+		"/home/jl/my/Lemuria/serv/S4/Common/hiredis/hiredis.c",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/zero/redis_dispatch.lua",
+		"/home/jl/my/Lemuria/serv/S4/Common/pbc/pbc-lua.c",
 		"/home/jl/my/Lemuria/serv/S4/Common/ae/ae.h",
 		"/home/jl/my/Lemuria/serv/S4/Common/ae/ae.c",
 		"/home/jl/my/Lemuria/serv/S4/Common/hiredis/net.h",
+		"/home/jl/my/Lemuria/serv/S4/Common/hiredis/net.c",
 		"/home/jl/my/Lemuria/serv/S4/Common/hiredis/hiredis.h",
 		"/home/jl/my/Lemuria/serv/S4/Common/ae/ae_epoll.c",
 		"/home/jl/github/luasys/src/event/epoll.h",
@@ -266,7 +261,6 @@
 		"/home/jl/github/luasys/test/event/test_evq.lua",
 		"/home/jl/github/luasys/test/event/bench.lua",
 		"/home/jl/my/Lemuria/serv/S4/router/lua/mod/luajit_h.lua",
-		"/home/jl/my/Lemuria/serv/S4/router/lua/predefine/config.lua",
 		"/home/jl/github/nginx/objs/nginx.conf",
 		"/home/jl/github/server-configs-nginx/nginx.conf",
 		"/home/jl/github/server-configs-nginx/sites-available/example.com",
@@ -287,8 +281,6 @@
 		"/home/jl/github/lua-protobuf/test/test.lua",
 		"/home/jl/github/lua-protobuf/test/test_codec.c",
 		"/home/jl/github/pbc/src/proto.h",
-		"/home/jl/my/Lemuria/serv/S4/Common/pbc/pbc-lua.c",
-		"/home/jl/my/Lemuria/serv/S4/router/lua/zero/box1.lua",
 		"/home/jl/github/pbc/binding/lua/Makefile",
 		"/home/jl/github/pbc/binding/lua/README.md",
 		"/home/jl/github/pbc/README.md",
@@ -296,11 +288,9 @@
 		"/home/jl/github/pbc/Makefile",
 		"/home/jl/my/Lemuria/serv/S4/Common/picohttpparser/test.c",
 		"/home/jl/my/Lemuria/serv/S4/Common/picohttpparser/picohttpparser.h",
-		"/home/jl/my/Lemuria/serv/S4/router/lua/zero/OnGXMessage.lua",
-		"/home/jl/my/Lemuria/serv/S4/router/LuaInterface.h",
+		"/home/jl/my/Lemuria/serv/S4/Common/GXContext.h",
 		"/home/jl/my/Lemuria/serv/S4/router/message_dispatch.cpp",
 		"/home/jl/my/Lemuria/serv/S4/router/cfunction.h",
-		"/home/jl/my/Lemuria/serv/S4/router/cfunction.cpp",
 		"/home/jl/github/picohttpparser/test.c",
 		"/home/jl/my/hgrc_server/Destiny_Server/trunk/Destiny.Server/GameServer.cs",
 		"/home/jl/my/hgrc_server/Destiny_Server/trunk/Destiny.Server/RouteTable.cs",
@@ -313,10 +303,10 @@
 		"/home/jl/my/hgrc_server/Patrix_Lib/ZinEngine.Framework.Server/Modules/Task/TaskHelper.cs",
 		"/home/jl/my/hgrc_server/Destiny_Server/trunk/Destiny.Server/Program.cs",
 		"/home/jl/my/Lemuria/serv/S4/router/lua/zero/boxraid.lua",
-		"/home/jl/my/Lemuria/serv/S4/router/LuaInterface.cpp",
 		"/home/jl/my/Lemuria/serv/S4/router/lua/box/ma.lua",
 		"/home/jl/my/Lemuria/serv/S4/router/lua/init.lua",
 		"/home/jl/my/Lemuria/serv/S4/router/lua/predefine/redis_common.lua",
+		"/home/jl/my/Lemuria/serv/S4/router/lua/zero/OnFrame.lua",
 		"/home/jl/my/Lemuria/serv/S4/Common/types.h",
 		"/home/jl/my/Lemuria/serv/S4/router/lua/predefine/init.lua",
 		"/home/jl/my/Lemuria/serv/S3/service/cfunction.h",
@@ -324,15 +314,11 @@
 		"/home/jl/.bashrc",
 		"/home/jl/my/Lemuria/serv/S4/router/lua/predefine/111.lua",
 		"/home/jl/my/Lemuria/serv/S4/router/lua/predefine/log.lua",
-		"/home/jl/my/Lemuria/serv/S4/router/main.cpp",
 		"/home/jl/my/Lemuria/serv/S4/Common/GameTime.h",
 		"/home/jl/my/Lemuria/serv/S4/router/lua/zero/init.lua",
 		"/home/jl/my/Lemuria/serv/S4/router/lua/zero/PostInit.lua",
 		"/home/jl/my/Lemuria/serv/S4/router/lua/box/init.lua",
-		"/home/jl/my/Lemuria/serv/S4/router/lua/zero/redis_dispatch.lua",
-		"/home/jl/my/Lemuria/serv/S4/router/lua/predefine/config_port.lua",
 		"/home/jl/my/Lemuria/serv/S4/router/lua/box/msghandle_1.lua",
-		"/home/jl/my/Lemuria/serv/S4/Common/packet_header.h",
 		"/home/jl/github/picohttpparser/picohttpparser.h",
 		"/home/jl/my/gbkconv/gbkconv.go",
 		"/home/jl/my/gbkconv/aa.go",
@@ -345,21 +331,36 @@
 		"/home/jl/my/zzz1/kklog.go",
 		"/home/jl/my/Lemuria/serv/include/tolua++/luajit.h",
 		"/home/jl/my/Lemuria/serv/S4/gate/Makefile",
+		"/home/jl/my/Lemuria/serv/S4/router/redis_thread.cpp",
 		"/home/jl/zzz1/kklog.go",
 		"/etc/hosts",
 		"/home/jl/github/lua-resty-mysql/lib/resty/mysql.lua",
 		"/home/jl/github/mysql-async-example/mysql_async_example.c",
-		"/home/jl/github/mysql-async-example/mysql_example.c"
+		"/home/jl/github/mysql-async-example/mysql_example.c",
+		"/home/jl/github/lua-resty-mysql/README.markdown",
+		"/home/jl/github/lua-resty-mysql/Makefile",
+		"/home/jl/github/lua-resty-mysql/t/world.t",
+		"/home/jl/github/lua-resty-mysql/t/big.t",
+		"/home/jl/github/twemproxy/README.md",
+		"/home/jl/github/twemproxy/src/nc_message.c",
+		"/home/jl/github/twemproxy/src/nc_request.c",
+		"/home/jl/github/twemproxy/src/nc_core.h",
+		"/home/jl/golang/src/github.com/buaazp/fasthttprouter/README.md",
+		"/home/jl/golang/src/github.com/deckarep/golang-set/README.md",
+		"/home/jl/KK_Log/INFO/INFO_2016110100.txt",
+		"/home/jl/golang/src/github.com/aodin/date/date.go",
+		"/home/jl/zzz2/LogAnalysis/Src/client/app/analysis/analysis.service.ts"
 	],
 	"find":
 	{
-		"height": 23.0
+		"height": 34.0
 	},
 	"find_in_files":
 	{
 		"height": 90.0,
 		"where_history":
 		[
+			"/home/jl/my/Lemuria/serv/S4/Common",
 			"/home/jl/my/Lemuria/serv/S4/Common/hiredis",
 			"",
 			"/home/jl/github/pbc/src",
@@ -374,12 +375,8 @@
 		"case_sensitive": false,
 		"find_history":
 		[
-			"connect",
-			"delWrite",
-			"ev.delWrite = ",
-			"delWrite",
-			"DEL_W",
-			"del_write",
+			"lua_pop",
+			"link_stat_",
 			"redisConnectNonBlock",
 			"redisContextConnectTcp",
 			"timeout",
@@ -469,60 +466,62 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "router/lua/zero/HttpReqParse.lua",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 102,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								84,
-								84
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Lua/Lua.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
 					"stack_index": 3,
 					"type": "text"
 				},
 				{
-					"buffer": 2,
-					"file": "router/lua/zero/LemuriaParse.lua",
+					"buffer": 1,
+					"file": "Common/GXContext.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 102,
+						"buffer_size": 4121,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								102,
-								102
+								0,
+								0
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Lua/Lua.sublime-syntax"
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 1170.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "Common/GXContext.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 26257,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								25208,
+								25208
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 15870.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
@@ -530,19 +529,19 @@
 				},
 				{
 					"buffer": 3,
-					"file": "router/lua/zero/HttpResponseParse.lua",
+					"file": "router/lua/zero/LemuriaParse.lua",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 112,
+						"buffer_size": 177,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								112,
-								112
+								156,
+								156
 							]
 						],
 						"settings":
@@ -554,63 +553,6 @@
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "router/lua/zero/C_Writeable.lua",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 92,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								92,
-								92
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Lua/Lua.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "Common/GXContext.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 26211,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								24943,
-								24943
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 15628.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
 					"type": "text"
 				}
 			]
@@ -709,7 +651,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 151.0,
+	"side_bar_width": 234.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{
