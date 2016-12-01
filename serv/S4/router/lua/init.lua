@@ -21,7 +21,7 @@ end
 g_lua_dir = "lua/"
 g_data_dir = "data/"
 
-package.path = './lua/mod/?.lua;' .. package.path
+package.path = './lua/mod/?.lua;./lua/mod/lpegLJ/?.lua;' .. package.path
 --print('package.path',package.path)
 
 jlpcall(dofile,g_lua_dir.."predefine/init.lua")
