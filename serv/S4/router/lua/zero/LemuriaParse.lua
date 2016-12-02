@@ -1,13 +1,11 @@
 
-local pg = require"lpeglj"
-
 function LemuriaParse(buf, pindex)
-	print("LemuriaParse")
-	print(buf, #buf, pindex)
+	local cmd,bodylen,addr,custom_cookie = string.match(buf, 'LEM ([%w_]+) (%d+) ([%w%.:]+) ?(.-)\r\n')
+	if nil==cmd or nil==bodylen or nil==addr then
+		return -4,0
+	end
 
-	
-	local aa = pg.P('LEM')
-	print(aa:match(buf))
+	print(cmd,bodylen,addr,custom_cookie, "@@")
 
 	local ack = buf.." ACK"
 	ffi.C.gx_push_link_buffer(pindex, #ack, ack)
