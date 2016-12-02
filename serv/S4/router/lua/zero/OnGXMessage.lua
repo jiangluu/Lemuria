@@ -4,21 +4,15 @@ local ls = require('luastate')
 
 local yield_value = ls.C.LUA_YIELD
 
-local function remote_transaction_start(dest_boxc,func_name,mid,app_context,con_index)
+local function remote_transaction_start(dest_boxc,func_name,con_index,msg_id,body,addr)
 		ls.pushnil(dest_boxc.L)
 		ls.setglobal(dest_boxc.L, '__g_cur_context')
-		ls.pushnil(dest_boxc.L)
-		ls.setglobal(dest_boxc.L, '__g_repush')
 		
 		local co = ls.newthread(dest_boxc.L)		-- @TODO: coroutine pool
 		ls.getglobal(co,func_name)
 		local arg_num = 1
-		if nil~=app_context then
-			ls.pushnumber(co,con_index)
-			arg_num = 2
-		end
-		ls.pushnumber(co,mid)
 		
+		ls.pushstring(co,msg_id)
 		
 		local r = ls.C.lua_resume(co,arg_num)
 		if yield_value==r then		-- yield
@@ -29,21 +23,9 @@ local function remote_transaction_start(dest_boxc,func_name,mid,app_context,con_
 			end
 			
 			td.co = co
-			if mid>=8000 and mid<8100 then
-				td.optype = 0
-			else
-				td.optype = 1
-			end
 			
 			-- save co to box_co, prevent GC
 			ls.rawseti(dest_boxc.L, dest_boxc.stack_at_box_co, td.trans_id)
-			
-			-- save context
-			local src = lcf.gx_get_input_context()
-			ffi.copy(td.input_context, src, box.input_context_size)
-			if nil~=app_context then
-				ffi.copy(td.app_context, app_context, box.app_context_size)
-			end
 			
 			ls.pushlightuserdata(co,td)
 			return ls.C.lua_resume(co,1)
@@ -58,6 +40,7 @@ local function remote_transaction_start(dest_boxc,func_name,mid,app_context,con_
 		end
 end
 
+--[[
 function OnGXMessage()
 	local msg_id = lcf.gx_get_message_id()
 	
@@ -91,8 +74,10 @@ function OnGXMessage()
 	
 	return 0
 end
+--]]
 
 -- 内部伪造一个消息
+--[[
 function sendFakeMessage(mid,box_id)
 	local boxc = boxraid.getboxc(box_id)
 	if nil~=boxc then
@@ -114,5 +99,6 @@ function sendFakeMessage(mid,box_id)
 	
 	return 0
 end
+--]]
 
 gRemoteCall = remote_transaction_start

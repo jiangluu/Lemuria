@@ -1083,6 +1083,9 @@ void GXContext::frame_poll(timetype now,int block_time)
 								if(likely(passed == ioable->read_buf_offset_)){
 									ioable->read_buf_offset_ = 0;
 								}
+								else if(0==passed){
+									// nothing
+								}
 								else if(-1!=passed && ioable->read_buf_offset_ > passed){
 									memmove(ioable->read_buf_,ioable->read_buf_+passed,ioable->read_buf_offset_-passed);
 									ioable->read_buf_offset_ -= passed;
