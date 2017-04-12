@@ -1,6 +1,7 @@
 
 function LemuriaParse(buf, pindex)
-	buf = "LEM cmdhere 3 127.00.1:5566 CUSTOM\r\nBOD"
+	--buf = "LEM cmdhere 3 127.00.1:5566 CUSTOM\r\nBOD"
+	-- LEM hello 3 127.00.1:5566 CUSTOM
 	local cmd,bodylen,addr,custom_cookie = string.match(buf, 'LEM ([%w_]+) (%d+) ([%w%.:]+) ?(.-)\r\n')
 	if nil==cmd or nil==bodylen or nil==addr then
 		return -4,0

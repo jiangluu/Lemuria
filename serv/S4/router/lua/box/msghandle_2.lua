@@ -3,7 +3,8 @@ local lcf = ffi.C
 
 local hd1 = {}
 
-function on_message_2(con_index, mid)
+function on_message_2(con_index, mid, bod)
+	print('on_message_2',con_index,mid,bod)
 		local hd = hd1[mid]
 		if hd then
 			local actor = ma.get(con_index)
@@ -20,7 +21,7 @@ function on_message_2(con_index, mid)
 				return -1
 			end
 		else
-			print(string.format('msg %d has NO handle',mid))
+			print(string.format('msg %s has NO handle',mid))
 			return -1
 		end
 end
@@ -30,12 +31,12 @@ function regAllHandlers2()
 	-- 注册消息handler
 	local the_dir = g_lua_dir..'msg_custom/'
 	for file in lfs.dir(the_dir) do
-		local msg_id = string.match(file,'msg_(%d+)%.lua')
+		local msg_id = string.match(file,'msg_(%w+)%.lua')
 		if msg_id then
 			onMsg = nil
 			jlpcall(dofile,the_dir..file)
 			if nil~=onMsg then
-				hd1[tonumber(msg_id)] = onMsg
+				hd1[tostring(msg_id)] = onMsg
 			end
 			onMsg = nil
 		end

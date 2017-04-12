@@ -10,9 +10,11 @@ local function remote_transaction_start(dest_boxc,func_name,con_index,msg_id,bod
 		
 		local co = ls.newthread(dest_boxc.L)		-- @TODO: coroutine pool
 		ls.getglobal(co,func_name)
-		local arg_num = 1
+		local arg_num = 3
 		
+		ls.pushnumber(co,con_index)
 		ls.pushstring(co,msg_id)
+		ls.pushstring(co,body)
 		
 		local r = ls.C.lua_resume(co,arg_num)
 		if yield_value==r then		-- yield
