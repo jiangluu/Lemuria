@@ -25,6 +25,7 @@ local function remote_transaction_start(dest_boxc,func_name,con_index,msg_id,bod
 			end
 			
 			td.co = co
+			td.con_index_ = con_index
 			
 			-- save co to box_co, prevent GC
 			ls.rawseti(dest_boxc.L, dest_boxc.stack_at_box_co, td.trans_id)

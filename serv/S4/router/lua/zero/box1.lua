@@ -18,8 +18,7 @@ typedef __attribute__((aligned(4))) struct TransData{
 	uint8_t optype;		// 0-GX msg  1-GX msg with app_context  9-redis push msg
 	uint32_t trans_id;
 	uint32_t serial_no;
-	char input_context[128];
-	char app_context[16];
+	uint32_t con_index_;
 	lua_State *co;
 } TransData;
 
