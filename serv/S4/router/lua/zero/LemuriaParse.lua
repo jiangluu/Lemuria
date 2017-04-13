@@ -26,8 +26,8 @@ function LemuriaParse(buf, pindex)
 	end
 	gRemoteCall(boxc, 'on_message_2',pindex, cmd, body, addr)
 
-	local ack = buf.." ACK"
-	ffi.C.gx_push_link_buffer(pindex, #ack, ack)
+	--local ack = buf.." ACK"
+	--ffi.C.gx_push_link_buffer(pindex, #ack, ack)
 
 	return 0,#buf
 end

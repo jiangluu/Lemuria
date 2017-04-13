@@ -11,8 +11,13 @@ function on_message_2(con_index, mid, bod)
 			if nil==actor then
 				actor = ma.new(con_index)
 			end
+
+			local f_sendback = function(a)
+				a = 'LEM '..mid.."ACK 3\r\n"..tostring(a)
+				lcf.gx_push_link_buffer(con_index, #a, a)
+			end
 			
-			local ok,ret = pcall(hd,actor)
+			local ok,ret = pcall(hd,actor,bod,f_sendback)
 			if ok then
 				return ret
 			else

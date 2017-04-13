@@ -34,6 +34,7 @@ void* gx_env_get_shared_ptr(int index);
 
 bool gx_env_set_shared_ptr(int index,void *p);
 
+/*
 void gx_cur_stream_cleanup();
 
 bool gx_cur_stream_is_end();
@@ -74,6 +75,8 @@ void gx_cur_writestream_cleanup();
 
 void gx_cur_writestream_protect(int);
 
+*/
+
 unsigned int gx_push_link_buffer(int link_index, unsigned int len, const char *buf);
 
 int gx_connect_async(const char *ip_and_port);
@@ -81,6 +84,7 @@ int gx_connect_async(const char *ip_and_port);
 // GX END
 
 
+/*
 struct Slice cur_stream_get_slice();
 
 bool cur_stream_is_end();
@@ -113,6 +117,7 @@ bool cur_stream_push_string(const char* v,int len);
 
 
 void cur_write_stream_cleanup();
+*/
 
 
 uint32_t cur_game_time();
@@ -127,11 +132,6 @@ void log_force_flush();
 
 int string_hash(const char *str);
 
-int cur_message_loopback();
-
-int cur_stream_get_readbuf_len();
-
-const char* cur_stream_get_bin(int len);	// 获取bin块（事先知道len） 
 
 
 ]]
