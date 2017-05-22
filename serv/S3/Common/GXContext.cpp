@@ -87,9 +87,94 @@ int nc_set_block(int sock)
     return 0;
 }
 
+
+// below copied from nginx ngx_inet.c ========================
+size_t
+ngx_sock_ntop(struct sockaddr *sa, socklen_t socklen, u_char *text, size_t len,
+    uint port)
+{
+    u_char               *p;
+    struct sockaddr_in   *sin;
+#if (NGX_HAVE_INET6)
+    size_t                n;
+    struct sockaddr_in6  *sin6;
+#endif
+#if (NGX_HAVE_UNIX_DOMAIN)
+    struct sockaddr_un   *saun;
+#endif
+    int sprintf_r;
+
+    switch (sa->sa_family) {
+
+    case AF_INET:
+
+        sin = (struct sockaddr_in *) sa;
+        p = (u_char *) &sin->sin_addr;
+
+        if (port) {
+            sprintf_r = sprintf(text, "%ud.%ud.%ud.%ud:%d",
+                             p[0], p[1], p[2], p[3], ntohs(sin->sin_port));
+        } else {
+            sprintf_r = sprintf(text, "%ud.%ud.%ud.%ud",
+                             p[0], p[1], p[2], p[3]);
+        }
+
+        //return (p - text);
+        return sprintf_r;
+
+#if (NGX_HAVE_INET6)
+
+    case AF_INET6:
+
+        sin6 = (struct sockaddr_in6 *) sa;
+
+        n = 0;
+
+        if (port) {
+            text[n++] = '[';
+        }
+
+        n = ngx_inet6_ntop(sin6->sin6_addr.s6_addr, &text[n], len);
+
+        if (port) {
+            n = ngx_sprintf(&text[1 + n], "]:%d",
+                            ntohs(sin6->sin6_port)) - text;
+        }
+
+        return n;
+#endif
+
+#if (NGX_HAVE_UNIX_DOMAIN)
+
+    case AF_UNIX:
+        saun = (struct sockaddr_un *) sa;
+
+        /* on Linux sockaddr might not include sun_path at all */
+
+        if (socklen <= (socklen_t) offsetof(struct sockaddr_un, sun_path)) {
+            p = ngx_snprintf(text, len, "unix:%Z");
+
+        } else {
+            p = ngx_snprintf(text, len, "unix:%s%Z", saun->sun_path);
+        }
+
+        /* we do not include trailing zero in address length */
+
+        return (p - text - 1);
+
+#endif
+
+    default:
+        return 0;
+    }
+}
+// ========================
+
+#define IP_TEXT_LEN 60
+
 int nc_get_ip(int sock,char *out_ip,int max_len)
 {
-	if(0==out_ip || max_len<64){
+	if(0==out_ip || max_len<IP_TEXT_LEN){
 		return -1;
 	}
 	
@@ -100,25 +185,15 @@ int nc_get_ip(int sock,char *out_ip,int max_len)
     socklen_t len = sizeof(sa);
 #endif
     getpeername(sock,(struct sockaddr *)&sa,&len);
-    char *aa = inet_ntoa(*(in_addr *)&sa.sin_addr.s_addr);
-    strncpy(out_ip,aa,max_len);
+
+    size_t r = ngx_sock_ntop((struct sockaddr *)&sa, len, (u_char*)out_ip, max_len, 1);
+    if(r<=0){
+    	return 0;
+    }
     
-    return 0;
+    return r;
 }
 
-std::string nc_get_ip(int sock)
-{
-    sockaddr_in sa;
-#ifdef WIN32
-    int len = sizeof(sa);
-#else
-    socklen_t len = sizeof(sa);
-#endif
-    getpeername(sock,(struct sockaddr *)&sa,&len);
-    std::string ip = inet_ntoa(*(in_addr *)&sa.sin_addr.s_addr);
-    
-    return ip;
-}
 
 int nc_read(intptr_t fd,char *buf,int buf_len,int &real_read)
 {
